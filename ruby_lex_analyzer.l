@@ -1,62 +1,66 @@
 %{
 #include <stdio.h>
 #include "y.tab.h"
-
-#define TOKEN(t) (yylval = t)
 %}
 
 %%
 
 [ \t]                    { ; }
-"def"                    { return TOKEN(DEF); }
-"do"                     { return TOKEN(DO); }
-"return"                 { return TOKEN(RETURN); }
-"class"                  { return TOKEN(CLASS); }
-"if"                     { return TOKEN(IF); }
-"else"                   { return TOKEN(ELSE); }
-"elsif"                  { return TOKEN(ELSIF); }
-"end"                    { return TOKEN(END); }
-"while"                  { return TOKEN(WHILE); }
-"attr_reader"            { return TOKEN(ATTR_READER); }
-"attr_writer"            { return TOKEN(ATTR_WRITER); }
-"attr_accessor"          { return TOKEN(ATTR_ACCESSOR); }
-"each"                   { return TOKEN(EACH); }
-"puts"                   { return TOKEN(PUTS); }
-"new"                    { return TOKEN(NEW); }
-"=begin"                 { return TOKEN(OPEN_COMMENT); }
-"=end"                   { return TOKEN(CLOSE_COMMENT); }
-[a-zA-Z_][a-zA-Z0-9_]*   { return TOKEN(IDENTIFIER); }
-:[a-zA-Z_][a-zA-Z0-9_]*  { return TOKEN(SYMBOL); }
-@[a-zA-Z_][a-zA-Z0-9_]*  { return TOKEN(INST_VAR); }
-"="                      { return TOKEN(OP_EQUAL); }
-"!"                      { return TOKEN(NOT); }
-"&&"                     { return TOKEN(OP_CMP_AND); }
-"||"                     { return TOKEN(OP_CMP_OR); }
-"=="                     { return TOKEN(OP_CMP_EQ); }
-"!="                     { return TOKEN(OP_CMP_NEG); }
-"<"                      { return TOKEN(OP_CMP_LE); }
-">"                      { return TOKEN(OP_CMP_GT); }
-"<="                     { return TOKEN(OP_CMP_LE_EQ); }
-">="                     { return TOKEN(OP_CMP_GT_EQ); }
-"+"                      { return TOKEN(OP_PLUS); }
-"-"                      { return TOKEN(OP_MINUS); }
-"*"                      { return TOKEN(OP_MUL); }
-"/"                      { return TOKEN(OP_DIV); }
-"+="                     { return TOKEN(OP_PLUS_EQ); }
-"-="                     { return TOKEN(OP_LE_EQ); }
-"*="                     { return TOKEN(OP_MUL_EQ); }
-"/="                     { return TOKEN(OP_DIV_EQ); }
-"("                      { return TOKEN(L_PAREN); }
-")"                      { return TOKEN(R_PAREN); }
-"{"                      { return TOKEN(L_BRACE); }
-"}"                      { return TOKEN(R_BRACE); }
-"["                      { return TOKEN(L_SQ_BRACK); }
-"]"                      { return TOKEN(R_SQ_BRACK); }
-"#"                      { return TOKEN(HASH); }
-"."                      { return TOKEN(DOT); }
-","                      { return TOKEN(COMMA); }
-";"                      { return TOKEN(SEMI_COLON); }
-"\n"                     { return TOKEN(NL); }
+"nil"                    { return NIL; }
+"self"                   { return SELF; }
+"def"                    { return DEF; }
+"do"                     { return DO; }
+"return"                 { return RETURN; }
+"class"                  { return CLASS; }
+"if"                     { return IF; }
+"else"                   { return ELSE; }
+"elsif"                  { return ELSIF; }
+"end"                    { return END; }
+"while"                  { return WHILE; }
+"attr_reader"            { return ATTR_READER; }
+"attr_writer"            { return ATTR_WRITER; }
+"attr_accessor"          { return ATTR_ACCESSOR; }
+"each"                   { return EACH; }
+"puts"                   { return PUTS; }
+"new"                    { return NEW; }
+^"=begin"$               { ; }
+^"=end"$                 { ; }
+[a-zA-Z_][a-zA-Z0-9_]*   { return IDENTIFIER; }
+:[a-zA-Z_][a-zA-Z0-9_]*  { return SYMBOL; }
+@[a-zA-Z_][a-zA-Z0-9_]*  { return INST_VAR; }
+[0-9]+\.[0-9]*           { return DOUBLE; }
+[0-9]+                   { return INTEGER; }
+"="                      { return OP_EQUAL; }
+"!"                      { return OP_NOT; }
+"&&"                     { return OP_CMP_AND; }
+"||"                     { return OP_CMP_OR; }
+"=="                     { return OP_CMP_EQ; }
+"!="                     { return OP_CMP_NEG; }
+"<"                      { return OP_CMP_LE; }
+">"                      { return OP_CMP_GT; }
+"<="                     { return OP_CMP_LE_EQ; }
+">="                     { return OP_CMP_GT_EQ; }
+"+"                      { return OP_PLUS; }
+"-"                      { return OP_MINUS; }
+"*"                      { return OP_MUL; }
+"/"                      { return OP_DIV; }
+"%"                      { return OP_MODULO; }
+"**"                     { return OP_EXP; }
+"+="                     { return OP_PLUS_EQ; }
+"-="                     { return OP_LE_EQ; }
+"*="                     { return OP_MUL_EQ; }
+"/="                     { return OP_DIV_EQ; }
+"("                      { return L_PAREN; }
+")"                      { return R_PAREN; }
+"{"                      { return L_BRACE; }
+"}"                      { return R_BRACE; }
+"["                      { return L_SQ_BRACK; }
+"]"                      { return R_SQ_BRACK; }
+"#"                      { return HASH; }
+"."                      { return DOT; }
+","                      { return COMMA; }
+";"                      { return SEMI_COLON; }
+"\n"                     { return NL; }
 .                        { ECHO; }
 
 %%
