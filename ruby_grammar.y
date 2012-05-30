@@ -23,21 +23,25 @@ void yyerror(char const * error) {
 %token L_PAREN R_PAREN L_BRACE R_BRACE L_SQ_BRACK R_SQ_BRACK
 %token HASH DOT COMMA SEMI_COLON NL
 
-%start program
+%start input
 
 %%
 
-program    : /* empty */
-           | expr
+input      : /* empty */
+           | input line
            ;
 
-expr       : ident OP_EQUAL expr
-           | L_PAREN expr R_PAREN
+line       : NL
+           | expresion NL
+           | expresion SEMI_COLON
+           ;
+
+expresion  : ident OP_EQUAL expresion
+           | L_PAREN expresion R_PAREN
         /*   | expr comparison expr */
            | ident
            | numeric
            | SEMI_COLON
-           | NL
            ;
 
 numeric    : INTEGER
