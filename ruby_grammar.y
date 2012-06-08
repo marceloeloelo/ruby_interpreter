@@ -29,16 +29,15 @@ void yyerror(char const * error) {
 
 %%
 
-program    : /* empty */
-           | comp_statement
+program    : comp_statement
            ;
 
 comp_statement  : comp_statement statement
-                | statement
+                | /* empty */
                 ;
 
-statement  : expresion
-           | end_of_line
+statement  : end_of_line
+           | expresion end_of_line
            ;
 
 expresion  : expresion OP_PLUS expresion
