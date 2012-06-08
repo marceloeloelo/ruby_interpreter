@@ -34,3 +34,12 @@ echo "Running tests/unit/literals/strings_2.in..."
 echo "Running tests/unit/literals/symbols_1.in..."
 ./interpreter < tests/unit/literals/symbols_1.in > tests/output/unit/symbols_1.res
 
+echo "Running tests/unit/variables/identifier_1.in..."
+./interpreter < tests/unit/variables/identifier_1.in > tests/output/unit/identifier_1.res
+
+echo "Running tests/unit/variables/nil_1.in..."
+./interpreter < tests/unit/variables/nil_1.in > tests/output/unit/nil_1.res
+
+echo "Running tests/unit/variables/self_1.in..."
+./interpreter < tests/unit/variables/self_1.in > tests/output/unit/self_1.res
+

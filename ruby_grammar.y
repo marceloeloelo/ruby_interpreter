@@ -41,7 +41,7 @@ statement  : end_of_line
            | expresion end_of_line
            ;
 
-expresion  : left_hs OP_EQUAL expresion
+expresion  : variable OP_EQUAL expresion
            | expresion OP_PLUS expresion
            | expresion OP_MINUS expresion
            | expresion OP_MUL expresion
@@ -51,9 +51,6 @@ expresion  : left_hs OP_EQUAL expresion
            | OP_PLUS expresion   %prec OP_NOT
            | OP_MINUS expresion  %prec OP_NOT
            | primary
-           ;
-
-left_hs    : variable
            ;
 
 variable   : INST_VAR
