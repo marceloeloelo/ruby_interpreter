@@ -1,11 +1,33 @@
 %{
 #include <stdio.h>
-#include "y.tab.h"
+#include "ruby_grammar.tab.h"
 %}
+
+%x COMMENT
 
 %%
 
 [ \t]                    { ; }
+
+^=begin[ \n]             { BEGIN COMMENT; }
+<COMMENT>^=end           { BEGIN INITIAL; }
+<COMMENT>.|\n            { ; }
+<COMMENT><<EOF>>         { return yyerror("ERROR: Commentarios"); }
+
+'(.|\n|\t)*'             { return STRING1; }
+\"(.|\n|\t)*\"           { return STRING2; }
+
+[0-9]+\.[0-9]*           { return DOUBLE; }
+[0-9]+                   { return INTEGER; }
+
+"+"                      { return OP_PLUS; }
+"-"                      { return OP_MINUS; }
+"*"                      { return OP_MUL; }
+"/"                      { return OP_DIV; }
+"%"                      { return OP_MODULO; }
+
+"="                      { return OP_EQUAL; }
+
 "nil"                    { return NIL; }
 "self"                   { return SELF; }
 "def"                    { return DEF; }
@@ -23,14 +45,9 @@
 "each"                   { return EACH; }
 "puts"                   { return PUTS; }
 "new"                    { return NEW; }
-^"=begin"$               { ; }
-^"=end"$                 { ; }
 [a-zA-Z_][a-zA-Z0-9_]*   { return IDENTIFIER; }
 :[a-zA-Z_][a-zA-Z0-9_]*  { return SYMBOL; }
 @[a-zA-Z_][a-zA-Z0-9_]*  { return INST_VAR; }
-[0-9]+\.[0-9]*           { return DOUBLE; }
-[0-9]+                   { return INTEGER; }
-"="                      { return OP_EQUAL; }
 "!"                      { return OP_NOT; }
 "&&"                     { return OP_CMP_AND; }
 "||"                     { return OP_CMP_OR; }
@@ -40,11 +57,6 @@
 ">"                      { return OP_CMP_GT; }
 "<="                     { return OP_CMP_LE_EQ; }
 ">="                     { return OP_CMP_GT_EQ; }
-"+"                      { return OP_PLUS; }
-"-"                      { return OP_MINUS; }
-"*"                      { return OP_MUL; }
-"/"                      { return OP_DIV; }
-"%"                      { return OP_MODULO; }
 "**"                     { return OP_EXP; }
 "+="                     { return OP_PLUS_EQ; }
 "-="                     { return OP_LE_EQ; }
@@ -60,16 +72,9 @@
 "."                      { return DOT; }
 ","                      { return COMMA; }
 ";"                      { return SEMI_COLON; }
+"?"                      { return OP_QUESTION; }
 "\n"                     { return NL; }
 .                        { ECHO; }
 
 %%
 
-/*main(argc, argv)
-int argc;
-char** argv;
-{
-}
-
-
-*/

@@ -1,4 +1,4 @@
-rm y.tab.h
-rm y.tab.c
+rm ruby_grammar.tab.h
+rm ruby_grammar.tab.c
 rm lex.yy.c
 rm interpreter
