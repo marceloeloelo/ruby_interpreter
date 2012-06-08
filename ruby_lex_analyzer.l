@@ -25,6 +25,7 @@
 "*"                      { return OP_MUL; }
 "/"                      { return OP_DIV; }
 "%"                      { return OP_MODULO; }
+"**"                     { return OP_EXP; }
 
 "="                      { return OP_EQUAL; }
 
@@ -57,7 +58,6 @@
 ">"                      { return OP_CMP_GT; }
 "<="                     { return OP_CMP_LE_EQ; }
 ">="                     { return OP_CMP_GT_EQ; }
-"**"                     { return OP_EXP; }
 "+="                     { return OP_PLUS_EQ; }
 "-="                     { return OP_LE_EQ; }
 "*="                     { return OP_MUL_EQ; }
