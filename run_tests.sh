@@ -1,6 +1,8 @@
 #!/bin/bash
 
 files=`find . -name *.in`
+passed_counter=0
+failed_counter=0
 
 for file in $files
 do
@@ -20,6 +22,7 @@ do
   if [ "$errors" == "" ]; then
   	tput setaf 2 # green
     echo "."
+    passed_counter=`expr $passed_counter + 1`
   #errors   
   else
     tput setaf 1 # red
@@ -30,9 +33,15 @@ do
     fi
     
     echo "$errors"
+    failed_counter=`expr $failed_counter + 1`
   fi
   tput setaf 1 # red
   
 done
+
+tput setaf 2 # green
+echo "Passed $passed_counter"
+tput setaf 1 # red
+echo "Failed $failed_counter"
 
 tput setaf 7 #back to white
