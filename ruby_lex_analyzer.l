@@ -20,14 +20,29 @@
 [0-9]+\.[0-9]*           { return DOUBLE; }
 [0-9]+                   { return INTEGER; }
 
+"="                      { return OP_EQUAL; }
+"+="                     { return OP_PLUS_EQ; }
+"-="                     { return OP_MINUS_EQ; }
+"*="                     { return OP_MUL_EQ; }
+"/="                     { return OP_DIV_EQ; }
+"%="                     { return OP_MODULO_EQ; }
+"||"                     { return OP_CMP_OR; }
+"&&"                     { return OP_CMP_AND; }
+"!="                     { return OP_CMP_NEG; }
+"<=>"                    { return OP_CMP_INEQ; }
+"==="                    { return OP_CMP_EQ_EQ; }
+"=="                     { return OP_CMP_EQ; }
+"<="                     { return OP_CMP_LE_EQ; }
+"<"                      { return OP_CMP_LE; }
+">="                     { return OP_CMP_GT_EQ; }
+">"                      { return OP_CMP_GT; }
 "+"                      { return OP_PLUS; }
 "-"                      { return OP_MINUS; }
 "*"                      { return OP_MUL; }
 "/"                      { return OP_DIV; }
 "%"                      { return OP_MODULO; }
+"!"                      { return OP_NOT; }
 "**"                     { return OP_EXP; }
-
-"="                      { return OP_EQUAL; }
 
 "nil"                    { return NIL; }
 "self"                   { return SELF; }
@@ -46,27 +61,13 @@
 "each"                   { return EACH; }
 "puts"                   { return PUTS; }
 "new"                    { return NEW; }
-[a-zA-Z_][a-zA-Z0-9_]*   { return IDENTIFIER; }
-:[a-zA-Z_][a-zA-Z0-9_]*  { return SYMBOL; }
-@[a-zA-Z_][a-zA-Z0-9_]*  { return INST_VAR; }
+:[@]?[a-zA-Z_@][a-zA-Z0-9_]* { return SYMBOL; }
+[@]?[a-zA-Z_@][a-zA-Z0-9_]* { return IDENTIFIER; }
 
 
 
 
 
-"!"                      { return OP_NOT; }
-"&&"                     { return OP_CMP_AND; }
-"||"                     { return OP_CMP_OR; }
-"=="                     { return OP_CMP_EQ; }
-"!="                     { return OP_CMP_NEG; }
-"<"                      { return OP_CMP_LE; }
-">"                      { return OP_CMP_GT; }
-"<="                     { return OP_CMP_LE_EQ; }
-">="                     { return OP_CMP_GT_EQ; }
-"+="                     { return OP_PLUS_EQ; }
-"-="                     { return OP_LE_EQ; }
-"*="                     { return OP_MUL_EQ; }
-"/="                     { return OP_DIV_EQ; }
 "("                      { return L_PAREN; }
 ")"                      { return R_PAREN; }
 "{"                      { return L_BRACE; }

@@ -6,11 +6,16 @@ void yyerror(char const * error) {
 }
 %}
 
+%left OP_CMP_OR
+%left OP_CMP_AND
+%left OP_CMP_EQ OP_CMP_EQ_EQ OP_CMP_INEQ OP_CMP_NEG
+%left OP_CMP_GT OP_CMP_LE OP_CMP_GT_EQ OP_CMP_LE_EQ
 %left OP_PLUS OP_MINUS
 %left OP_MUL OP_DIV OP_MODULO
 %left OP_NOT
 %left OP_EXP
-%right OP_EQUAL
+
+%right OP_EQUAL OP_PLUS_EQ OP_MINUS_EQ OP_MUL_EQ OP_DIV_EQ OP_MODULO_EQ
 
 %token STRING1 STRING2
 %token NIL SELF
@@ -19,10 +24,8 @@ void yyerror(char const * error) {
 %token WHILE EACH
 %token ATTR_READER ATTR_WRITER ATTR_ACCESSOR
 %token PUTS NEW
-%token IDENTIFIER SYMBOL INST_VAR
+%token IDENTIFIER SYMBOL
 %token DOUBLE INTEGER
-%token OP_CMP_AND OP_CMP_OR OP_CMP_EQ OP_CMP_NEG OP_CMP_LE OP_CMP_GT OP_CMP_LE_EQ OP_CMP_GT_EQ
-%token OP_PLUS_EQ OP_LE_EQ OP_MUL_EQ OP_DIV_EQ
 %token L_PAREN R_PAREN L_BRACE R_BRACE L_SQ_BRACK R_SQ_BRACK
 %token HASH DOT COMMA SEMI_COLON OP_QUESTION NL
 
@@ -41,28 +44,34 @@ statement  : end_of_line
            | expression end_of_line
            ;
 
-expression : variable OP_EQUAL expression
-           | expression OP_PLUS expression
-           | expression OP_MINUS expression
+expression : IDENTIFIER OP_EQUAL expression
+           | expression OP_EXP expression
            | expression OP_MUL expression
            | expression OP_DIV expression
            | expression OP_MODULO expression
-           | expression OP_EXP expression
-           | OP_PLUS expression   %prec OP_NOT
-           | OP_MINUS expression  %prec OP_NOT
+           | expression OP_PLUS expression
+           | expression OP_MINUS expression
+           | expression OP_CMP_GT expression
+           | expression OP_CMP_GT_EQ expression
+           | expression OP_CMP_LE expression
+           | expression OP_CMP_LE_EQ expression
+           | expression OP_CMP_EQ expression
+           | expression OP_CMP_EQ_EQ expression
+           | expression OP_CMP_INEQ expression
+           | expression OP_CMP_NEG expression
+           | expression OP_CMP_AND expression
+           | expression OP_CMP_OR expression
+           | OP_PLUS expression    %prec OP_NOT
+           | OP_MINUS expression   %prec OP_NOT
+           | OP_NOT expression
            | L_PAREN expression R_PAREN
            | primary
            ;
 
 primary    : literal
-           | variable
+           | IDENTIFIER
            | NIL
            | SELF
-           | IDENTIFIER
-           ;
-
-variable   : INST_VAR
-           | IDENTIFIER
            ;
 
 literal    : INTEGER
