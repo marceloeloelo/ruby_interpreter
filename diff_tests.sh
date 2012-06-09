@@ -43,3 +43,12 @@ diff tests/output/unit/nil_1.res tests/expected_output/unit/nil_1.out
 echo "Diff tests/output/unit/self_1.res tests/expected_output/unit/self_1.out..."
 diff tests/output/unit/self_1.res tests/expected_output/unit/self_1.out
 
+echo "Diff tests/output/integration/expressions_1.res tests/expected_output/integration/expressions_1.out..."
+diff tests/output/integration/expressions_1.res tests/expected_output/integration/expressions_1.out
+
+echo "Diff tests/output/integration/expressions_2.res tests/expected_output/integration/expressions_2.out..."
+diff tests/output/integration/expressions_2.res tests/expected_output/integration/expressions_2.out
+
+echo "Diff tests/output/integration/expressions_3.res tests/expected_output/integration/expressions_3.out..."
+diff tests/output/integration/expressions_3.res tests/expected_output/integration/expressions_3.out
+
