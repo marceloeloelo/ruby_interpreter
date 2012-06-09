@@ -38,31 +38,30 @@ comp_statement  : comp_statement statement
                 ;
 
 statement  : end_of_line
-           | expresion end_of_line
+           | expression end_of_line
            ;
 
-expresion  : left_hs OP_EQUAL expresion
-           | expresion OP_PLUS expresion
-           | expresion OP_MINUS expresion
-           | expresion OP_MUL expresion
-           | expresion OP_DIV expresion
-           | expresion OP_MODULO expresion
-           | expresion OP_EXP expresion
-           | OP_PLUS expresion   %prec OP_NOT
-           | OP_MINUS expresion  %prec OP_NOT
+expression : variable OP_EQUAL expression
+           | expression OP_PLUS expression
+           | expression OP_MINUS expression
+           | expression OP_MUL expression
+           | expression OP_DIV expression
+           | expression OP_MODULO expression
+           | expression OP_EXP expression
+           | OP_PLUS expression   %prec OP_NOT
+           | OP_MINUS expression  %prec OP_NOT
+           | L_PAREN expression R_PAREN
            | primary
            ;
 
-left_hs    : variable
+primary    : literal
+           | variable
+           | NIL
+           | SELF
+           | IDENTIFIER
            ;
 
 variable   : INST_VAR
-           | IDENTIFIER
-           | NIL
-           | SELF
-           ;
-
-primary    : literal
            | IDENTIFIER
            ;
 

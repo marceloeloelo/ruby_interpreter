@@ -49,6 +49,11 @@
 [a-zA-Z_][a-zA-Z0-9_]*   { return IDENTIFIER; }
 :[a-zA-Z_][a-zA-Z0-9_]*  { return SYMBOL; }
 @[a-zA-Z_][a-zA-Z0-9_]*  { return INST_VAR; }
+
+
+
+
+
 "!"                      { return OP_NOT; }
 "&&"                     { return OP_CMP_AND; }
 "||"                     { return OP_CMP_OR; }
