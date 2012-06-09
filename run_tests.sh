@@ -10,9 +10,12 @@ do
   out_file=`echo $file | sed 's/\(.*\.\)in/\1out/'`
   res_file=`echo $file | sed 's/\(.*\.\)in/\1res/'`
 
+  # run tests
+  #echo generatin $file $res_file
+  ./interpreter < $file > $res_file
+
   # run diff command
   diff_output=`diff $res_file $out_file`
-  
 
   # success
   if [ "$diff_output" == "" ]; then
