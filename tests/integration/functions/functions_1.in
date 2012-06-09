@@ -1,0 +1,11 @@
+def method_1
+end
+
+def method_2
+  return(1+1)
+end
+
+def method_3(x, y)
+  return(x*y);
+end
+
