@@ -11,5 +11,8 @@
 *.la
 *.a
 
-# Mac files
+# Mac Finder Files
 *.DS_Store
+
+# Test Result Files
+*.res
