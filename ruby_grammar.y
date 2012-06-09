@@ -72,7 +72,19 @@ primary    : literal
            | IDENTIFIER
            | NIL
            | SELF
+           | DEF IDENTIFIER arg_decl comp_statement END { printf("def\n"); }
+           /* | RETURN expression*/
+           | RETURN L_BRACE expression R_BRACE          { printf("return\n"); }
            ;
+
+arg_decl  : L_PAREN arg_list R_PAREN   { printf("(arg_list)\n"); }
+          | arg_list                   { printf("arg_list\n"); }
+          | /* empty */
+          ;
+
+arg_list  : arg_list COMMA IDENTIFIER  { printf("arg_list , id\n"); }
+          | IDENTIFIER                 { printf("id\n"); }
+          ;
 
 literal    : INTEGER
            | DOUBLE
