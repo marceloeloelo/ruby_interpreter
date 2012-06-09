@@ -11,21 +11,25 @@ do
   res_file=`echo $file | sed 's/\(.*\.\)in/\1res/'`
 
   # run tests
-  #echo generatin $file $res_file
   ./interpreter < $file > $res_file
 
   # run diff command
-  diff_output=`diff $res_file $out_file`
+  errors=`diff $res_file $out_file 2>&1`
 
   # success
-  if [ "$diff_output" == "" ]; then
+  if [ "$errors" == "" ]; then
   	tput setaf 2 # green
     echo "."
   #errors   
   else
-  	tput setaf 1 # red
-  	echo "Diff for file $file_name"
-   	echo "$diff_output"
+    tput setaf 1 # red
+
+    # if files exist
+    if [ -e "$out_file" ] && [ -e "$res_file" ]; then
+  	  echo "Diff for file $file_name"
+    fi
+    
+    echo "$errors"
   fi
   tput setaf 1 # red
   
