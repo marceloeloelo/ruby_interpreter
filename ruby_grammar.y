@@ -53,10 +53,16 @@ declarations : CLASS IDENTIFIER NL comp_statement END
              | DEF IDENTIFIER arg_decl NL comp_statement END
              | RETURN expression
              | WHILE expression NL comp_statement END
-             | IF expression NL comp_statement END
-             | IF expression NL comp_statement ELSE NL comp_statement END
-             | IF expression NL comp_statement ELSIF expression NL comp_statement ELSE NL comp_statement END
+             | IF expression NL comp_statement elsif_optional else_optional END
              ;
+
+elsif_optional : elsif_optional ELSIF expression NL comp_statement
+               | /* empty */
+               ;
+
+else_optional : ELSE NL comp_statement
+              | /* empty */
+              ;
 
 expression : IDENTIFIER OP_EQUAL expression
            | IDENTIFIER OP_PLUS_EQ expression

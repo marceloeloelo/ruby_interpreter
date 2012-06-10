@@ -28,8 +28,28 @@ else
   x = 0
 end
 
-# outs x
+# puts x
 
-if x == 2
+x = 0
+
+if false
+  x = 0
+elsif (x == 1)
+  x = 0
+elsif x == 0
+  x = 0
+end
+
+if false
+  x = 0
+elsif (x == 1)
+  x = 0
+elsif x == 0
+  x = 0
+else 
+  x = 0
+end
+
+if x == 1
   # puts x
 end
