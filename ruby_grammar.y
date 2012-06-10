@@ -46,7 +46,17 @@ comp_statement  : comp_statement statement
 
 statement  : end_of_line
            | expression end_of_line
+           | declarations end_of_line
            ;
+
+declarations : CLASS IDENTIFIER NL comp_statement END
+             | DEF IDENTIFIER arg_decl NL comp_statement END
+             | RETURN expression
+             | WHILE expression NL comp_statement END
+             | IF expression NL comp_statement END
+             | IF expression NL comp_statement ELSE NL comp_statement END
+             | IF expression NL comp_statement ELSIF expression NL comp_statement ELSE NL comp_statement END
+             ;
 
 expression : IDENTIFIER OP_EQUAL expression
            | IDENTIFIER OP_PLUS_EQ expression
@@ -81,13 +91,6 @@ primary    : literal
            | IDENTIFIER
            | NIL
            | SELF
-           | CLASS IDENTIFIER NL comp_statement END
-           | DEF IDENTIFIER arg_decl NL comp_statement END
-           | RETURN expression
-           | WHILE expression NL comp_statement END
-           | IF expression NL comp_statement END
-           | IF expression NL comp_statement ELSE NL comp_statement END
-           | IF expression NL comp_statement ELSIF expression NL comp_statement ELSE NL comp_statement END
            ;
 
 arg_decl  : L_PAREN arg_list R_PAREN
