@@ -49,6 +49,11 @@ statement  : end_of_line
            ;
 
 expression : IDENTIFIER OP_EQUAL expression
+           | IDENTIFIER OP_PLUS_EQ expression
+           | IDENTIFIER OP_MINUS_EQ expression
+           | IDENTIFIER OP_MUL_EQ expression
+           | IDENTIFIER OP_DIV_EQ expression
+           | IDENTIFIER OP_MODULO_EQ expression
            | expression OP_EXP expression
            | expression OP_MUL expression
            | expression OP_DIV expression
@@ -76,9 +81,10 @@ primary    : literal
            | IDENTIFIER
            | NIL
            | SELF
+           | CLASS IDENTIFIER NL comp_statement END
            | DEF IDENTIFIER arg_decl NL comp_statement END
            | RETURN expression
-           | CLASS IDENTIFIER NL comp_statement END
+           | WHILE expression NL comp_statement END
            ;
 
 arg_decl  : L_PAREN arg_list R_PAREN
