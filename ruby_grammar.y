@@ -78,6 +78,7 @@ primary    : literal
            | SELF
            | DEF IDENTIFIER arg_decl NL comp_statement END
            | RETURN expression
+           | CLASS IDENTIFIER NL comp_statement END
            ;
 
 arg_decl  : L_PAREN arg_list R_PAREN
