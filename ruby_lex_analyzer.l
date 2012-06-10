@@ -3,18 +3,19 @@
 #include "ruby_grammar.tab.h"
 %}
 
+%option nodefault yylineno
 %x COMMENT
 
 %%
 
 [ \t]                    { ; }
 
-#.* {;}
-
 ^=begin[ \n]             { BEGIN COMMENT; }
 <COMMENT>^=end           { BEGIN INITIAL; }
 <COMMENT>.|\n            { ; }
 <COMMENT><<EOF>>         { return yyerror("ERROR: Commentarios"); }
+
+#.* { ; }
 
 '(.|\n|\t)*'             { return STRING1; }
 \"(.|\n|\t)*\"           { return STRING2; }
@@ -76,13 +77,13 @@
 "}"                      { return R_BRACE; }
 "["                      { return L_SQ_BRACK; }
 "]"                      { return R_SQ_BRACK; }
-
 "."                      { return DOT; }
 ","                      { return COMMA; }
 ";"                      { return SEMI_COLON; }
 "?"                      { return OP_QUESTION; }
 "\n"                     { return NL; }
-.                        { ECHO; }
+.                        { printf("ERROR: Line %d, invalid token \"%s\"\n", yylineno, yytext); exit(1); }
 
 %%
 
+int yywrap(void){}

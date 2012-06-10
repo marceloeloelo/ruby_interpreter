@@ -1,11 +1,15 @@
 %{
 #include <stdio.h>
+#include <stdlib.h>
+
+extern int yylineno;
 
 void yyerror(char const * error) {
-  printf("ERROR: %s\n", error);
+  printf("ERROR: Line %d, %s\n", yylineno, error);
 }
 %}
 
+%left RETURN
 %left OP_CMP_OR
 %left OP_CMP_AND
 %left OP_CMP_EQ OP_CMP_EQ_EQ OP_CMP_INEQ OP_CMP_NEG
@@ -19,7 +23,7 @@ void yyerror(char const * error) {
 
 %token STRING1 STRING2
 %token NIL SELF
-%token DEF CLASS RETURN END DO
+%token DEF CLASS END DO
 %token IF ELSIF ELSE
 %token WHILE EACH
 %token ATTR_READER ATTR_WRITER ATTR_ACCESSOR
@@ -72,18 +76,17 @@ primary    : literal
            | IDENTIFIER
            | NIL
            | SELF
-           | DEF IDENTIFIER arg_decl comp_statement END { printf("def\n"); }
-           /* | RETURN expression*/
-           | RETURN L_BRACE expression R_BRACE          { printf("return\n"); }
+           | DEF IDENTIFIER arg_decl NL comp_statement END
+           | RETURN expression
            ;
 
-arg_decl  : L_PAREN arg_list R_PAREN   { printf("(arg_list)\n"); }
-          | arg_list                   { printf("arg_list\n"); }
+arg_decl  : L_PAREN arg_list R_PAREN
+          | arg_list
           | /* empty */
           ;
 
-arg_list  : arg_list COMMA IDENTIFIER  { printf("arg_list , id\n"); }
-          | IDENTIFIER                 { printf("id\n"); }
+arg_list  : arg_list COMMA IDENTIFIER
+          | IDENTIFIER
           ;
 
 literal    : INTEGER
