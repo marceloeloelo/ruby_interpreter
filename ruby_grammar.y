@@ -85,6 +85,9 @@ primary    : literal
            | DEF IDENTIFIER arg_decl NL comp_statement END
            | RETURN expression
            | WHILE expression NL comp_statement END
+           | IF expression NL comp_statement END
+           | IF expression NL comp_statement ELSE NL comp_statement END
+           | IF expression NL comp_statement ELSIF expression NL comp_statement ELSE NL comp_statement END
            ;
 
 arg_decl  : L_PAREN arg_list R_PAREN

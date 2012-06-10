@@ -1,0 +1,35 @@
+x = 0
+
+if false
+  x = -1
+end
+
+# puts x
+
+if true
+  x = 1
+end
+
+# puts x
+
+if (x > 0)
+  x = 2
+else
+  x = -2
+end
+
+# puts x
+
+if (x == 4)
+  x = 2
+elsif (x == -4)
+  x = -2
+else
+  x = 0
+end
+
+# outs x
+
+if x == 2
+  # puts x
+end
