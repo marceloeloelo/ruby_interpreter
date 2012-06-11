@@ -1,0 +1,5 @@
+xyz = 10
+case
+  when xyz % 2 == 0 then true
+  when xyz % 2 != 0 then false
+end
