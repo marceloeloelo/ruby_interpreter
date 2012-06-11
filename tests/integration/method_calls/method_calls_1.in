@@ -1,0 +1,7 @@
+puts "foo"
+
+d.ladrar
+d.saludar "hola"
+d.saludar "foo", "bar"
+d.saludar("foo")
+d.saludar("foo", "bar")

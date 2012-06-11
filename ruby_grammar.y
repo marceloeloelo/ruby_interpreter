@@ -27,7 +27,6 @@ void yyerror(char const * error) {
 %token IF ELSIF ELSE
 %token WHILE EACH
 %token ATTR_READER ATTR_WRITER ATTR_ACCESSOR
-%token PUTS NEW
 %token IDENTIFIER SYMBOL
 %token DOUBLE INTEGER
 %token L_PAREN R_PAREN L_BRACE R_BRACE L_SQ_BRACK R_SQ_BRACK
@@ -47,7 +46,12 @@ comp_statement  : comp_statement statement
 statement  : end_of_line
            | expression end_of_line
            | declarations end_of_line
+           | method_call end_of_line
            ;
+
+method_call : IDENTIFIER DOT IDENTIFIER arg_decl
+            | IDENTIFIER arg_decl_fn
+            ; 
 
 declarations : CLASS IDENTIFIER NL comp_statement END
              | DEF IDENTIFIER arg_decl NL comp_statement END
@@ -104,9 +108,13 @@ arg_decl  : L_PAREN arg_list R_PAREN
           | /* empty */
           ;
 
-arg_list  : arg_list COMMA IDENTIFIER
-          | IDENTIFIER
-          ;
+arg_decl_fn : L_PAREN arg_list R_PAREN
+            | arg_list
+            ;
+
+arg_list  : arg_list COMMA primary
+          | primary
+          ;          
 
 literal    : INTEGER
            | DOUBLE
