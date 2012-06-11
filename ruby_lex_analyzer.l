@@ -17,8 +17,8 @@
 
 #.* { ; }
 
-'(.|\n|\t)*'             { return STRING1; }
-\"(.|\n|\t)*\"           { return STRING2; }
+'(.|\\\n)*'             { return STRING1; }
+\"(.|\\\n)*\"           { return STRING2; }
 
 [0-9]+\.[0-9]*           { return DOUBLE; }
 [0-9]+                   { return INTEGER; }
@@ -58,6 +58,9 @@
 "elsif"                  { return ELSIF; }
 "end"                    { return END; }
 "while"                  { return WHILE; }
+"case"                   { return CASE; }
+"when"                   { return WHEN; }
+"then"                   { return THEN; }
 "attr_reader"            { return ATTR_READER; }
 "attr_writer"            { return ATTR_WRITER; }
 "attr_accessor"          { return ATTR_ACCESSOR; }
