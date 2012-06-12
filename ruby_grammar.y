@@ -58,7 +58,7 @@ declarations : CLASS IDENTIFIER NL comp_statement END
              | RETURN expression
              | WHILE expression NL comp_statement END
              | IF expression NL comp_statement elsif_optional else_optional END
-             | CASE NL case_when END
+             | CASE expression NL case_when case_when_optional else_optional END
              ;
 
 elsif_optional : elsif_optional ELSIF expression NL comp_statement
@@ -69,8 +69,12 @@ else_optional : ELSE NL comp_statement
               | /* empty */
               ;
 
-case_when : WHEN expression THEN comp_statement
-          | /* empty */
+case_when : WHEN expression NL comp_statement
+          ;
+
+case_when_optional : case_when_optional case_when
+                   | /* empty */
+                   ;
 
 expression : IDENTIFIER OP_EQUAL expression
            | IDENTIFIER OP_PLUS_EQ expression
