@@ -1,6 +1,7 @@
 %{
 #include <stdio.h>
 #include "ruby_grammar.tab.h"
+#include <string.h>
 %}
 
 %option nodefault yylineno
@@ -17,11 +18,17 @@
 
 #.* { ; }
 
-'(.|\\\n)*'             { return STRING1; }
-\"(.|\\\n)*\"           { return STRING2; }
+'(.|\\\n)*'              { yylval.string = malloc((strlen(yytext)+1)*sizeof(char));
+                           strcpy(yylval.string, yytext);
+                           return STRING1; }
+\"(.|\\\n)*\"            { yylval.string = malloc((strlen(yytext)+1)*sizeof(char));
+                           strcpy(yylval.string, yytext);
+                           return STRING2; }
 
-[0-9]+\.[0-9]*           { return DOUBLE; }
-[0-9]+                   { return INTEGER; }
+[0-9]+\.[0-9]*           { yylval.int_number = atof(yytext);
+                           return DOUBLE; }
+[0-9]+                   { yylval.double_number = atoi(yytext);
+                           return INTEGER; }
 
 "="                      { return OP_EQUAL; }
 "+="                     { return OP_PLUS_EQ; }
@@ -66,10 +73,6 @@
 "attr_accessor"          { return ATTR_ACCESSOR; }
 :[@]?[a-zA-Z_@][a-zA-Z0-9_]* { return SYMBOL; }
 [@]?[a-zA-Z_@][a-zA-Z0-9_]* { return IDENTIFIER; }
-
-
-
-
 
 "("                      { return L_PAREN; }
 ")"                      { return R_PAREN; }

@@ -1,6 +1,7 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include "ast.h"
 
 extern int yylineno;
 
@@ -8,6 +9,13 @@ void yyerror(char const * error) {
   printf("ERROR: Line %d, %s\n", yylineno, error);
 }
 %}
+
+%union {
+  struct ast* node;
+  int int_number;
+  double double_number;
+  char* string;
+}
 
 %left RETURN
 %left OP_CMP_OR
@@ -21,14 +29,15 @@ void yyerror(char const * error) {
 
 %right OP_EQUAL OP_PLUS_EQ OP_MINUS_EQ OP_MUL_EQ OP_DIV_EQ OP_MODULO_EQ
 
-%token STRING1 STRING2
+%token <string> STRING1 STRING2
+%token <int_number> INTEGER
+%token <double_number> DOUBLE
 %token NIL SELF
 %token DEF CLASS END DO
 %token IF ELSIF ELSE CASE WHEN THEN
 %token WHILE EACH
 %token ATTR_READER ATTR_WRITER ATTR_ACCESSOR
 %token IDENTIFIER SYMBOL
-%token DOUBLE INTEGER
 %token L_PAREN R_PAREN L_BRACE R_BRACE L_SQ_BRACK R_SQ_BRACK
 %token HASH DOT COMMA SEMI_COLON OP_QUESTION NL
 
@@ -83,11 +92,11 @@ expression : IDENTIFIER OP_EQUAL expression
            | IDENTIFIER OP_DIV_EQ expression
            | IDENTIFIER OP_MODULO_EQ expression
            | expression OP_EXP expression
-           | expression OP_MUL expression
-           | expression OP_DIV expression
-           | expression OP_MODULO expression
-           | expression OP_PLUS expression
-           | expression OP_MINUS expression
+           | expression OP_MUL expression           { $$ = new_ast('*', $1, $3); }
+           | expression OP_DIV expression           { $$ = new_ast('/', $1, $3); }
+           | expression OP_MODULO expression        { $$ = new_ast('%', $1, $3); }
+           | expression OP_PLUS expression          { $$ = new_ast('+', $1, $3); }
+           | expression OP_MINUS expression         { $$ = new_ast('-', $1, $3); }
            | expression OP_CMP_GT expression
            | expression OP_CMP_GT_EQ expression
            | expression OP_CMP_LE expression
@@ -124,11 +133,11 @@ arg_list  : arg_list COMMA primary
           | primary
           ;
 
-literal    : INTEGER
-           | DOUBLE
+literal    : INTEGER  { $$ = new_int_number($1);    }
+           | DOUBLE   { $$ = new_double_number($1); }
            | SYMBOL
-           | STRING1
-           | STRING2
+           | STRING1  { $$ = new_string($1);        }
+           | STRING2  { $$ = new_string($2);        }
            ;
 
 end_of_line   : NL
