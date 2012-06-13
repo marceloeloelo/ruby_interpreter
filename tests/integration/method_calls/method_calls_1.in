@@ -1,0 +1,10 @@
+puts "foo"
+
+d.ladrar
+d.ladrar x
+d.ladrar 'foo'
+d.ladrar 8
+d.saludar "hola"
+d.saludar "foo", "bar"
+d.saludar("foo")
+d.saludar("foo", "bar")

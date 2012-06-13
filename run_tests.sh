@@ -1,53 +1,47 @@
-echo "Running tests/others/blank.in..."
-./interpreter < tests/others/blank.in > tests/output/others/blank.res
+#!/bin/bash
 
-echo "Running tests/others/end_of_line.in..."
-./interpreter < tests/others/end_of_line.in > tests/output/others/end_of_line.res
+files=`find . -name *.in`
+passed_counter=0
+failed_counter=0
 
-echo "Running tests/unit/comments/comment_1.in..."
-./interpreter < tests/unit/comments/comments_1.in > tests/output/unit/comments_1.res
+for file in $files
+do
 
-echo "Running tests/unit/operations/addition_1.in..."
-./interpreter < tests/unit/operations/addition_1.in > tests/output/unit/addition_1.res
+  # generate file paths
+  file_name=`echo $file | sed 's/\(.*\).\in/\1/'`
+  out_file=`echo $file | sed 's/\(.*\.\)in/\1out/'`
+  res_file=`echo $file | sed 's/\(.*\.\)in/\1res/'`
 
-echo "Running tests/unit/operations/substraction_1.in..."
-./interpreter < tests/unit/operations/substraction_1.in > tests/output/unit/substraction_1.res
+  # run tests
+  ./interpreter < $file > $res_file
 
-echo "Running tests/unit/operations/multiplication_1.in..."
-./interpreter < tests/unit/operations/multiplication_1.in > tests/output/unit/multiplication_1.res
+  # run diff command
+  errors=`diff $res_file $out_file 2>&1`
 
-echo "Running tests/unit/operations/division_1.in..."
-./interpreter < tests/unit/operations/division_1.in > tests/output/unit/division_1.res
+  # success
+  if [ "$errors" == "" ]; then
+  	tput setaf 2 # green
+    echo "."
+    passed_counter=`expr $passed_counter + 1`
+  #errors   
+  else
+    tput setaf 1 # red
 
-echo "Running tests/unit/operations/modulo_1.in..."
-./interpreter < tests/unit/operations/modulo_1.in > tests/output/unit/modulo_1.res
+    # if files exist
+    if [ -e "$out_file" ] && [ -e "$res_file" ]; then
+  	  echo "Diff for file $file_name"
+    fi
+    
+    echo "$errors"
+    failed_counter=`expr $failed_counter + 1`
+  fi
+  tput setaf 1 # red
+  
+done
 
-echo "Running tests/unit/operations/exponentiation_1.in..."
-./interpreter < tests/unit/operations/exponentiation_1.in > tests/output/unit/exponentiation_1.res
+tput setaf 2 # green
+echo "Passed $passed_counter"
+tput setaf 1 # red
+echo "Failed $failed_counter"
 
-echo "Running tests/unit/literals/strings_1.in..."
-./interpreter < tests/unit/literals/strings_1.in > tests/output/unit/strings_1.res
-
-echo "Running tests/unit/literals/strings_2.in..."
-./interpreter < tests/unit/literals/strings_2.in > tests/output/unit/strings_2.res
-
-echo "Running tests/unit/literals/symbols_1.in..."
-./interpreter < tests/unit/literals/symbols_1.in > tests/output/unit/symbols_1.res
-
-echo "Running tests/unit/variables/identifier_1.in..."
-./interpreter < tests/unit/variables/identifier_1.in > tests/output/unit/identifier_1.res
-
-echo "Running tests/unit/variables/nil_1.in..."
-./interpreter < tests/unit/variables/nil_1.in > tests/output/unit/nil_1.res
-
-echo "Running tests/unit/variables/self_1.in..."
-./interpreter < tests/unit/variables/self_1.in > tests/output/unit/self_1.res
-
-echo "Running tests/integration/expressions/expressions_1.in..."
-./interpreter < tests/integration/expressions/expressions_1.in > tests/output/integration/expressions_1.res
-
-echo "Running tests/integration/expressions/expressions_2.in..."
-./interpreter < tests/integration/expressions/expressions_2.in > tests/output/integration/expressions_2.res
-
-echo "Running tests/integration/expressions/expressions_3.in..."
-./interpreter < tests/integration/expressions/expressions_3.in > tests/output/integration/expressions_3.res
+tput setaf 7 #back to white
