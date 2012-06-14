@@ -25,9 +25,9 @@
                            strcpy(yylval.string, yytext);
                            return STRING2; }
 
-[0-9]+\.[0-9]*           { yylval.int_number = atof(yytext);
+[0-9]+\.[0-9]*           { yylval.double_number = atof(yytext);
                            return DOUBLE; }
-[0-9]+                   { yylval.double_number = atoi(yytext);
+[0-9]+                   { yylval.int_number = atoi(yytext);
                            return INTEGER; }
 
 "="                      { return OP_EQUAL; }
