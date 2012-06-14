@@ -29,7 +29,7 @@ void yyerror(char const * error) {
 %token ATTR_READER ATTR_WRITER ATTR_ACCESSOR
 %token IDENTIFIER SYMBOL
 %token DOUBLE INTEGER
-%token L_PAREN R_PAREN L_BRACE R_BRACE L_SQ_BRACK R_SQ_BRACK
+%token L_PAREN R_PAREN L_BRACE R_BRACE L_SQ_BRACK R_SQ_BRACK PIPE
 %token HASH DOT COMMA SEMI_COLON OP_QUESTION NL
 
 %start program
@@ -49,9 +49,13 @@ statement  : end_of_line
            | method_call end_of_line
            ;
 
-method_call : IDENTIFIER DOT IDENTIFIER arg_decl
-            | IDENTIFIER arg_decl_fn
+method_call : IDENTIFIER DOT IDENTIFIER arg_decl block_optional
+            | IDENTIFIER arg_decl_fn block_optional
             ;
+
+block_optional : DO PIPE IDENTIFIER ids_optional PIPE NL comp_statement END
+               | /* empty */
+               ;
 
 declarations : CLASS IDENTIFIER NL comp_statement END
              | DEF IDENTIFIER arg_decl NL comp_statement END
@@ -108,8 +112,17 @@ expression : IDENTIFIER OP_EQUAL expression
 primary    : literal
            | IDENTIFIER
            | NIL
-           | SELF
+           | SELF 
+           | array
            ;
+
+array : L_SQ_BRACK primary array_content_optional R_SQ_BRACK
+      | L_SQ_BRACK R_SQ_BRACK
+      ;
+
+array_content_optional : array_content_optional COMMA primary
+                       | /* empty */                 
+                       ;
 
 arg_decl  : L_PAREN arg_list R_PAREN
           | arg_list
@@ -123,6 +136,11 @@ arg_decl_fn : L_PAREN arg_list R_PAREN
 arg_list  : arg_list COMMA primary
           | primary
           ;
+
+ids_optional : ids_optional COMMA IDENTIFIER 
+             | /* empty */
+             ;
+
 
 literal    : INTEGER
            | DOUBLE

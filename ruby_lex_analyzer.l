@@ -77,6 +77,7 @@
 "}"                      { return R_BRACE; }
 "["                      { return L_SQ_BRACK; }
 "]"                      { return R_SQ_BRACK; }
+"|"                      { return PIPE; }
 "."                      { return DOT; }
 ","                      { return COMMA; }
 ";"                      { return SEMI_COLON; }
