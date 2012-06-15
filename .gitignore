@@ -16,3 +16,6 @@
 
 # Test Result Files
 *.res
+
+#swap files
+*.swp
