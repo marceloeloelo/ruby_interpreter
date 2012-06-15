@@ -57,13 +57,34 @@ block_optional : DO PIPE IDENTIFIER ids_optional PIPE NL comp_statement END
                | /* empty */
                ;
 
-declarations : CLASS IDENTIFIER NL comp_statement END
+declarations : CLASS IDENTIFIER NL class_statement END
              | DEF IDENTIFIER arg_decl NL comp_statement END
              | RETURN expression
              | WHILE expression NL comp_statement END
              | IF expression NL comp_statement elsif_optional else_optional END
              | CASE expression NL case_when case_when_optional else_optional END
              ;
+
+class_statement : comp_statement 
+/*                | comp_attr_statement */
+                ;
+
+comp_attr_statement : comp_attr_statement attr_statement
+                    | attr_statement
+                    ;
+
+attr_statement : ATTR_ACCESSOR sym_list end_of_line
+               | ATTR_READER sym_list end_of_line
+               | ATTR_WRITER sym_list end_of_line
+               ;
+
+sym_list : SYMBOL sym_list_optional
+         | /* empty */
+         ;
+
+sym_list_optional : sym_list_optional COMMA SYMBOL
+                  | /* empty */
+                  ;
 
 elsif_optional : elsif_optional ELSIF expression NL comp_statement
                | /* empty */
