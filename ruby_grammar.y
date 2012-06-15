@@ -12,22 +12,22 @@ void yyerror(char const * error) {
 
 %union {
   struct ast* node;
-  int int_number;
+  int int_number, bop;
   double double_number;
   char* string;
 }
 
 %left RETURN
-%left OP_CMP_OR
-%left OP_CMP_AND
-%left OP_CMP_EQ OP_CMP_EQ_EQ OP_CMP_INEQ OP_CMP_NEG
-%left OP_CMP_GT OP_CMP_LE OP_CMP_GT_EQ OP_CMP_LE_EQ
-%left OP_PLUS OP_MINUS
-%left OP_MUL OP_DIV OP_MODULO
-%left OP_NOT
-%left OP_EXP
+%left <int_number> OP_CMP_OR
+%left <int_number> OP_CMP_AND
+%left <int_number> OP_CMP_EQ OP_CMP_EQ_EQ OP_CMP_INEQ OP_CMP_NEG
+%left <int_number> OP_CMP_GT OP_CMP_LE OP_CMP_GT_EQ OP_CMP_LE_EQ
+%left <int_number> OP_PLUS OP_MINUS
+%left <int_number> OP_MUL OP_DIV OP_MODULO
+%left <int_number> OP_NOT
+%left <int_number> OP_EXP
 
-%right OP_EQUAL OP_PLUS_EQ OP_MINUS_EQ OP_MUL_EQ OP_DIV_EQ OP_MODULO_EQ
+%right <int_number> OP_EQUAL OP_PLUS_EQ OP_MINUS_EQ OP_MUL_EQ OP_DIV_EQ OP_MODULO_EQ
 
 %token STRING1 STRING2
 %token INTEGER
@@ -42,7 +42,7 @@ void yyerror(char const * error) {
 %token HASH DOT COMMA SEMI_COLON OP_QUESTION NL
 
 
-%type <string> STRING1 STRING2
+%type <string> STRING1 STRING2 IDENTIFIER SYMBOL
 %type <int_number> INTEGER
 %type <double_number> DOUBLE
 %type <node> program
@@ -58,15 +58,15 @@ void yyerror(char const * error) {
 
 %%
 
-program    : comp_statement  { $$ = $1; /*print_ast($$);*/ }
+program    : comp_statement                  { $$ = $1; print_ast($$); }
            ;
 
-comp_statement  : comp_statement statement { $$ = $2; }
+comp_statement  : comp_statement statement   { $$ = new_stmt_list_node($2, $1); }
                 | /* empty */
                 ;
 
-statement  : end_of_line
-           | expression end_of_line { $$ = $1; }
+statement  : end_of_line                     { $$ = $1; }
+           | expression end_of_line          { $$ = $1; }
            | declarations end_of_line
            | method_call end_of_line
            ;
@@ -76,7 +76,7 @@ method_call : IDENTIFIER DOT IDENTIFIER arg_decl
             ;
 
 declarations : CLASS IDENTIFIER NL comp_statement END
-             | DEF IDENTIFIER arg_decl NL comp_statement END    /*{ $$ = new_function($2); }*/
+             | DEF IDENTIFIER arg_decl NL comp_statement END    { $$ = new_function_node($2, $3, $5); }
              | RETURN expression
              | WHILE expression NL comp_statement END
              | IF expression NL comp_statement elsif_optional else_optional END
@@ -101,36 +101,36 @@ expression : IDENTIFIER OP_EQUAL expression
            | IDENTIFIER OP_DIV_EQ expression
            | IDENTIFIER OP_MODULO_EQ expression
            | expression OP_EXP expression
-           | expression OP_MUL expression           { $$ = new_ast(N_MUL, $1, $3);        }
-           | expression OP_DIV expression           { $$ = new_ast(N_DIV, $1, $3);        }
-           | expression OP_MODULO expression        { $$ = new_ast(N_MODULO, $1, $3);     }
-           | expression OP_PLUS expression          { $$ = new_ast(N_PLUS, $1, $3);       }
-           | expression OP_MINUS expression         { $$ = new_ast(N_MINUS, $1, $3);      }
-           | expression OP_CMP_GT expression        { $$ = new_ast(N_CMP_GT, $1, $3);     }
-           | expression OP_CMP_GT_EQ expression     { $$ = new_ast(N_CMP_GT_EQ, $1, $3);  }
-           | expression OP_CMP_LE expression        { $$ = new_ast(N_CMP_LE, $1, $3);     }
-           | expression OP_CMP_LE_EQ expression     { $$ = new_ast(N_CMP_LE_EQ, $1, $3);  }
-           | expression OP_CMP_EQ expression        { $$ = new_ast(N_CMP_EQ, $1, $3);     }
-           | expression OP_CMP_EQ_EQ expression     { $$ = new_ast(N_CMP_EQ_EQ, $1, $3);  }
-           | expression OP_CMP_INEQ expression      { $$ = new_ast(N_CMP_INEQ, $1, $3);   }
-           | expression OP_CMP_NEG expression       { $$ = new_ast(N_CMP_NEG, $1, $3);    }
-           | expression OP_CMP_AND expression       { $$ = new_ast(N_CMP_AND, $1, $3);    }
-           | expression OP_CMP_OR expression        { $$ = new_ast(N_CMP_OR, $1, $3);     }
-           | OP_PLUS expression    %prec OP_NOT     { $$ = new_ast(N_PLUS_UN, $2, NULL);  }
-           | OP_MINUS expression   %prec OP_NOT     { $$ = new_ast(N_MINUS_UN, $2, NULL); }
-           | OP_NOT expression                      { $$ = new_ast(N_NOT, $2, NULL);      }
+           | expression OP_MUL expression           { $$ = new_binary_op_node(OP_MUL, $1, $3);        }
+           | expression OP_DIV expression           { $$ = new_binary_op_node(OP_DIV, $1, $3);        }
+           | expression OP_MODULO expression        { $$ = new_binary_op_node(OP_MODULO, $1, $3);     }
+           | expression OP_PLUS expression          { $$ = new_binary_op_node(OP_PLUS, $1, $3);       }
+           | expression OP_MINUS expression         { $$ = new_binary_op_node(OP_MINUS, $1, $3);      }
+           | expression OP_CMP_GT expression        { $$ = new_binary_op_node(OP_CMP_GT, $1, $3);     }
+           | expression OP_CMP_GT_EQ expression     { $$ = new_binary_op_node(OP_CMP_GT_EQ, $1, $3);  }
+           | expression OP_CMP_LE expression        { $$ = new_binary_op_node(OP_CMP_LE, $1, $3);     }
+           | expression OP_CMP_LE_EQ expression     { $$ = new_binary_op_node(OP_CMP_LE_EQ, $1, $3);  }
+           | expression OP_CMP_EQ expression        { $$ = new_binary_op_node(OP_CMP_EQ, $1, $3);     }
+           | expression OP_CMP_EQ_EQ expression     { $$ = new_binary_op_node(OP_CMP_EQ_EQ, $1, $3);  }
+           | expression OP_CMP_INEQ expression      { $$ = new_binary_op_node(OP_CMP_INEQ, $1, $3);   }
+           | expression OP_CMP_NEG expression       { $$ = new_binary_op_node(OP_CMP_NEG, $1, $3);    }
+           | expression OP_CMP_AND expression       { $$ = new_binary_op_node(OP_CMP_AND, $1, $3);    }
+           | expression OP_CMP_OR expression        { $$ = new_binary_op_node(OP_CMP_OR, $1, $3);     }
+           | OP_PLUS expression    %prec OP_NOT     { $$ = new_binary_op_node(OP_PLUS, $2, NULL);  }
+           | OP_MINUS expression   %prec OP_NOT     { $$ = new_binary_op_node(OP_MINUS, $2, NULL); }
+           | OP_NOT expression                      { $$ = new_binary_op_node(OP_NOT, $2, NULL);      }
            | L_PAREN expression R_PAREN
-           | primary { $$ = $1; }
+           | primary                                { $$ = $1;                                        }
            ;
 
-primary    : literal               { $$ = $1;                 }
-           | IDENTIFIER            { $$ = new_identifier($1); }
-           | NIL                   { ; }
-           | SELF                  { ; }
+primary    : literal                     { $$ = $1;                      }
+           | IDENTIFIER                  { $$ = new_identifier_node($1); }
+           | NIL                         { ; }
+           | SELF                        { ; }
            ;
 
-arg_decl  : L_PAREN arg_list R_PAREN
-          | arg_list
+arg_decl  : L_PAREN arg_list R_PAREN     { $$ = $2;   }
+          | arg_list                     { $$ = $1;   }
           | /* empty */
           ;
 
@@ -138,15 +138,15 @@ arg_decl_fn : L_PAREN arg_list R_PAREN
             | arg_list
             ;
 
-arg_list  : arg_list COMMA primary
-          | primary                      { $$ = $1; }
+arg_list  : arg_list COMMA primary       { $$ = new_arg_list_node($3, $1);   }
+          | primary                      { $$ = new_arg_list_node($1, NULL); }
           ;
 
-literal    : INTEGER  { $$ = new_int_number($1);    }
-           | DOUBLE   { $$ = new_double_number($1); }
-           | SYMBOL   { $$ = new_symbol($1);        }
-           | STRING1  { $$ = new_string_1($1);      }
-           | STRING2  { $$ = new_string_2($1);      }
+literal    : INTEGER                     { $$ = new_integer_node($1);  }
+           | DOUBLE                      { $$ = new_double_node($1);   }
+           | SYMBOL                      { $$ = new_string_node($1);   }
+           | STRING1                     { $$ = new_string_node($1);   }
+           | STRING2                     { $$ = new_string_node($1);   }
            ;
 
 end_of_line   : NL
