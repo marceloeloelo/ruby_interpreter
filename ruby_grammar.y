@@ -19,15 +19,15 @@ void yyerror(char const * error) {
 }
 
 %left RETURN
-%left <int_number> OP_CMP_OR
-%left <int_number> OP_CMP_AND
-%left <int_number> OP_CMP_EQ OP_CMP_EQ_EQ OP_CMP_INEQ OP_CMP_NEG
-%left <int_number> OP_CMP_GT OP_CMP_LE OP_CMP_GT_EQ OP_CMP_LE_EQ
-%left <int_number> OP_PLUS OP_MINUS
-%left <int_number> OP_MUL OP_DIV OP_MODULO
-%left <int_number> OP_NOT
-%left <int_number> OP_EXP
-%right <int_number> OP_EQUAL OP_PLUS_EQ OP_MINUS_EQ OP_MUL_EQ OP_DIV_EQ OP_MODULO_EQ
+%left <ast_type> OP_CMP_OR
+%left <ast_type> OP_CMP_AND
+%left <ast_type> OP_CMP_EQ OP_CMP_EQ_EQ OP_CMP_INEQ OP_CMP_NEG
+%left <ast_type> OP_CMP_GT OP_CMP_LE OP_CMP_GT_EQ OP_CMP_LE_EQ
+%left <ast_type> OP_PLUS OP_MINUS
+%left <ast_type> OP_MUL OP_DIV OP_MODULO
+%left <ast_type> OP_NOT
+%left <ast_type> OP_EXP
+%right <ast_type> OP_EQUAL OP_PLUS_EQ OP_MINUS_EQ OP_MUL_EQ OP_DIV_EQ OP_MODULO_EQ
 
 %token STRING1 STRING2
 %token INTEGER
@@ -45,7 +45,7 @@ void yyerror(char const * error) {
 %type <string> STRING1 STRING2 IDENTIFIER SYMBOL
 %type <int_number> INTEGER
 %type <double_number> DOUBLE
-%type <ast_type> program comp_statement statement end_of_line expression primary literal declarations method_call
+%type <ast_type> program comp_statement statement end_of_line expression primary literal declarations method_call if_remain
 %type <arg_list_type> arg_list arg_decl arg_decl_fn
 
 %start program
@@ -69,21 +69,18 @@ method_call : IDENTIFIER DOT IDENTIFIER arg_decl { $$ = new_method_call_node(N_M
             | IDENTIFIER arg_decl_fn             { $$ = new_method_call_node(N_METHOD_CALL_2, NULL, $1, $2); }
             ;
 
-declarations : CLASS IDENTIFIER NL comp_statement END           { $$ = new_class_node($2, $4);           }
-             | DEF IDENTIFIER arg_decl NL comp_statement END    { $$ = new_function_node($2, $3, $5);    }
-             | RETURN expression                                { $$ = new_ast_node(N_RETURN, $2, NULL); }
-             | WHILE expression NL comp_statement END           { $$ = new_ast_node(N_WHILE, $2, $4);    }
-             | IF expression NL comp_statement elsif_optional else_optional END
+declarations : CLASS IDENTIFIER NL comp_statement END              { $$ = new_class_node($2, $4);           }
+             | DEF IDENTIFIER arg_decl NL comp_statement END       { $$ = new_function_node($2, $3, $5);    }
+             | RETURN expression                                   { $$ = new_ast_node(N_RETURN, $2, NULL); }
+             | WHILE expression NL comp_statement END              { $$ = new_ast_node(N_WHILE, $2, $4);    }
+             | IF expression NL comp_statement if_remain END       { $$ = new_if_node(N_IF, $2, $4, $5);    }
              | CASE expression NL case_when END
              ;
 
-elsif_optional : elsif_optional ELSIF expression NL comp_statement
-               | /* empty */
-               ;
-
-else_optional : ELSE NL comp_statement
-              | /* empty */
-              ;
+if_remain : ELSIF expression NL comp_statement if_remain     { $$ = new_if_node(N_IF_REM, $2, $4, $5); }
+          | ELSE NL comp_statement                           { $$ = $3;                                }
+          | /* empty */                                      { $$ = NULL;                              }
+          ;
 
 case_when : WHEN expression THEN comp_statement
           | /* empty */

@@ -42,6 +42,8 @@
 #define N_CLASS          38
 #define N_METHOD_CALL_1  39
 #define N_METHOD_CALL_2  40
+#define N_IF             41
+#define N_IF_REM         42
 
 extern int yylineno;
 void yyerror(char const*);
@@ -97,6 +99,13 @@ struct method_call_node {
   struct arg_list_node* args;
 };
 
+struct if_node {
+  int node_type;
+  struct ast* condition;
+  struct ast* th;
+  struct ast* el;
+};
+
 struct ast* new_ast_node(int, struct ast*, struct ast*);
 struct ast* new_integer_node(int);
 struct ast* new_double_node(double);
@@ -106,6 +115,7 @@ struct arg_list_node* new_arg_list_node(struct ast*, struct arg_list_node*);
 struct ast* new_function_node(char*, struct arg_list_node*, struct ast*);
 struct ast* new_class_node(char*, struct ast*);
 struct ast* new_method_call_node(int, char*, char*, struct arg_list_node*);
+struct ast* new_if_node(int, struct ast*, struct ast*, struct ast*);
 
 double eval_ast(struct ast*);
 void free_ast(struct ast*);

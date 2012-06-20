@@ -87,6 +87,15 @@ struct ast* new_method_call_node(int node_type, char* class_name, char* method_n
   return (struct ast*)node;
 }
 
+struct ast* new_if_node(int node_type, struct ast* condition, struct ast* th, struct ast* el) {
+  struct if_node* node = malloc(sizeof(struct if_node));
+  node->node_type = node_type;
+  node->condition = condition;
+  node->th = th;
+  node->el = el;
+  return (struct ast*)node;
+};
+
 /////////////////////////////////////
 
 double eval_ast(struct ast* node) {
