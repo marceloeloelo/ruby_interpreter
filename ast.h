@@ -36,6 +36,12 @@
 #define N_STATEMENT      32
 #define N_ARG_LIST       33
 #define N_STMT_LIST      34
+#define N_RETURN         35
+#define N_WHILE          36
+#define N_CASE           37
+#define N_CLASS          38
+#define N_METHOD_CALL_1  39
+#define N_METHOD_CALL_2  40
 
 extern int yylineno;
 void yyerror(char const*);
@@ -72,11 +78,24 @@ struct arg_list_node {
 };
 
 struct function_node {
+  int node_type;
   char* name;
   struct arg_list_node* args;
   struct ast* stmts;
 };
 
+struct class_node {
+  int node_type;
+  char* name;
+  struct ast* stmts;
+};
+
+struct method_call_node {
+  int node_type;
+  char* class_name;
+  char* method_name;
+  struct arg_list_node* args;
+};
 
 struct ast* new_ast_node(int, struct ast*, struct ast*);
 struct ast* new_integer_node(int);
@@ -85,6 +104,8 @@ struct ast* new_string_node(char*);
 struct ast* new_identifier_node(char*);
 struct arg_list_node* new_arg_list_node(struct ast*, struct arg_list_node*);
 struct ast* new_function_node(char*, struct arg_list_node*, struct ast*);
+struct ast* new_class_node(char*, struct ast*);
+struct ast* new_method_call_node(int, char*, char*, struct arg_list_node*);
 
 double eval_ast(struct ast*);
 void free_ast(struct ast*);
