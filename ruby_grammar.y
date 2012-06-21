@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "ast.h"
+#include "st.h"
 
 extern int yylineno;
 
@@ -151,5 +152,9 @@ end_of_line : NL                         { $$ = NULL; }
 %%
 
 int main(int argc, char** argv) {
+
+  // install sym_table
+  sym_table = install_sym_table;
+
   return yyparse();
 }
