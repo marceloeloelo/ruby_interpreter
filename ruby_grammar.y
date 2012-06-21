@@ -74,7 +74,7 @@ declarations : CLASS IDENTIFIER NL comp_statement END              { $$ = new_cl
              | RETURN expression                                   { $$ = new_ast_node(N_RETURN, $2, NULL); }
              | WHILE expression NL comp_statement END              { $$ = new_ast_node(N_WHILE, $2, $4);    }
              | IF expression NL comp_statement if_remain END       { $$ = new_if_node(N_IF, $2, $4, $5);    }
-             | CASE expression NL case_when END
+             | CASE expression NL case_when case_remain END
              ;
 
 if_remain : ELSIF expression NL comp_statement if_remain     { $$ = new_if_node(N_IF_REM, $2, $4, $5); }
@@ -82,8 +82,13 @@ if_remain : ELSIF expression NL comp_statement if_remain     { $$ = new_if_node(
           | /* empty */                                      { $$ = NULL;                              }
           ;
 
-case_when : WHEN expression THEN comp_statement
-          | /* empty */
+case_when : WHEN expression NL comp_statement
+          ;
+
+case_remain : case_when case_remain
+            | ELSE NL comp_statement
+            | /* empty */
+            ;
 
 expression : IDENTIFIER OP_EQUAL expression         { $$ = new_ast_node(N_OP_EQUAL, new_identifier_node($1), $3);     }
            | IDENTIFIER OP_PLUS_EQ expression       { $$ = new_ast_node(N_OP_PLUS_EQ, new_identifier_node($1), $3);   }
