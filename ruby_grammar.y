@@ -9,6 +9,10 @@ extern int yylineno;
 void yyerror(char const * error) {
   printf("ERROR: Line %d, %s\n", yylineno, error);
 }
+
+// install sym_table
+struct sym* sym_table = 0;
+
 %}
 
 %union {
@@ -53,7 +57,7 @@ void yyerror(char const * error) {
 
 %%
 
-program    : comp_statement                  { $$ = $1;  }
+program    : comp_statement                  { $$ = $1; print_sym_table(sym_table); }
            ;
 
 comp_statement  : comp_statement statement   { $$ = new_ast_node(N_STMT_LIST, $2, $1); }
@@ -91,7 +95,9 @@ case_remain : case_when case_remain
             | /* empty */
             ;
 
-expression : IDENTIFIER OP_EQUAL expression         { $$ = new_ast_node(N_OP_EQUAL, new_identifier_node($1), $3);     }
+expression : IDENTIFIER OP_EQUAL expression         { $$ = new_ast_node(N_OP_EQUAL, new_identifier_node($1), $3); 
+sym_table = put_sym(sym_table, $1);   
+}
            | IDENTIFIER OP_PLUS_EQ expression       { $$ = new_ast_node(N_OP_PLUS_EQ, new_identifier_node($1), $3);   }
            | IDENTIFIER OP_MINUS_EQ expression      { $$ = new_ast_node(N_OP_MINUS_EQ, new_identifier_node($1), $3);  }
            | IDENTIFIER OP_MUL_EQ expression        { $$ = new_ast_node(N_OP_MUL_EQ, new_identifier_node($1), $3);    }
@@ -152,9 +158,6 @@ end_of_line : NL                         { $$ = NULL; }
 %%
 
 int main(int argc, char** argv) {
-
-  // install sym_table
-  sym_table = install_sym_table;
 
   return yyparse();
 }

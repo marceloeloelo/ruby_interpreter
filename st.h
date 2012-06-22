@@ -15,7 +15,7 @@ struct sym_list {
   struct sym* next;
 };
 
-struct sym* sym_table; /* global variable sym_table */
-struct sym* install_sym_table;
-struct sym* put_sym(char*);
-struct sym* get_sym(char*);
+//struct sym* install_sym_table();
+struct sym* put_sym(struct sym*, char*);
+struct sym* get_sym(struct sym*, char*);
+void print_sym_table(struct sym*);
