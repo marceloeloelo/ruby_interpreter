@@ -59,7 +59,7 @@ struct sym* sym_table = 0;
 
 program    : comp_statement                  { $$ = $1; 
                                                struct ast* eval = eval_ast($1);
-                                               print_ast(eval); }
+                                               print_ast(eval);  }
            ;
 
 comp_statement  : comp_statement statement   { $$ = new_ast_node(N_STMT_LIST, $2, $1); }
@@ -146,11 +146,11 @@ arg_list  : arg_list COMMA primary       { $$ = new_arg_list_node($3, $1);   }
           | primary                      { $$ = new_arg_list_node($1, NULL); }
           ;
 
-literal    : INTEGER                     { $$ = new_integer_node($1);  }
-           | DOUBLE                      { $$ = new_double_node($1);   }
-           | SYMBOL                      { $$ = new_string_node($1);   }
-           | STRING1                     { $$ = new_string_node($1);   }
-           | STRING2                     { $$ = new_string_node($1);   }
+literal    : INTEGER                     { $$ = new_integer_node($1);             }
+           | DOUBLE                      { $$ = new_double_node($1);              }
+           | SYMBOL                      { $$ = new_string_node($1);              }
+           | STRING1                     { $$ = new_string_node(drop_quotes($1)); }
+           | STRING2                     { $$ = new_string_node(drop_quotes($1)); }
            ;
 
 end_of_line : NL                         { $$ = NULL; }

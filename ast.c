@@ -28,6 +28,7 @@ struct ast* new_double_node(double value) {
   return (struct ast*)node;
 };
 
+// TODO crear string_nodo para interpolación
 struct ast* new_string_node(char* value) {
   struct string_node* node = malloc(sizeof(struct string_node));
   node->node_type = N_STRING_1;
@@ -111,6 +112,13 @@ void print_arg_list(struct arg_list_node* args) {
   printf(")\n");
 }; 
 
+char* drop_quotes(char* str) {
+  char* res = malloc((sizeof(str)+1)*sizeof(char));
+  strcpy(res, str); 
+  res[strlen(res) - 1] = '\0'; /* elimino comilla final */
+  return res + 1; /* elimino comilla inicial */
+}
+
 //
 //
 //
@@ -124,17 +132,17 @@ struct ast* eval_ast(struct ast* node) {
                               struct integer_node* i = (struct integer_node*) node;
                               return new_integer_node(i->value);
       };
-/*      case N_DOUBLE  : {
-                              struct double_node* d = (struct double_node*)node;
-                              printf("%f", d->value);
-                              break;
+      case N_DOUBLE  : {
+                              struct double_node* d = (struct double_node*) node;
+                              return new_double_node(d->value);
       };
       case N_STRING_1: {
-                              struct string_node* s = (struct string_node*)node;
-                              printf("%s", s->value);
-                              break;
+                              struct string_node* s = (struct string_node*) node;
+                              char* string = malloc((sizeof(s->value)+1)*sizeof(char));
+                              strcpy(string, s->value);
+                              return new_string_node(string);
       };
-      case N_IDENTIFIER : {
+/*      case N_IDENTIFIER : {
                               struct identifier_node* i = (struct identifier_node*)node;
                               printf("%s", i->name);
                               break;
@@ -199,11 +207,32 @@ struct ast* eval_ast(struct ast* node) {
                               break;
       }; */
       case N_OP_PLUS : {
-                              struct integer_node* eval_left = (struct integer_node*) eval_ast(node->left);
-                              struct integer_node* eval_right = (struct integer_node*) eval_ast(node->right); 
-                              struct ast* ast = new_integer_node(eval_left->value + eval_right->value);
-                              return ast;
-                              break;
+                              struct ast* eval_left = eval_ast(node->left);
+                              struct ast* eval_right = eval_ast(node->right);
+
+                              if (eval_left->node_type == N_INTEGER && eval_right->node_type == N_INTEGER) {
+                                struct integer_node* integer_node_left = (struct integer_node*) eval_left;
+                                struct integer_node* integer_node_right = (struct integer_node*) eval_right; 
+                                return new_integer_node(integer_node_left->value + integer_node_right->value);
+
+                              } else if (eval_left->node_type == N_DOUBLE && eval_right->node_type == N_DOUBLE) {
+                                struct double_node* double_node_left = (struct double_node*) eval_left;
+                                struct double_node* double_node_right = (struct double_node*) eval_right; 
+                                return new_double_node(double_node_left->value + double_node_right->value);
+
+                              } else if ((eval_left->node_type == N_STRING_1 && eval_right->node_type == N_STRING_1) || 
+                                         (eval_left->node_type == N_STRING_2 && eval_right->node_type == N_STRING_2)) {
+                                struct string_node* string_node_left = (struct string_node*) eval_left;
+                                struct string_node* string_node_right = (struct string_node*) eval_right; 
+                                char* res = malloc((sizeof(string_node_left->value) + sizeof(string_node_right->value) + 1)*sizeof(char));
+                                strcpy(res, string_node_left->value);
+                                strcat(res, string_node_right->value);
+                                return new_string_node(res);
+
+                              } else {
+                                printf("%i\n", eval_left->node_type);
+                                printf("%i\n", eval_right->node_type);
+                              };
       };
       /*case N_OP_MINUS : {
                               print_ast(node->left);
@@ -287,9 +316,7 @@ struct ast* eval_ast(struct ast* node) {
                               break;
       }; */
       case N_STMT_LIST : {
-                              struct ast* ast = new_ast_node(node->node_type, eval_ast(node->left), eval_ast(node->right));
-                              return ast;
-                              break;
+                              return new_ast_node(N_STMT_LIST, eval_ast(node->left), eval_ast(node->right));
       };
 /*      case N_FUNCTION : {
                               struct function_node* f = (struct function_node*)node;
@@ -329,8 +356,10 @@ struct ast* eval_ast(struct ast* node) {
       default : {
                               printf("ERROR: when evaluating %c.\n", node->node_type);
       };
-    }
-  }
+    };
+  } else {
+    return NULL;
+  };
 };
 
 void free_ast(struct ast* node) {
@@ -550,8 +579,8 @@ void print_ast(struct ast* node) {
                               printf("%i\n", node->node_type);
                               printf("ERROR: when printing %c.\n", node->node_type);
       };
-    }
-  }
+    };
+  };
 };
 
  

@@ -120,3 +120,9 @@ struct ast* new_if_node(int, struct ast*, struct ast*, struct ast*);
 struct ast* eval_ast(struct ast*);
 void free_ast(struct ast*);
 void print_ast(struct ast*);
+
+//
+//
+// aux functions
+
+char* drop_quotes(char*);

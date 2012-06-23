@@ -18,10 +18,10 @@
 
 #.* { ; }
 
-'(.|\\\n)*'              { yylval.string = malloc((strlen(yytext)+1)*sizeof(char));
+'([^']|\n|\t)*'          { yylval.string = malloc((strlen(yytext)+1)*sizeof(char));
                            strcpy(yylval.string, yytext);
                            return STRING1; }
-\"(.|\\\n)*\"            { yylval.string = malloc((strlen(yytext)+1)*sizeof(char));
+\"([^"]|\n|\t)*\"        { yylval.string = malloc((strlen(yytext)+1)*sizeof(char));
                            strcpy(yylval.string, yytext);
                            return STRING2; }
 
