@@ -96,6 +96,22 @@ struct ast* new_if_node(int node_type, struct ast* condition, struct ast* th, st
   return (struct ast*)node;
 };
 
+//
+//
+// aux functions
+
+void print_arg_list(struct arg_list_node* args) {
+  printf("(");
+  struct arg_list_node* aux = args;
+  while (aux != NULL) {
+    print_ast(aux->arg);
+    aux = aux->next;
+    if (aux != NULL) { printf(", "); };
+  };
+  printf(")\n");
+}; 
+
+
 /////////////////////////////////////
 
 double eval_ast(struct ast* node) {
@@ -166,14 +182,7 @@ void print_ast(struct ast* node) {
                         };
       case N_ARG_LIST : {
                           struct arg_list_node* l = (struct arg_list_node*)node;
-                          printf("(");
-                          struct arg_list_node* aux = l;
-                          while (aux != NULL) {
-                            print_ast(aux->arg);
-                            printf(", ");
-                            aux = aux->next;
-                          };
-                          printf(")");
+                          print_arg_list(l); 
                           break;
                         };
       case N_OP_MUL     : {
@@ -288,21 +297,9 @@ void print_ast(struct ast* node) {
                          };
       case N_FUNCTION : {
                           struct function_node* f = (struct function_node*)node;
-                          printf("def %s", f->name);
-
-                          /* function parameters */
-                          printf("(");
-                          struct arg_list_node* aux = f->args;
-                          while (aux != NULL) {
-                            print_ast(aux->arg);
-                            printf(", ");
-                            aux = aux->next;
-                          };
-                          printf(")\n");
-
-                          /* comp_statements */
-                          print_ast(f->stmts);
-
+                          printf("def %s", f->name); // def function name
+                          print_arg_list(f->args); // function parameters
+                          print_ast(f->stmts); // comp_statements
                           printf("end");
                           break;
                         };
@@ -337,9 +334,17 @@ void print_ast(struct ast* node) {
                          printf("end");
                          break;
                        };
+      case N_METHOD_CALL_2 : {
+                        struct method_call_node* m = (struct method_call_node*) node;
+                        printf("%s ", m->method_name);
+                        print_arg_list(m->args);
+                        break;
+                       };
       default        : {
                          printf("ERROR: when printing %c.\n", node->node_type);
                        };
     }
   }
 };
+
+ 
