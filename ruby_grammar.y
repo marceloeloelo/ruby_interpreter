@@ -57,7 +57,9 @@ struct sym* sym_table = 0;
 
 %%
 
-program    : comp_statement                  { $$ = $1; print_sym_table(sym_table); }
+program    : comp_statement                  { $$ = $1; 
+                                               struct ast* eval = eval_ast($1);
+                                               print_ast(eval); }
            ;
 
 comp_statement  : comp_statement statement   { $$ = new_ast_node(N_STMT_LIST, $2, $1); }
@@ -66,7 +68,7 @@ comp_statement  : comp_statement statement   { $$ = new_ast_node(N_STMT_LIST, $2
 
 statement  : end_of_line                     { $$ = $1; }
            | expression end_of_line          { $$ = $1; }
-           | declarations end_of_line        { $$ = $1; /*print_ast($$);*/ }
+           | declarations end_of_line        { $$ = $1; }
            | method_call end_of_line         { $$ = $1; }
            ;
 
