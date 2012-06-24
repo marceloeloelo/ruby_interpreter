@@ -38,6 +38,7 @@ struct sym* sym_table = 0;
 %token INTEGER
 %token DOUBLE
 %token NIL
+%token TRUE_BOOL FALSE_BOOL
 %token DEF CLASS END DO
 %token IF ELSIF ELSE CASE WHEN THEN
 %token WHILE EACH
@@ -151,6 +152,8 @@ literal    : INTEGER                     { $$ = new_integer_node($1);           
            | SYMBOL                      { $$ = new_string_node($1);              }
            | STRING1                     { $$ = new_string_node(drop_quotes($1)); }
            | STRING2                     { $$ = new_string_node(drop_quotes($1)); }
+           | TRUE_BOOL                   { $$ = NULL; }
+           | FALSE_BOOL                  { $$ = NULL; }
            ;
 
 end_of_line : NL                         { $$ = NULL; }
