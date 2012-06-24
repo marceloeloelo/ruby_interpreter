@@ -135,6 +135,36 @@ char* type_name(int node_type) {
   };
 };
 
+int int_value(struct ast* ast) {
+  if (ast->node_type == N_INTEGER) {
+    struct integer_node* i = (struct integer_node*) ast;
+    return i->value;
+  } else {
+    return 0; // no debería pasar
+  };
+};
+
+double double_value(struct ast* ast) {
+  if (ast->node_type == N_DOUBLE) {
+    struct double_node* d = (struct double_node*) ast;
+    return d->value;
+  } else if (ast->node_type == N_INTEGER) {
+    struct integer_node* d = (struct integer_node*) ast;
+    return (double) d->value;
+  } else {
+    return 0; // no debería pasar
+  };
+};
+
+char* string_value(struct ast* ast) {
+  if ((ast->node_type == N_STRING_1) || (ast->node_type == N_STRING_2)) {
+    struct string_node* s = (struct string_node*) ast;
+    return s->value;
+  } else {
+    return ""; // no debería pasar
+  };
+};
+
 //
 //
 //
@@ -224,33 +254,36 @@ struct ast* eval_ast(struct ast* node) {
                               break;
       }; */
       case N_OP_PLUS : {
-                              struct ast* eval_left = eval_ast(node->left);
-                              struct ast* eval_right = eval_ast(node->right);
+                              struct ast* left = eval_ast(node->left);
+                              struct ast* right = eval_ast(node->right);
 
-                              if (eval_left->node_type == N_INTEGER && eval_right->node_type == N_INTEGER) {
-                                struct integer_node* integer_node_left = (struct integer_node*) eval_left;
-                                struct integer_node* integer_node_right = (struct integer_node*) eval_right; 
-                                return new_integer_node(integer_node_left->value + integer_node_right->value);
+                              // int + int
+                              if (left->node_type == N_INTEGER && right->node_type == N_INTEGER) {
+                                return new_integer_node(int_value(left) + int_value(right));
 
-                              } else if (eval_left->node_type == N_DOUBLE && eval_right->node_type == N_DOUBLE) {
-                                struct double_node* double_node_left = (struct double_node*) eval_left;
-                                struct double_node* double_node_right = (struct double_node*) eval_right; 
-                                return new_double_node(double_node_left->value + double_node_right->value);
+                              // double + double
+                              } else if (left->node_type == N_DOUBLE && right->node_type == N_DOUBLE) {
+                                return new_double_node(double_value(left) + double_value(right));
 
-                              } else if ((eval_left->node_type == N_STRING_1 && eval_right->node_type == N_STRING_1) || 
-                                         (eval_left->node_type == N_STRING_2 && eval_right->node_type == N_STRING_2)) {
-                                struct string_node* string_node_left = (struct string_node*) eval_left;
-                                struct string_node* string_node_right = (struct string_node*) eval_right; 
-                                char* res = malloc((sizeof(string_node_left->value) + sizeof(string_node_right->value) + 1)*sizeof(char));
-                                strcpy(res, string_node_left->value);
-                                strcat(res, string_node_right->value);
+                              // double + int || int + double
+                              } else if ((left->node_type == N_DOUBLE && right->node_type == N_INTEGER) ||
+                                         (left->node_type == N_INTEGER && right->node_type == N_DOUBLE)) {
+                                return new_double_node(double_value(left) + double_value(right));
+
+                              // string + string
+                              } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1) {
+                                char* s_left = string_value(left);
+                                char* s_right = string_value(right);
+                                char* res = malloc((sizeof(s_left) + sizeof(s_right) + 1)*sizeof(char));
+                                strcpy(res, s_left);
+                                strcat(res, s_right);
                                 return new_string_node(res);
 
-                              } else if (eval_left->node_type == N_NIL) {
-                                no_method_error("+", type_name(eval_left->node_type));
+                              } else if (left->node_type == N_NIL) {
+                                no_method_error("+", type_name(left->node_type));
 
                               } else {
-                                type_error(type_name(eval_left->node_type), type_name(eval_right->node_type));
+                                type_error(type_name(left->node_type), type_name(right->node_type));
                                 
                               };
       };
