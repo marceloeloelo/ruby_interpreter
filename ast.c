@@ -126,14 +126,7 @@ char* drop_quotes(char* str) {
   return res + 1; /* elimino comilla inicial */
 };
 
-char* type_name(int node_type) {
-  switch(node_type) {
-    case N_INTEGER  : { return "Fixnum";       };
-    case N_DOUBLE   : { return "Float";        };
-    case N_STRING_1 : { return "String";       };
-    case N_NIL      : { return "nil:NilClass"; };
-  };
-};
+
 
 int int_value(struct ast* ast) {
   if (ast->node_type == N_INTEGER) {
@@ -279,20 +272,44 @@ struct ast* eval_ast(struct ast* node) {
                                 strcat(res, s_right);
                                 return new_string_node(res);
 
-                              } else if (left->node_type == N_NIL) {
-                                no_method_error("+", type_name(left->node_type));
+                              // TODO manejar mejor casteo de tipos
+                              } else if (left->node_type != N_INTEGER &&
+                                         left->node_type != N_DOUBLE  &&
+                                         left->node_type != N_STRING_1) {
+                                no_method_error("+", left);
 
-                              } else {
-                                type_error(type_name(left->node_type), type_name(right->node_type));
-                                
+                              } else {          
+                                type_error(left->node_type, right->node_type);
                               };
-      };
-      /*case N_OP_MINUS : {
-                              print_ast(node->left);
-                              printf(" - ");
-                              print_ast(node->right);
                               break;
       };
+      case N_OP_MINUS : {
+                              struct ast* left = eval_ast(node->left);
+                              struct ast* right = eval_ast(node->right);
+
+                              // int - int
+                              if (left->node_type == N_INTEGER && right->node_type == N_INTEGER) {
+                                return new_integer_node(int_value(left) - int_value(right));
+
+                              // double - double
+                              } else if (left->node_type == N_DOUBLE && right->node_type == N_DOUBLE) {
+                                return new_double_node(double_value(left) - double_value(right));
+
+                              // double - int || int - double
+                              } else if ((left->node_type == N_DOUBLE && right->node_type == N_INTEGER) ||
+                                         (left->node_type == N_INTEGER && right->node_type == N_DOUBLE)) {
+                                return new_double_node(double_value(left) - double_value(right));
+
+                              // TODO manejar mejor casteo de tipos
+                              } else if (left->node_type != N_INTEGER &&
+                                         left->node_type != N_DOUBLE ) {
+                                no_method_error("-", left);
+                                
+                              } else {          
+                                type_error(left->node_type, right->node_type);
+                              };
+                              break;
+      }; /*
       case N_OP_CMP_GT : {
                               print_ast(node->left);
                               printf(" > ");
