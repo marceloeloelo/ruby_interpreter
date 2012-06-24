@@ -478,22 +478,29 @@ struct ast* eval_ast(struct ast* node) {
                               printf(" || ");
                               print_ast(node->right);
                               break;
-      };
+      }; */
       case N_OP_PLUS_UN : {
-                              printf("+");
-                              print_ast(node->left);
+                              struct ast* left = eval_ast(node->left);
+
+                              // int
+                              if (left->node_type == N_INTEGER) {
+                                return new_integer_node(int_value(left));
+
+                              // double 
+                              } else if (left->node_type == N_DOUBLE) {
+                                return new_double_node(double_value(left));
+
+                              // TODO manejar mejor casteo de tipos
+                              } else {
+                                no_method_error("+", left);
                               break;
       };
       case N_OP_MINUS_UN : {
-                              printf("+");
-                              print_ast(node->left);
                               break;
       };
       case N_OP_NOT : {
-                              printf("+");
-                              print_ast(node->left);
                               break;
-      }; */
+      }; 
       case N_STMT_LIST : {
                               return new_ast_node(N_STMT_LIST, eval_ast(node->left), eval_ast(node->right));
       };
