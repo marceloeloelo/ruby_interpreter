@@ -39,7 +39,7 @@ struct ast* new_double_node(double value) {
 struct ast* new_string_node(char* value) {
   struct string_node* node = malloc(sizeof(struct string_node));
   node->node_type = N_STRING_1;
-  node->value = malloc((sizeof(value)+1)*sizeof(char));
+  node->value = malloc((strlen(value)+1)*sizeof(char));
   strcpy(node->value, value);
   return (struct ast*)node;
 };
@@ -47,7 +47,7 @@ struct ast* new_string_node(char* value) {
 struct ast* new_identifier_node(char* name) {
   struct identifier_node* node = malloc(sizeof(struct identifier_node));
   node->node_type = N_IDENTIFIER;
-  node->name = malloc((sizeof(name)+1)*sizeof(char));
+  node->name = malloc((strlen(name)+1)*sizeof(char));
   strcpy(node->name, name);
   return (struct ast*)node;
 };
@@ -62,7 +62,7 @@ struct arg_list_node* new_arg_list_node(struct ast* arg, struct arg_list_node* n
 struct ast* new_function_node(char* name, struct arg_list_node* args, struct ast* stmts) {
   struct function_node* node = malloc(sizeof(struct function_node));
   node->node_type = N_FUNCTION;
-  node->name = malloc((sizeof(name)+1)*sizeof(char));
+  node->name = malloc((strlen(name)+1)*sizeof(char));
   strcpy(node->name, name);
   node->args = args;
   node->stmts = stmts;
@@ -72,7 +72,7 @@ struct ast* new_function_node(char* name, struct arg_list_node* args, struct ast
 struct ast* new_class_node(char* name, struct ast* stmts) {
   struct class_node* node = malloc(sizeof(struct class_node));
   node->node_type = N_CLASS;
-  node->name = malloc((sizeof(name)+1)*sizeof(char));
+  node->name = malloc((strlen(name)+1)*sizeof(char));
   strcpy(node->name, name);
   node->stmts = stmts;
   return (struct ast*)node;
@@ -81,11 +81,11 @@ struct ast* new_class_node(char* name, struct ast* stmts) {
 struct ast* new_method_call_node(int node_type, char* class_name, char* method_name, struct arg_list_node* args) {
   struct method_call_node* node = malloc(sizeof(struct method_call_node));
   node->node_type = node_type;
-  node->method_name = malloc((sizeof(method_name)+1)*sizeof(char));
+  node->method_name = malloc((strlen(method_name)+1)*sizeof(char));
   strcpy(node->method_name, method_name);
 
   if (node_type == N_METHOD_CALL_1) {
-    node->class_name = malloc((sizeof(class_name)+1)*sizeof(char));
+    node->class_name = malloc((strlen(class_name)+1)*sizeof(char));
     strcpy(node->class_name, class_name);
   } else {
     node->class_name = NULL;
@@ -120,8 +120,8 @@ void print_arg_list(struct arg_list_node* args) {
 }; 
 
 char* drop_quotes(char* str) {
-  char* res = malloc((sizeof(str)+1)*sizeof(char));
-  strcpy(res, str); 
+  char* res = malloc((strlen(str)+1)*sizeof(char));
+  strcpy(res, str);
   res[strlen(res) - 1] = '\0'; /* elimino comilla final */
   return res + 1; /* elimino comilla inicial */
 };
@@ -163,6 +163,18 @@ char* string_value(struct ast* ast) {
   } else {
     return ""; // no debería pasar
   };
+};
+
+char * string_repeat( int n, const char * s ) {
+  size_t slen = strlen(s);
+  char * dest = malloc(n*slen+1);
+
+  int i; char * p;
+  for ( i=0, p = dest; i < n; ++i, p += slen ) {
+    memcpy(p, s, slen);
+  }
+  *p = '\0';
+  return dest;
 };
 
 //
@@ -234,25 +246,120 @@ struct ast* eval_ast(struct ast* node) {
                               struct arg_list_node* l = (struct arg_list_node*)node;
                               print_arg_list(l); 
                               break;
-      };
+      };*/
       case N_OP_MUL : {
-                              print_ast(node->left);
-                              printf(" * ");
-                              print_ast(node->right);
-                              break;
+                              struct ast* left = eval_ast(node->left);
+                              struct ast* right = eval_ast(node->right);
+
+                              // int * int
+                              if (left->node_type == N_INTEGER && right->node_type == N_INTEGER) {
+                                return new_integer_node(int_value(left) * int_value(right));
+
+                              // double * double
+                              } else if (left->node_type == N_DOUBLE && right->node_type == N_DOUBLE) {
+                                return new_double_node(double_value(left) * double_value(right));
+
+                              // double * int || int * double
+                              } else if ((left->node_type == N_DOUBLE && right->node_type == N_INTEGER) ||
+                                         (left->node_type == N_INTEGER && right->node_type == N_DOUBLE)) {
+                                return new_double_node(double_value(left) * double_value(right));
+
+                              // string * int
+                              } else if (left->node_type == N_STRING_1 && right->node_type == N_INTEGER) {
+                                char* s_left = string_value(left);
+                                int n = int_value(right);
+                                char* res = malloc((strlen(s_left)*n + 1)*sizeof(char));
+                                res = string_repeat(n, s_left);
+                                return new_string_node(res);
+
+                              // int * string
+                              } else if (left->node_type == N_INTEGER && right->node_type == N_STRING_1) {
+                                char* s_right = string_value(right);
+                                int n = int_value(left);
+                                char* res = malloc((strlen(s_right)*n + 1)*sizeof(char));
+                                res = string_repeat(n, s_right);
+                                return new_string_node(res);
+
+                              } else if (left->node_type == N_NIL) {
+                                no_method_error("+", type_name(left->node_type));
+
+                              } else {
+                                type_error(type_name(left->node_type), type_name(right->node_type));
+
+                              };
       };
       case N_OP_DIV : {
-                              print_ast(node->left);
-                              printf(" / ");
-                              print_ast(node->right);
-                              break;
+                              struct ast* left = eval_ast(node->left);
+                              struct ast* right = eval_ast(node->right);
+
+                              // int / int
+                              if (left->node_type == N_INTEGER && right->node_type == N_INTEGER) {
+                                if (int_value(right) != 0) {
+                                  return new_integer_node(int_value(left) / int_value(right));
+                                } else {
+                                  /* ERROR !!!! */
+                                }
+
+                              // double / double
+                              } else if (left->node_type == N_DOUBLE && right->node_type == N_DOUBLE) {
+                                if (double_value(right) != 0) {
+                                  return new_double_node(double_value(left) / double_value(right));
+                                } else {
+                                  /* ERROR !!! */
+                                }
+                              // double / int || int / double
+                              } else if ((left->node_type == N_DOUBLE && right->node_type == N_INTEGER) ||
+                                         (left->node_type == N_INTEGER && right->node_type == N_DOUBLE)) {
+                                if (double_value(right) != 0) {
+                                  return new_double_node(double_value(left) * double_value(right));
+                                } else {
+                                  /* ERROR !!! */
+                                }
+
+                              } else if (left->node_type == N_NIL) {
+                                no_method_error("+", type_name(left->node_type));
+
+                              } else {
+                                type_error(type_name(left->node_type), type_name(right->node_type));
+
+                              };
       };
       case N_OP_MODULO : {
-                              print_ast(node->left);
-                              printf(" mod ");
-                              print_ast(node->right);
-                              break;
-      }; */
+                              struct ast* left = eval_ast(node->left);
+                              struct ast* right = eval_ast(node->right);
+
+                              // int % int
+                              if (left->node_type == N_INTEGER && right->node_type == N_INTEGER) {
+                                if (int_value(right) != 0) {
+                                  return new_integer_node((int_value(left) % int_value(right) + int_value(right)) % int_value(right));
+                                } else {
+                                  /* ERROR !!!! */
+                                }
+
+                              // double % double
+                              /* } else if (left->node_type == N_DOUBLE && right->node_type == N_DOUBLE) {*/
+                              /*   if (double_value(right) != 0) {*/
+                              /*     return new_double_node((double_value(left) % double_value(right) + double_value(right)) % double_value(right));*/
+                              /*   } else {*/
+                              /*     [> ERROR !!! <]*/
+                              /*   }*/
+                              // double % int || int % double
+                              /* } else if ((left->node_type == N_DOUBLE && right->node_type == N_INTEGER) ||*/
+                              /*            (left->node_type == N_INTEGER && right->node_type == N_DOUBLE)) {*/
+                              /*   if (double_value(right) != 0) {*/
+                              /*     return new_double_node((double_value(left) % double_value(right) + double_value(right)) % double_value(right));*/
+                              /*   } else {*/
+                              /*     [> ERROR !!! <]*/
+                              /*   }*/
+
+                              } else if (left->node_type == N_NIL) {
+                                no_method_error("+", type_name(left->node_type));
+
+                              } else {
+                                type_error(type_name(left->node_type), type_name(right->node_type));
+
+                              };
+      };
       case N_OP_PLUS : {
                               struct ast* left = eval_ast(node->left);
                               struct ast* right = eval_ast(node->right);
@@ -284,7 +391,7 @@ struct ast* eval_ast(struct ast* node) {
 
                               } else {
                                 type_error(type_name(left->node_type), type_name(right->node_type));
-                                
+
                               };
       };
       /*case N_OP_MINUS : {
