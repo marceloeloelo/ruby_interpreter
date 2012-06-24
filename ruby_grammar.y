@@ -130,7 +130,7 @@ sym_table = put_sym(sym_table, $1);
 
 primary    : literal                     { $$ = $1;                      }
            | IDENTIFIER                  { $$ = new_identifier_node($1); }
-           | NIL                         { ; }
+           | NIL                         { $$ = new_nil_node();          }
            ;
 
 arg_decl  : L_PAREN arg_list R_PAREN     { $$ = $2;   }

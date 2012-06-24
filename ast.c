@@ -1,4 +1,5 @@
 #include "ast.h"
+#include "errors.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,6 +13,12 @@ struct ast* new_ast_node(int node_type, struct ast* left, struct ast* right) {
   node->right = right;
 
   return node;
+};
+
+struct ast* new_nil_node() {
+  struct integer_node* node = malloc(sizeof(struct nil_node));
+  node->node_type = N_NIL;
+  return (struct ast*)node;
 };
 
 struct ast* new_integer_node(int value) {
@@ -117,7 +124,16 @@ char* drop_quotes(char* str) {
   strcpy(res, str); 
   res[strlen(res) - 1] = '\0'; /* elimino comilla final */
   return res + 1; /* elimino comilla inicial */
-}
+};
+
+char* type_name(int node_type) {
+  switch(node_type) {
+    case N_INTEGER  : { return "Fixnum";       };
+    case N_DOUBLE   : { return "Float";        };
+    case N_STRING_1 : { return "String";       };
+    case N_NIL      : { return "nil:NilClass"; };
+  };
+};
 
 //
 //
@@ -128,19 +144,20 @@ struct ast* eval_ast(struct ast* node) {
 
   if (node != NULL) {
     switch(node->node_type) {
+      case N_NIL : {
+                              return new_nil_node();
+      };
       case N_INTEGER : {
                               struct integer_node* i = (struct integer_node*) node;
                               return new_integer_node(i->value);
       };
-      case N_DOUBLE  : {
+      case N_DOUBLE : {
                               struct double_node* d = (struct double_node*) node;
                               return new_double_node(d->value);
       };
       case N_STRING_1: {
                               struct string_node* s = (struct string_node*) node;
-                              char* string = malloc((sizeof(s->value)+1)*sizeof(char));
-                              strcpy(string, s->value);
-                              return new_string_node(string);
+                              return new_string_node(s->value);
       };
 /*      case N_IDENTIFIER : {
                               struct identifier_node* i = (struct identifier_node*)node;
@@ -229,9 +246,12 @@ struct ast* eval_ast(struct ast* node) {
                                 strcat(res, string_node_right->value);
                                 return new_string_node(res);
 
+                              } else if (eval_left->node_type == N_NIL) {
+                                no_method_error("+", type_name(eval_left->node_type));
+
                               } else {
-                                printf("%i\n", eval_left->node_type);
-                                printf("%i\n", eval_right->node_type);
+                                type_error(type_name(eval_left->node_type), type_name(eval_right->node_type));
+                                
                               };
       };
       /*case N_OP_MINUS : {
@@ -368,6 +388,10 @@ void free_ast(struct ast* node) {
 void print_ast(struct ast* node) {
   if (node != NULL) {
     switch(node->node_type) {
+      case N_NIL : {
+                              printf("nil");
+                              break;
+      };
       case N_INTEGER : {
                               struct integer_node* i = (struct integer_node*)node;
                               printf("%d", i->value);

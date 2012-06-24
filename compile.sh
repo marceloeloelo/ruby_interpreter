@@ -7,4 +7,5 @@ flex ruby_lex_analyzer.l
 echo "gcc -c lex.yy.c"
 gcc -c lex.yy.c
 echo "gcc -o interpreter lex.yy.o ruby_grammar.tab.o -lm"
-gcc -o interpreter lex.yy.o ruby_grammar.tab.o ast.c st.c -lm
+gcc -o interpreter lex.yy.o ruby_grammar.tab.o ast.c st.c errors.c -lm
+

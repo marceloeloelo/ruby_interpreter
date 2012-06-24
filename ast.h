@@ -44,6 +44,7 @@
 #define N_METHOD_CALL_2  40
 #define N_IF             41
 #define N_IF_REM         42
+#define N_NIL            43
 
 extern int yylineno;
 void yyerror(char const*);
@@ -52,6 +53,10 @@ struct ast {
   int node_type;
   struct ast* left;
   struct ast* right;
+};
+
+struct nil_node {
+  int node_type;
 };
 
 struct integer_node {
@@ -107,6 +112,7 @@ struct if_node {
 };
 
 struct ast* new_ast_node(int, struct ast*, struct ast*);
+struct ast* new_nil_node();
 struct ast* new_integer_node(int);
 struct ast* new_double_node(double);
 struct ast* new_string_node(char*);
