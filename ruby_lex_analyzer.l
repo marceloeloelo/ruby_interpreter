@@ -70,6 +70,8 @@
 "attr_reader"            { return ATTR_READER; }
 "attr_writer"            { return ATTR_WRITER; }
 "attr_accessor"          { return ATTR_ACCESSOR; }
+"true"                   { return TRUE_BOOL; }
+"false"                  { return FALSE_BOOL; }
 :[@]?[a-zA-Z_@][a-zA-Z0-9_]* { yylval.string = malloc((strlen(yytext)+1)*sizeof(char));
                                strcpy(yylval.string, yytext);
                                return SYMBOL; }
