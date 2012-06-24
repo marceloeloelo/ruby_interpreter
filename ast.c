@@ -21,6 +21,13 @@ struct ast* new_nil_node() {
   return (struct ast*)node;
 };
 
+struct ast* new_bool_node(int value) {
+  struct bool_node* node = malloc(sizeof(struct bool_node));
+  node->node_type = N_BOOL;
+  node->value = value;
+  return (struct ast*)node;
+};
+
 struct ast* new_integer_node(int value) {
   struct integer_node* node = malloc(sizeof(struct integer_node));
   node->node_type = N_INTEGER;
@@ -127,6 +134,14 @@ char* drop_quotes(char* str) {
 };
 
 
+int bool_value(struct ast* ast) {
+  if (ast->node_type == N_BOOL) {
+    struct bool_node* b = (struct bool_node*) ast;
+    return b->value;
+  } else {
+    return 0; // no debería pasar
+  };
+};
 
 int int_value(struct ast* ast) {
   if (ast->node_type == N_INTEGER) {
@@ -181,18 +196,23 @@ struct ast* eval_ast(struct ast* node) {
     switch(node->node_type) {
       case N_NIL : {
                               return new_nil_node();
+                              break;
+      };
+      case N_BOOL : {
+                              return new_bool_node(bool_value(node));
+                              break;
       };
       case N_INTEGER : {
-                              struct integer_node* i = (struct integer_node*) node;
-                              return new_integer_node(i->value);
+                              return new_integer_node(int_value(node));
+                              break;
       };
       case N_DOUBLE : {
-                              struct double_node* d = (struct double_node*) node;
-                              return new_double_node(d->value);
+                              return new_double_node(double_value(node));
+                              break;
       };
       case N_STRING_1: {
-                              struct string_node* s = (struct string_node*) node;
-                              return new_string_node(s->value);
+                              return new_string_node(string_value(node));
+                              break;
       };
 /*      case N_IDENTIFIER : {
                               struct identifier_node* i = (struct identifier_node*)node;
@@ -493,6 +513,7 @@ struct ast* eval_ast(struct ast* node) {
                               // TODO manejar mejor casteo de tipos
                               } else {
                                 no_method_error("+", left);
+                              };
                               break;
       };
       case N_OP_MINUS_UN : {
@@ -558,19 +579,24 @@ void print_ast(struct ast* node) {
                               printf("nil");
                               break;
       };
+      case N_BOOL : {
+                              if (bool_value(node) == 1) {
+                                printf("true");  
+                              } else {
+                                printf("false");  
+                              };
+                              break;
+      };
       case N_INTEGER : {
-                              struct integer_node* i = (struct integer_node*)node;
-                              printf("%d", i->value);
+                              printf("%d", int_value(node));
                               break;
       };
       case N_DOUBLE  : {
-                              struct double_node* d = (struct double_node*)node;
-                              printf("%f", d->value);
+                              printf("%f", double_value(node));
                               break;
       };
       case N_STRING_1: {
-                              struct string_node* s = (struct string_node*)node;
-                              printf("%s", s->value);
+                              printf("%s", string_value(node));
                               break;
       };
       case N_IDENTIFIER : {

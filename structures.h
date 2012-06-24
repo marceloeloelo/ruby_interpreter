@@ -48,6 +48,7 @@
 #define N_IF             41
 #define N_IF_REM         42
 #define N_NIL            43
+#define N_BOOL           44
 
 extern int yylineno;
 void yyerror(char const*);
@@ -60,6 +61,11 @@ struct ast {
 
 struct nil_node {
   int node_type;
+};
+
+struct bool_node {
+  int node_type;
+  int value;
 };
 
 struct integer_node {

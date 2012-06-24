@@ -152,8 +152,8 @@ literal    : INTEGER                     { $$ = new_integer_node($1);           
            | SYMBOL                      { $$ = new_string_node($1);              }
            | STRING1                     { $$ = new_string_node(drop_quotes($1)); }
            | STRING2                     { $$ = new_string_node(drop_quotes($1)); }
-           | TRUE_BOOL                   { $$ = NULL; }
-           | FALSE_BOOL                  { $$ = NULL; }
+           | TRUE_BOOL                   { $$ = new_bool_node(1); }
+           | FALSE_BOOL                  { $$ = new_bool_node(0); }
            ;
 
 end_of_line : NL                         { $$ = NULL; }
