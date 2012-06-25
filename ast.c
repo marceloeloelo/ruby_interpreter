@@ -591,12 +591,31 @@ struct ast* eval_ast(struct ast* node) {
 
                               break;
       };
-/*      case N_OP_CMP_NEG : {
-                              print_ast(node->left);
-                              printf(" != ");
-                              print_ast(node->right);
+      case N_OP_CMP_NEG : {
+                              struct ast* left = eval_ast(node->left);
+                              struct ast* right = eval_ast(node->right);
+
+                              // int, double
+                              if ((left->node_type == N_INTEGER  || left->node_type == N_DOUBLE) &&
+                                  (right->node_type == N_INTEGER || right->node_type == N_DOUBLE)) {
+                                int value = (double_value(left) == double_value(right)) ? 0 : 1;
+                                return new_bool_node(value);
+
+                              // string 
+                              } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1) {
+                                int value = (strcmp(string_value(left), string_value(right)) == 0) ? 0 : 1;
+                                return new_bool_node(value);
+
+                              // nil
+                              } else if (left->node_type == N_NIL && right->node_type == N_NIL) {
+                                return new_bool_node(0);
+
+                              } else {
+                                return new_bool_node(1);
+                              };
+
                               break;
-      };*/
+      };
       case N_OP_CMP_AND : {
                               struct ast* left = eval_ast(node->left);
                               struct ast* right = eval_ast(node->right);
