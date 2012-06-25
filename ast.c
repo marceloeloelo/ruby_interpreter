@@ -535,22 +535,31 @@ struct ast* eval_ast(struct ast* node) {
 
                               break;
       };
-      /* case N_OP_CMP_EQ : {*/
-      /*                         struct ast* left = eval_ast(node->left);*/
-      /*                         struct ast* right = eval_ast(node->right);*/
+     case N_OP_CMP_EQ : {
+                              struct ast* left = eval_ast(node->left);
+                              struct ast* right = eval_ast(node->right);
 
-      /*                         if () {*/
-      /*                         } else if (left->node_type != N_INTEGER  &&*/
-      /*                                    left->node_type != N_DOUBLE   &&*/
-      /*                                    left->node_type != N_STRING_1 &&) {*/
-      /*                           no_method_error("==", left);*/
+                              // int & double
+                              if ((left->node_type == N_INTEGER  || left->node_type == N_DOUBLE) &&
+                                  (right->node_type == N_INTEGER || right->node_type == N_DOUBLE)) {
+                                int value = (double_value(left) == double_value(right)) ? 1 : 0;
+                                return new_bool_node(value);
 
-      /*                         } else {*/
-      /*                           type_error(left->node_type, right->node_type);*/
-      /*                         };*/
+                              // string 
+                              } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1) {
+                                int value = (strcmp(string_value(left), string_value(right)) == 0) ? 1 : 0;
+                                return new_bool_node(value);
 
-      /*                         break;*/
-      /* };*/
+                              // nil
+                              } else if (left->node_type == N_NIL && right->node_type == N_NIL) {
+                                return new_bool_node(1);
+
+                              } else {
+                                return new_bool_node(0);
+                              };
+
+                              break;
+       };
 /*      case N_OP_CMP_EQ_EQ : {
                               print_ast(node->left);
                               printf(" === ");
