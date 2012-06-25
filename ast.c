@@ -221,14 +221,14 @@ struct ast* eval_ast(struct ast* node) {
                               struct identifier_node* i = (struct identifier_node*)node;
                               printf("%s", i->name);
                               break;
-      };
+      };*/
       case N_OP_EQUAL : {
-                              print_ast(node->left);
-                              printf(" = ");
-                              print_ast(node->right);
+                              struct ast* left = eval_ast(node->left);
+                              struct ast* right = eval_ast(node->right);
+
                               break;
       };
-      case N_OP_PLUS_EQ : {
+/*      case N_OP_PLUS_EQ : {
                               print_ast(node->left);
                               printf(" += ");
                               print_ast(node->right);
@@ -271,12 +271,9 @@ struct ast* eval_ast(struct ast* node) {
                               if (left->node_type == N_INTEGER && right->node_type == N_INTEGER) {
                                 return new_integer_node(int_value(left) * int_value(right));
 
-                              // double * double
-                              } else if (left->node_type == N_DOUBLE && right->node_type == N_DOUBLE) {
-                                return new_double_node(double_value(left) * double_value(right));
-
                               // double * int || int * double
-                              } else if ((left->node_type == N_DOUBLE && right->node_type == N_INTEGER) ||
+                              } else if ((left->node_type == N_DOUBLE && right->node_type == N_DOUBLE)  ||
+                                         (left->node_type == N_DOUBLE && right->node_type == N_INTEGER) ||
                                          (left->node_type == N_INTEGER && right->node_type == N_DOUBLE)) {
                                 return new_double_node(double_value(left) * double_value(right));
 
@@ -318,15 +315,9 @@ struct ast* eval_ast(struct ast* node) {
                                   /* ERROR !!!! */
                                 }
 
-                              // double / double
-                              } else if (left->node_type == N_DOUBLE && right->node_type == N_DOUBLE) {
-                                if (double_value(right) != 0) {
-                                  return new_double_node(double_value(left) / double_value(right));
-                                } else {
-                                  /* ERROR !!! */
-                                }
-                              // double / int || int / double
-                              } else if ((left->node_type == N_DOUBLE && right->node_type == N_INTEGER) ||
+                              // double / double || double / int || int / double
+                              } else if ((left->node_type == N_DOUBLE && right->node_type == N_DOUBLE)  ||
+                                         (left->node_type == N_DOUBLE && right->node_type == N_INTEGER) ||
                                          (left->node_type == N_INTEGER && right->node_type == N_DOUBLE)) {
                                 if (double_value(right) != 0) {
                                   return new_double_node(double_value(left) * double_value(right));
@@ -390,8 +381,9 @@ struct ast* eval_ast(struct ast* node) {
                               } else if (left->node_type == N_DOUBLE && right->node_type == N_DOUBLE) {
                                 return new_double_node(double_value(left) + double_value(right));
 
-                              // double + int || int + double
-                              } else if ((left->node_type == N_DOUBLE && right->node_type == N_INTEGER) ||
+                              // double + double || double + int || int + double
+                              } else if ((left->node_type == N_DOUBLE && right->node_type == N_DOUBLE)  ||
+                                         (left->node_type == N_DOUBLE && right->node_type == N_INTEGER) ||
                                          (left->node_type == N_INTEGER && right->node_type == N_DOUBLE)) {
                                 return new_double_node(double_value(left) + double_value(right));
 
@@ -410,7 +402,7 @@ struct ast* eval_ast(struct ast* node) {
                                          left->node_type != N_STRING_1) {
                                 no_method_error("+", left);
 
-                              } else {          
+                              } else {
                                 type_error(left->node_type, right->node_type);
                               };
                               break;
@@ -423,12 +415,9 @@ struct ast* eval_ast(struct ast* node) {
                               if (left->node_type == N_INTEGER && right->node_type == N_INTEGER) {
                                 return new_integer_node(int_value(left) - int_value(right));
 
-                              // double - double
-                              } else if (left->node_type == N_DOUBLE && right->node_type == N_DOUBLE) {
-                                return new_double_node(double_value(left) - double_value(right));
-
-                              // double - int || int - double
-                              } else if ((left->node_type == N_DOUBLE && right->node_type == N_INTEGER) ||
+                              // double - double || double - int || int - double
+                              } else if ((left->node_type == N_DOUBLE && right->node_type == N_DOUBLE)  ||
+                                         (left->node_type == N_DOUBLE && right->node_type == N_INTEGER) ||
                                          (left->node_type == N_INTEGER && right->node_type == N_DOUBLE)) {
                                 return new_double_node(double_value(left) - double_value(right));
 
@@ -436,43 +425,133 @@ struct ast* eval_ast(struct ast* node) {
                               } else if (left->node_type != N_INTEGER &&
                                          left->node_type != N_DOUBLE ) {
                                 no_method_error("-", left);
-                                
-                              } else {          
+
+                              } else {
                                 type_error(left->node_type, right->node_type);
                               };
                               break;
-      }; /*
+      };
       case N_OP_CMP_GT : {
-                              print_ast(node->left);
-                              printf(" > ");
-                              print_ast(node->right);
+                              struct ast* left = eval_ast(node->left);
+                              struct ast* right = eval_ast(node->right);
+
+                              // int > int || int > double || double > int || double > double
+                              if ((left->node_type == N_INTEGER  || left->node_type == N_DOUBLE) &&
+                                  (right->node_type == N_INTEGER || right->node_type == N_DOUBLE)) {
+                                int value = (double_value(left) > double_value(right)) ? 1 : 0;
+                                return new_bool_node(value);
+
+                              // string > string
+                              } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1) {
+                                int value = (strcmp(string_value(left), string_value(right)) > 0) ? 1 : 0;
+                                return new_bool_node(value);
+
+                              } else if (left->node_type != N_INTEGER &&
+                                         left->node_type != N_DOUBLE  &&
+                                         left->node_type != N_STRING_1) {
+                                no_method_error(">", left);
+
+                              } else {
+                                type_error(left->node_type, right->node_type);
+                              };
+
                               break;
       };
       case N_OP_CMP_GT_EQ : {
-                              print_ast(node->left);
-                              printf(" >= ");
-                              print_ast(node->right);
+                              struct ast* left = eval_ast(node->left);
+                              struct ast* right = eval_ast(node->right);
+
+                              // int >= int || int >= double || double >= int || double >= double
+                              if ((left->node_type == N_INTEGER  || left->node_type == N_DOUBLE) &&
+                                  (right->node_type == N_INTEGER || right->node_type == N_DOUBLE)) {
+                                int value = (double_value(left) >= double_value(right)) ? 1 : 0;
+                                return new_bool_node(value);
+
+                              // string >= string
+                              } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1) {
+                                int value = (strcmp(string_value(left), string_value(right)) >= 0) ? 1 : 0;
+                                return new_bool_node(value);
+
+                              } else if (left->node_type != N_INTEGER &&
+                                         left->node_type != N_DOUBLE  &&
+                                         left->node_type != N_STRING_1) {
+                                no_method_error(">=", left);
+
+                              } else {
+                                type_error(left->node_type, right->node_type);
+                              };
+
                               break;
       };
       case N_OP_CMP_LE : {
-                              print_ast(node->left);
-                              printf(" < ");
-                              print_ast(node->right);
+                              struct ast* left = eval_ast(node->left);
+                              struct ast* right = eval_ast(node->right);
+
+                              // int < int || int < double || double < int || double < double
+                              if ((left->node_type == N_INTEGER  || left->node_type == N_DOUBLE) &&
+                                  (right->node_type == N_INTEGER || right->node_type == N_DOUBLE)) {
+                                int value = (double_value(left) < double_value(right)) ? 1 : 0;
+                                return new_bool_node(value);
+
+                              // string < string
+                              } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1) {
+                                int value = (strcmp(string_value(left), string_value(right)) < 0) ? 1 : 0;
+                                return new_bool_node(value);
+
+                              } else if (left->node_type != N_INTEGER &&
+                                         left->node_type != N_DOUBLE  &&
+                                         left->node_type != N_STRING_1) {
+                                no_method_error("<", left);
+
+                              } else {
+                                type_error(left->node_type, right->node_type);
+                              };
+
                               break;
       };
       case N_OP_CMP_LE_EQ : {
-                              print_ast(node->left);
-                              printf(" <= ");
-                              print_ast(node->right);
+                              struct ast* left = eval_ast(node->left);
+                              struct ast* right = eval_ast(node->right);
+
+                              // int <= int || int <= double || double <= int || double <= double
+                              if ((left->node_type == N_INTEGER  || left->node_type == N_DOUBLE) &&
+                                  (right->node_type == N_INTEGER || right->node_type == N_DOUBLE)) {
+                                int value = (double_value(left) <= double_value(right)) ? 1 : 0;
+                                return new_bool_node(value);
+
+                              // string <= string
+                              } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1) {
+                                int value = (strcmp(string_value(left), string_value(right)) <= 0) ? 1 : 0;
+                                return new_bool_node(value);
+
+                              } else if (left->node_type != N_INTEGER &&
+                                         left->node_type != N_DOUBLE  &&
+                                         left->node_type != N_STRING_1) {
+                                no_method_error("<=", left);
+
+                              } else {
+                                type_error(left->node_type, right->node_type);
+                              };
+
                               break;
       };
-      case N_OP_CMP_EQ : {
-                              print_ast(node->left);
-                              printf(" == ");
-                              print_ast(node->right);
-                              break;
-      };
-      case N_OP_CMP_EQ_EQ : {
+      /* case N_OP_CMP_EQ : {*/
+      /*                         struct ast* left = eval_ast(node->left);*/
+      /*                         struct ast* right = eval_ast(node->right);*/
+
+      /*                         if () {*/
+      /*                         } else if (left->node_type != N_INTEGER  &&*/
+      /*                                    left->node_type != N_DOUBLE   &&*/
+      /*                                    left->node_type != N_STRING_1 &&) {*/
+      /*                           no_method_error("==", left);*/
+
+      /*                         } else {*/
+      /*                           type_error(left->node_type, right->node_type);*/
+      /*                         };*/
+
+      /*                         break;*/
+      /* };*/
+/*      case N_OP_CMP_EQ_EQ : {
                               print_ast(node->left);
                               printf(" === ");
                               print_ast(node->right);
@@ -483,25 +562,25 @@ struct ast* eval_ast(struct ast* node) {
                               printf(" <=> ");
                               print_ast(node->right);
                               break;
-      };
-      case N_OP_CMP_NEG : {
+      };*/
+/*      case N_OP_CMP_NEG : {
                               print_ast(node->left);
                               printf(" != ");
                               print_ast(node->right);
                               break;
-      };
+      };*/
       case N_OP_CMP_AND : {
-                              print_ast(node->left);
-                              printf(" && ");
-                              print_ast(node->right);
+                              struct ast* left = eval_ast(node->left);
+                              struct ast* right = eval_ast(node->right);
+                              return new_bool_node(bool_value(left) && bool_value(right));
                               break;
       };
       case N_OP_CMP_OR : {
-                              print_ast(node->left);
-                              printf(" || ");
-                              print_ast(node->right);
+                              struct ast* left = eval_ast(node->left);
+                              struct ast* right = eval_ast(node->right);
+                              return new_bool_node(bool_value(left) || bool_value(right));
                               break;
-      }; */
+      };
       case N_OP_PLUS_UN : {
                               struct ast* left = eval_ast(node->left);
 
