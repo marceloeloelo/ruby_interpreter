@@ -539,7 +539,7 @@ struct ast* eval_ast(struct ast* node) {
                               struct ast* left = eval_ast(node->left);
                               struct ast* right = eval_ast(node->right);
 
-                              // int & double
+                              // int, double
                               if ((left->node_type == N_INTEGER  || left->node_type == N_DOUBLE) &&
                                   (right->node_type == N_INTEGER || right->node_type == N_DOUBLE)) {
                                 int value = (double_value(left) == double_value(right)) ? 1 : 0;
@@ -565,13 +565,32 @@ struct ast* eval_ast(struct ast* node) {
                               printf(" === ");
                               print_ast(node->right);
                               break;
-      };
+      }; */
       case N_OP_CMP_INEQ : {
-                              print_ast(node->left);
-                              printf(" <=> ");
-                              print_ast(node->right);
+                              struct ast* left = eval_ast(node->left);
+                              struct ast* right = eval_ast(node->right);
+
+                              // int, double
+                              if ((left->node_type == N_INTEGER  || left->node_type == N_DOUBLE) &&
+                                  (right->node_type == N_INTEGER || right->node_type == N_DOUBLE)) {
+                                if (double_value(left) == double_value(right)) {
+                                  return new_integer_node(0);    
+                                } else if (double_value(left) > double_value(right)) {
+                                  return new_integer_node(1);   
+                                } else {
+                                  return new_integer_node(-1);   
+                                };
+
+                              // string <= string
+                              } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1) {
+                                return new_integer_node(strcmp(string_value(left), string_value(right)));
+
+                              } else {
+                                no_method_error("<=>", left);
+                              };
+
                               break;
-      };*/
+      };
 /*      case N_OP_CMP_NEG : {
                               print_ast(node->left);
                               printf(" != ");
