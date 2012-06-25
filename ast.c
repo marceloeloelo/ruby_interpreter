@@ -138,8 +138,11 @@ int bool_value(struct ast* ast) {
   if (ast->node_type == N_BOOL) {
     struct bool_node* b = (struct bool_node*) ast;
     return b->value;
+  } else if (ast->node_type == N_NIL) {
+    struct nil_node* n = (struct nil_node*) ast;
+    return 0;
   } else {
-    return 0; // no debería pasar
+    return 1; 
   };
 };
 
@@ -517,9 +520,25 @@ struct ast* eval_ast(struct ast* node) {
                               break;
       };
       case N_OP_MINUS_UN : {
+                              struct ast* left = eval_ast(node->left);
+
+                              // int
+                              if (left->node_type == N_INTEGER) {
+                                return new_integer_node(int_value(left) * (-1));
+
+                              // double 
+                              } else if (left->node_type == N_DOUBLE) {
+                                return new_double_node(double_value(left) * (-1));
+
+                              // TODO manejar mejor casteo de tipos
+                              } else {
+                                no_method_error("-", left);
+                              };
                               break;
       };
       case N_OP_NOT : {
+                              struct ast* left = eval_ast(node->left);
+                              return new_bool_node(!bool_value(left));
                               break;
       }; 
       case N_STMT_LIST : {
