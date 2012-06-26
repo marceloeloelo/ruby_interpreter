@@ -57,7 +57,7 @@ int no_method_error(char* method, struct ast* ast) {
 };
 
 int undefined_variable_error(char* variable_name) {
-  printf("NameError: undefined local variable or method `%s' for main:Object", variable_name);
+  printf("NameError: undefined local variable or method `%s' for main:Object\n", variable_name);
   exit(1);
 };
 

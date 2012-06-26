@@ -229,9 +229,7 @@ struct ast* eval_ast(struct ast* node) {
       };
       case N_OP_EQUAL : {
                               struct identifier_node* left = (struct identifier_node*) node->left;
-                              struct ast* right = node->right;
-                              
-                              put_sym(left->name, node->right);
+                              put_sym(left->name, eval_ast(node->right));
                               break;
       };
 /*      case N_OP_PLUS_EQ : {
