@@ -9,5 +9,6 @@
 
 int type_error(int, int);
 int no_method_error(char*, struct ast*);
+int undefined_variable_error(char*);
 
 #endif

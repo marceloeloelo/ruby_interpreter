@@ -1,12 +1,18 @@
+#ifndef ST_H
+#define ST_H
+
 /*****************************************/
 /************ SYMBOL TABLE  **************/
 /*****************************************/
 
+#include "structures.h"
+
+//declaro variable global
+extern struct sym* sym_table;
+
 struct sym {
   char* name; /* name of symbol */
-  double value; /* value of symbol */ 
-  struct ast* fn; /* asociated function of symbol */
-  struct sym_list* fn_args; /* function arguments */
+  struct ast* ast; /* value of symbol */ 
   struct sym* next; /* next symbol */
 };
 
@@ -16,6 +22,8 @@ struct sym_list {
 };
 
 //struct sym* install_sym_table();
-struct sym* put_sym(struct sym*, char*);
-struct sym* get_sym(struct sym*, char*);
-void print_sym_table(struct sym*);
+void put_sym(char*, struct ast*);
+struct ast* get_sym(char*);
+void print_sym_table();
+
+#endif

@@ -217,15 +217,21 @@ struct ast* eval_ast(struct ast* node) {
                               return new_string_node(string_value(node));
                               break;
       };
-/*      case N_IDENTIFIER : {
-                              struct identifier_node* i = (struct identifier_node*)node;
-                              printf("%s", i->name);
+      case N_IDENTIFIER : {
+                              struct identifier_node* i = (struct identifier_node*) node;
+                              struct ast* ast = get_sym(i->name);
+                              if (ast != NULL) {
+                                return eval_ast(ast);
+                              } else {
+                                undefined_variable_error(i->name);
+                              };
                               break;
-      };*/
+      };
       case N_OP_EQUAL : {
-                              struct ast* left = eval_ast(node->left);
-                              struct ast* right = eval_ast(node->right);
-
+                              struct identifier_node* left = (struct identifier_node*) node->left;
+                              struct ast* right = node->right;
+                              
+                              put_sym(left->name, node->right);
                               break;
       };
 /*      case N_OP_PLUS_EQ : {

@@ -6,6 +6,10 @@
 /*****************************************/
 
 #include "structures.h"
+#include "st.h"
+
+//declaro variable global
+extern struct sym* sym_table;
 
 struct ast* new_ast_node(int, struct ast*, struct ast*);
 struct ast* new_nil_node();

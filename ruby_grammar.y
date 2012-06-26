@@ -98,9 +98,7 @@ case_remain : case_when case_remain
             | /* empty */
             ;
 
-expression : IDENTIFIER OP_EQUAL expression         { $$ = new_ast_node(N_OP_EQUAL, new_identifier_node($1), $3); 
-sym_table = put_sym(sym_table, $1);   
-}
+expression : IDENTIFIER OP_EQUAL expression         { $$ = new_ast_node(N_OP_EQUAL, new_identifier_node($1), $3);     }
            | IDENTIFIER OP_PLUS_EQ expression       { $$ = new_ast_node(N_OP_PLUS_EQ, new_identifier_node($1), $3);   }
            | IDENTIFIER OP_MINUS_EQ expression      { $$ = new_ast_node(N_OP_MINUS_EQ, new_identifier_node($1), $3);  }
            | IDENTIFIER OP_MUL_EQ expression        { $$ = new_ast_node(N_OP_MUL_EQ, new_identifier_node($1), $3);    }
