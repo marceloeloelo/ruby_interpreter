@@ -11,7 +11,7 @@ void yyerror(char const * error) {
 }
 
 // install sym_table
-struct sym* sym_table = 0;
+struct scope* sym_table = 0;
 
 %}
 
@@ -59,6 +59,7 @@ struct sym* sym_table = 0;
 %%
 
 program    : comp_statement                  { $$ = $1; 
+                                               push_scope();
                                                struct ast* eval = eval_ast($1);
                                                print_ast(eval); }
            ;
