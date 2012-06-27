@@ -229,7 +229,7 @@ struct ast* eval_ast(struct ast* node) {
       };
       case N_OP_EQUAL : {
                               struct identifier_node* left = (struct identifier_node*) node->left;
-                              put_sym(left->name, eval_ast(node->right), NULL);
+                              put_sym(SYM_VAR, left->name, eval_ast(node->right), NULL);
                               break;
       };
 /*      case N_OP_PLUS_EQ : {
@@ -674,15 +674,12 @@ struct ast* eval_ast(struct ast* node) {
       case N_STMT_LIST : {
                               return new_ast_node(N_STMT_LIST, eval_ast(node->left), eval_ast(node->right));
       };
-/*      case N_FUNCTION : {
-                              struct function_node* f = (struct function_node*)node;
-                              printf("def %s", f->name); // def function name
-                              print_arg_list(f->args); // function parameters
-                              print_ast(f->stmts); // comp_statements
-                              printf("end");
+      case N_FUNCTION : {
+                              struct function_node* f = (struct function_node*) node;
+                              put_sym(SYM_FUNC, f->name, f->stmts, f->args);
                               break;
       };
-      case N_RETURN : {
+/*      case N_RETURN : {
                               printf("return ");
                               print_ast(node->left); // expression
                               printf("\n");
