@@ -188,6 +188,35 @@ char * string_repeat( int n, const char * s ) {
   return dest;
 };
 
+int arg_list_length(struct arg_list_node* arg_list) {
+  int i = 0;
+  while (arg_list != NULL) {
+    i = i + 1;
+    arg_list = arg_list->next;
+  };
+  return i;
+};
+
+void eval_end_push_args(struct arg_list_node* fn_args, struct arg_list_node* call_args) {
+  int i = arg_list_length(fn_args);
+  int j = arg_list_length(call_args);
+  if (i == j) {
+    while (fn_args != NULL) { // paso parámetros
+      struct ast* fn_arg = fn_args->arg;
+      struct ast* call_arg = call_args->arg;
+
+      struct identifier_node* i = (struct identifier_node*) fn_arg;
+      put_sym(SYM_VAR, i->name, eval_ast(call_arg), NULL);
+
+      fn_args = fn_args->next;
+      call_args = call_args->next;
+    };
+  } else {
+    wrong_arguments_error(i, j);
+  };
+};
+
+
 //
 //
 //
@@ -219,11 +248,19 @@ struct ast* eval_ast(struct ast* node) {
       };
       case N_IDENTIFIER : {
                               struct identifier_node* i = (struct identifier_node*) node;
-                              struct ast* ast = get_sym(i->name);
-                              if (ast != NULL) {
-                                return eval_ast(ast);
+                              struct sym* sym = get_sym(SYM_VAR, i->name); // busco variable primero
+                              if (sym != NULL) {
+                                return eval_ast(sym->ast); // retorno variable
                               } else {
-                                undefined_variable_error(i->name);
+                                sym = get_sym(SYM_FUNC, i->name); // busco función
+                                if (sym != NULL) {
+                                  push_scope(); // pusheo nuevo scope
+                                  // no pasamos parámetros porque estamos en nodo identifier
+                                  return eval_ast(sym->ast); // retorno función evaluada
+                                  pop_scope(); // pop del scope pusheado
+                                } else {
+                                  undefined_variable_error(i->name);
+                                };  
                               };
                               break;
       };
@@ -676,6 +713,17 @@ struct ast* eval_ast(struct ast* node) {
       };
       case N_FUNCTION : {
                               struct function_node* f = (struct function_node*) node;
+
+                              // checkeo que todos los parámetros sean identifiers
+                              struct arg_list_node* fn_args = f->args;
+                              while (fn_args != NULL) { // paso parámetros
+                                struct ast* fn_arg = fn_args->arg;
+                                if (fn_arg->node_type != N_IDENTIFIER) {
+                                  unexpected_type_error(fn_arg->node_type);
+                                };
+                                fn_args = fn_args->next;
+                              };
+
                               put_sym(SYM_FUNC, f->name, f->stmts, f->args);
                               break;
       };
@@ -699,13 +747,21 @@ struct ast* eval_ast(struct ast* node) {
                               print_ast(c->stmts); // comp_statements
                               printf("end");
                               break;
-      }; 
-      case N_METHOD_CALL_2 : { 
-                              // por ahora solo comportamiento puts
-                              struct method_call_node* m = (struct method_call_node*)node;
-                              print_ast(eval_ast(m->args->arg));
-                              break;
       }; */
+      case N_METHOD_CALL_2 : { 
+                              struct method_call_node* m = (struct method_call_node*) node;
+                              struct sym* sym = get_sym(SYM_FUNC, m->method_name); // busco función
+                              if (sym != NULL) {
+                                push_scope(); // pusheo nuevo scope
+                                eval_end_push_args(sym->args, m->args);
+                                struct ast* eval = eval_ast(sym->ast);                                 
+                                pop_scope(); // pop del scope pusheado
+                                return eval; // retorno función evaluada
+                              } else {
+                                undefined_variable_error(m->method_name);
+                              };  
+                              break;
+      }; 
       default : {
                               printf("ERROR: when evaluating %c.\n", node->node_type);
       };
@@ -898,7 +954,6 @@ void print_ast(struct ast* node) {
       };
       case N_STMT_LIST : {
                               print_ast(node->right);
-                              printf("\n");
                               print_ast(node->left);
                               break;
       };
