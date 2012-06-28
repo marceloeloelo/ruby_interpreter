@@ -54,6 +54,9 @@
 #define N_OPT_BLOCK       47
 #define N_SYMBOL          48
 #define N_COMP_CLASS_STMT 49
+#define N_ATTR_ACCESSOR   50
+#define N_ATTR_READER     51
+#define N_ATTR_WRITER     52
 
 extern int yylineno;
 void yyerror(char const*);

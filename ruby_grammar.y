@@ -53,8 +53,8 @@ struct scope* sym_table = 0;
 %type <string> STRING1 STRING2 IDENTIFIER SYMBOL
 %type <int_number> INTEGER
 %type <double_number> DOUBLE
-%type <ast_type> program comp_statement statement end_of_line expression primary literal declarations method_call if_remain optional_block  attr_statement
-%type <list_type> arg_list arg_decl arg_decl_fn optional_ids arg_decl2 arg_list2 sym_list comp_class_statement
+%type <ast_type> program comp_statement statement end_of_line expression primary literal declarations method_call if_remain optional_block  attr_statement sym_list
+%type <list_type> arg_list arg_decl arg_decl_fn optional_ids arg_decl2 arg_list2 comp_class_statement
 
 %start program
 
@@ -101,13 +101,13 @@ comp_class_statement : comp_class_statement statement       { $$ = new_list_node
                      | /* empty */                          { $$ = NULL; }
                      ;
 
-attr_statement : ATTR_ACCESSOR sym_list end_of_line  { $$ = NULL; }
-               | ATTR_READER sym_list end_of_line    { $$ = NULL; }
-               | ATTR_WRITER sym_list end_of_line    { $$ = NULL; }
+attr_statement : ATTR_ACCESSOR sym_list end_of_line  { $$ = new_ast_node(N_ATTR_ACCESSOR, $2, NULL); }
+               | ATTR_READER sym_list end_of_line    { $$ = new_ast_node(N_ATTR_READER, $2, NULL);   }
+               | ATTR_WRITER sym_list end_of_line    { $$ = new_ast_node(N_ATTR_WRITER, $2, NULL);   }
                ;
 
-sym_list : sym_list COMMA SYMBOL { $$ = new_list_node(N_SYM_LIST, new_symbol_node($3), $1);   }
-         | SYMBOL                { $$ = new_list_node(N_SYM_LIST, new_symbol_node($1), NULL); }
+sym_list : sym_list COMMA SYMBOL { $$ = new_ast_node(N_SYM_LIST, new_symbol_node($3), $1);   }
+         | SYMBOL                { $$ = new_ast_node(N_SYM_LIST, new_symbol_node($1), NULL); }
          ;
 
 if_remain : ELSIF expression NL comp_statement if_remain     { $$ = new_if_node(N_IF_REM, $2, $4, $5); }
