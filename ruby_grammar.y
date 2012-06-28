@@ -53,7 +53,7 @@ struct scope* sym_table = 0;
 %type <string> STRING1 STRING2 IDENTIFIER SYMBOL
 %type <int_number> INTEGER
 %type <double_number> DOUBLE
-%type <ast_type> program comp_statement statement end_of_line expression primary literal declarations method_call if_remain optional_block  attr_statement sym_list
+%type <ast_type> program comp_statement statement end_of_line expression primary literal declarations method_call if_remain optional_block  attr_statement sym_list array array_content
 %type <list_type> arg_list arg_decl arg_decl_fn optional_ids arg_decl2 arg_list2 comp_class_statement
 
 %start program
@@ -81,7 +81,7 @@ method_call : IDENTIFIER DOT IDENTIFIER arg_decl2 optional_block   { $$ = new_me
             ;
 
 optional_block : DO PIPE optional_ids PIPE NL comp_statement END   { $$ = new_opt_block_node($3, $6); }
-               | /* empty */                                       { $$ = NULL;                              }
+               | /* empty */                                       { $$ = NULL;                       }
                ;
 
 optional_ids : optional_ids COMMA IDENTIFIER { $$ = new_list_node(N_OPT_IDS, new_identifier_node($3), $1);   }
@@ -180,12 +180,12 @@ arg_list2  : arg_list2 COMMA expression     { $$ = new_list_node(N_ARG_LIST, $3,
           | expression                      { $$ = new_list_node(N_ARG_LIST, $1, NULL); }
           ;
 
-array : L_SQ_BRACK array_content R_SQ_BRACK
-      | L_SQ_BRACK R_SQ_BRACK
+array : L_SQ_BRACK array_content R_SQ_BRACK { $$ = new_ast_node(N_ARRAY, $2, NULL); }
+      | L_SQ_BRACK R_SQ_BRACK               { $$ = NULL;                            }
       ;
 
-array_content : array_content COMMA primary
-              | primary
+array_content : array_content COMMA primary { $$ = new_ast_node(N_ARRAY_CONTENT, $3, $1);   }
+              | primary                     { $$ = new_ast_node(N_ARRAY_CONTENT, $1, NULL); }
               ;
 
 literal    : INTEGER                     { $$ = new_integer_node($1);             }
@@ -193,8 +193,8 @@ literal    : INTEGER                     { $$ = new_integer_node($1);           
            | SYMBOL                      { $$ = new_symbol_node($1);              }
            | STRING1                     { $$ = new_string_node(drop_quotes($1)); }
            | STRING2                     { $$ = new_string_node(drop_quotes($1)); }
-           | TRUE_BOOL                   { $$ = new_bool_node(1); }
-           | FALSE_BOOL                  { $$ = new_bool_node(0); }
+           | TRUE_BOOL                   { $$ = new_bool_node(1);                 }
+           | FALSE_BOOL                  { $$ = new_bool_node(0);                 }
            ;
 
 end_of_line : NL                         { $$ = NULL; }
