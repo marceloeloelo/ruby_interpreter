@@ -22,14 +22,12 @@ struct ast* new_class_node(char*, struct ast*);
 struct ast* new_method_call_node(int, char*, char*, struct arg_list_node*);
 struct ast* new_if_node(int, struct ast*, struct ast*, struct ast*);
 
-struct ast* eval_ast(struct ast*);
+
+int bool_value(struct ast*);
+int int_value(struct ast*);
+double double_value(struct ast*);
+char* string_value(struct ast*);
+
 void free_ast(struct ast*);
-void print_ast(struct ast*);
-
-//
-//
-// aux functions
-
-char* drop_quotes(char*);
 
 #endif

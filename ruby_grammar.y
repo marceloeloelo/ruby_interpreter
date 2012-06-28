@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include "ast.h"
 #include "st.h"
+#include "eval.h"
+#include "print.h"
 
 extern int yylineno;
 
