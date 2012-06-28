@@ -59,14 +59,23 @@ struct ast* new_identifier_node(char* name) {
   return (struct ast*)node;
 };
 
-struct arg_list_node* new_arg_list_node(struct ast* arg, struct arg_list_node* next) {
-  struct arg_list_node* node = malloc(sizeof(struct arg_list_node));
+struct ast* new_symbol_node(char* name) {
+  struct symbol_node* node = malloc(sizeof(struct symbol_node));
+  node->node_type = N_SYMBOL;
+  node->name = malloc((strlen(name)+1)*sizeof(char));
+  strcpy(node->name, name);
+  return (struct ast*)node;
+};
+
+struct list_node* new_list_node(int node_type, struct ast* arg, struct list_node* next) {
+  struct list_node* node = malloc(sizeof(struct list_node));
+  node->node_type = node_type;
   node->arg = arg;
   node->next = next;
   return node;
 };
 
-struct ast* new_function_node(char* name, struct arg_list_node* args, struct ast* stmts) {
+struct ast* new_function_node(char* name, struct list_node* args, struct ast* stmts) {
   struct function_node* node = malloc(sizeof(struct function_node));
   node->node_type = N_FUNCTION;
   node->name = malloc((strlen(name)+1)*sizeof(char));
@@ -76,7 +85,7 @@ struct ast* new_function_node(char* name, struct arg_list_node* args, struct ast
   return (struct ast*)node;
 };
 
-struct ast* new_class_node(char* name, struct ast* stmts) {
+struct ast* new_class_node(char* name, struct list_node* stmts) {
   struct class_node* node = malloc(sizeof(struct class_node));
   node->node_type = N_CLASS;
   node->name = malloc((strlen(name)+1)*sizeof(char));
@@ -85,7 +94,7 @@ struct ast* new_class_node(char* name, struct ast* stmts) {
   return (struct ast*)node;
 };
 
-struct ast* new_method_call_node(int node_type, char* class_name, char* method_name, struct arg_list_node* args) {
+struct ast* new_method_call_node(int node_type, char* class_name, char* method_name, struct list_node* args, struct ast* opt_block) {
   struct method_call_node* node = malloc(sizeof(struct method_call_node));
   node->node_type = node_type;
   node->method_name = malloc((strlen(method_name)+1)*sizeof(char));
@@ -99,6 +108,7 @@ struct ast* new_method_call_node(int node_type, char* class_name, char* method_n
   };
 
   node->args = args;
+  node->opt_block = opt_block;
   return (struct ast*)node;
 }
 
@@ -111,13 +121,21 @@ struct ast* new_if_node(int node_type, struct ast* condition, struct ast* th, st
   return (struct ast*)node;
 };
 
+struct ast* new_opt_block_node(struct list_node* opt_ids, struct ast* stmts) {
+  struct opt_block_node* node = malloc(sizeof(struct opt_block_node));
+  node->node_type = N_OPT_BLOCK;
+  node->opt_ids = opt_ids;
+  node->stmts = stmts;
+  return (struct ast*)node;
+}
+
 //
 //
 // aux functions /////////////////////////////////////
 
-void print_arg_list(struct arg_list_node* args) {
+void print_list(struct list_node* args) {
   printf("(");
-  struct arg_list_node* aux = args;
+  struct list_node* aux = args;
   while (aux != NULL) {
     print_ast(aux->arg);
     aux = aux->next;
@@ -790,8 +808,8 @@ void print_ast(struct ast* node) {
                               break;
       };
       case N_ARG_LIST : {
-                              struct arg_list_node* l = (struct arg_list_node*)node;
-                              print_arg_list(l); 
+                              struct list_node* l = (struct list_node*)node;
+                              print_list(l); 
                               break;
       };
       case N_OP_MUL : {
@@ -908,7 +926,7 @@ void print_ast(struct ast* node) {
       case N_FUNCTION : {
                               struct function_node* f = (struct function_node*)node;
                               printf("def %s", f->name); // def function name
-                              print_arg_list(f->args); // function parameters
+                              print_list(f->args); // function parameters
                               print_ast(f->stmts); // comp_statements
                               printf("end");
                               break;
@@ -930,14 +948,14 @@ void print_ast(struct ast* node) {
       case N_CLASS : {
                               struct class_node* c = (struct class_node*)node;
                               printf("class %s\n", c->name); // class name
-                              print_ast(c->stmts); // comp_statements
+                              print_list(c->stmts); // comp_statements
                               printf("end");
                               break;
       };
       case N_METHOD_CALL_2 : { 
                               struct method_call_node* m = (struct method_call_node*) node;
                               printf("%s ", m->method_name);
-                              print_arg_list(m->args);
+                              print_list(m->args);
                               break;
       };
       default : {
