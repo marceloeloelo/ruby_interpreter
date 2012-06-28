@@ -61,3 +61,13 @@ int undefined_variable_error(char* variable_name) {
   exit(1);
 };
 
+
+int wrong_arguments_error(int x, int y) {
+  printf("ArgumentError: wrong number of arguments (%i for %i)\n", x, y);
+  exit(1);
+};
+
+int unexpected_type_error(int type) {
+  printf("syntax error, unexpected %s\n", type_name(type));
+  exit(1);
+};

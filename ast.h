@@ -8,8 +8,6 @@
 #include "structures.h"
 #include "st.h"
 
-//declaro variable global
-extern struct sym* sym_table;
 
 struct ast* new_ast_node(int, struct ast*, struct ast*);
 struct ast* new_nil_node();
@@ -26,14 +24,12 @@ struct ast* new_method_call_node(int, char*, char*, struct list_node*, struct as
 struct ast* new_if_node(int, struct ast*, struct ast*, struct ast*);
 struct ast* new_opt_block_node(struct list_node*, struct ast*);
 
-struct ast* eval_ast(struct ast*);
+
+int bool_value(struct ast*);
+int int_value(struct ast*);
+double double_value(struct ast*);
+char* string_value(struct ast*);
+
 void free_ast(struct ast*);
-void print_ast(struct ast*);
-
-//
-//
-// aux functions
-
-char* drop_quotes(char*);
 
 #endif
