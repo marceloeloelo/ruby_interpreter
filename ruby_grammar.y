@@ -45,22 +45,22 @@ struct sym* sym_table = 0;
 %token ATTR_READER ATTR_WRITER ATTR_ACCESSOR
 %token IDENTIFIER SYMBOL
 %token L_PAREN R_PAREN L_BRACE R_BRACE L_SQ_BRACK R_SQ_BRACK
-%token HASH DOT COMMA SEMI_COLON OP_QUESTION NL
+%token HASH DOT COMMA SEMI_COLON OP_QUESTION NL PIPE
 
 
 %type <string> STRING1 STRING2 IDENTIFIER SYMBOL
 %type <int_number> INTEGER
 %type <double_number> DOUBLE
-%type <ast_type> program comp_statement statement end_of_line expression primary literal declarations method_call if_remain
-%type <arg_list_type> arg_list arg_decl arg_decl_fn
+%type <ast_type> program comp_statement statement end_of_line expression primary literal declarations method_call if_remain optional_block comp_class_statement
+%type <arg_list_type> arg_list arg_decl arg_decl_fn optional_ids arg_decl2 arg_list2
 
 %start program
 
 %%
 
 program    : comp_statement                  { $$ = $1; 
-                                               struct ast* eval = eval_ast($1);
-                                               print_ast(eval); }
+                                               /*struct ast* eval = eval_ast($1);
+                                               print_ast(eval);*/ }
            ;
 
 comp_statement  : comp_statement statement   { $$ = new_ast_node(N_STMT_LIST, $2, $1); }
@@ -73,17 +73,39 @@ statement  : end_of_line                     { $$ = $1; }
            | method_call end_of_line         { $$ = $1; }
            ;
 
-method_call : IDENTIFIER DOT IDENTIFIER arg_decl { $$ = new_method_call_node(N_METHOD_CALL_1, $1, $3, $4);   }
-            | IDENTIFIER arg_decl_fn             { $$ = new_method_call_node(N_METHOD_CALL_2, NULL, $1, $2); }
+method_call : IDENTIFIER DOT IDENTIFIER arg_decl2 optional_block { $$ = new_method_call_node(N_METHOD_CALL_1, $1, $3, $4);   }
+            | IDENTIFIER arg_decl_fn optional_block            { $$ = new_method_call_node(N_METHOD_CALL_2, NULL, $1, $2); }
             ;
 
-declarations : CLASS IDENTIFIER NL comp_statement END              { $$ = new_class_node($2, $4);           }
+optional_block : DO PIPE optional_ids PIPE NL comp_statement END { $$ = NULL; }
+               | /* empty */                                                { $$ = NULL; }
+               ;
+
+optional_ids : optional_ids COMMA IDENTIFIER { $$ = NULL; }
+             | IDENTIFIER                    { $$ = NULL; }
+             ;
+
+declarations : CLASS IDENTIFIER NL comp_class_statement END        { $$ = new_class_node($2, $4);           }
              | DEF IDENTIFIER arg_decl NL comp_statement END       { $$ = new_function_node($2, $3, $5);    }
              | RETURN expression                                   { $$ = new_ast_node(N_RETURN, $2, NULL); }
              | WHILE expression NL comp_statement END              { $$ = new_ast_node(N_WHILE, $2, $4);    }
              | IF expression NL comp_statement if_remain END       { $$ = new_if_node(N_IF, $2, $4, $5);    }
-             | CASE expression NL case_when case_remain END
+             | CASE expression NL case_when case_remain END        { $$ = NULL; }
              ;
+
+comp_class_statement : comp_class_statement statement       { $$ = NULL; }
+                     | comp_class_statement attr_statement  { $$ = NULL; }
+                     | /* empty */                          { $$ = NULL; }
+                     ;
+
+attr_statement : ATTR_ACCESSOR sym_list end_of_line
+               | ATTR_READER sym_list end_of_line
+               | ATTR_WRITER sym_list end_of_line
+               ;
+
+sym_list : sym_list COMMA SYMBOL
+         | SYMBOL
+         ;
 
 if_remain : ELSIF expression NL comp_statement if_remain     { $$ = new_if_node(N_IF_REM, $2, $4, $5); }
           | ELSE NL comp_statement                           { $$ = $3;                                }
@@ -130,6 +152,7 @@ expression : IDENTIFIER OP_EQUAL expression         { $$ = new_ast_node(N_OP_EQU
 primary    : literal                     { $$ = $1;                      }
            | IDENTIFIER                  { $$ = new_identifier_node($1); }
            | NIL                         { $$ = new_nil_node();          }
+           | array                       { $$ = NULL; }
            ;
 
 arg_decl  : L_PAREN arg_list R_PAREN     { $$ = $2;   }
@@ -137,13 +160,30 @@ arg_decl  : L_PAREN arg_list R_PAREN     { $$ = $2;   }
           | /* empty */                  { $$ = NULL; }
           ;
 
-arg_decl_fn : L_PAREN arg_list R_PAREN   { $$ = $2;   }
-            | arg_list                   { $$ = $1;   }
-            ;
-
 arg_list  : arg_list COMMA primary       { $$ = new_arg_list_node($3, $1);   }
           | primary                      { $$ = new_arg_list_node($1, NULL); }
           ;
+
+arg_decl2  : L_PAREN arg_list2 R_PAREN     { $$ = $2;   }
+           | arg_list2                     { $$ = $1;   }
+           | /* empty */                  { $$ = NULL; }
+           ;
+
+arg_decl_fn : L_PAREN arg_list2 R_PAREN   { $$ = $2;   }
+            | arg_list2                   { $$ = $1;   }
+            ;
+
+arg_list2  : arg_list2 COMMA expression       { $$ = NULL;/*new_arg_list_node($3, $1);*/   }
+          | expression                      { $$ = NULL; /*new_arg_list_node($1, NULL);*/ }
+          ;
+
+array : L_SQ_BRACK array_content R_SQ_BRACK
+      | L_SQ_BRACK R_SQ_BRACK
+      ;
+
+array_content : array_content COMMA primary
+              | primary
+              ;
 
 literal    : INTEGER                     { $$ = new_integer_node($1);             }
            | DOUBLE                      { $$ = new_double_node($1);              }

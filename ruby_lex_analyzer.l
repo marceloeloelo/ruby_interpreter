@@ -89,6 +89,7 @@
 ","                      { return COMMA; }
 ";"                      { return SEMI_COLON; }
 "?"                      { return OP_QUESTION; }
+"|"                      { return PIPE; }
 "\n"                     { return NL; }
 .                        { printf("ERROR: Line %d, invalid token \"%s\"\n", yylineno, yytext); exit(1); }
 
