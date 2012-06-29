@@ -6,6 +6,7 @@
 #include <stdarg.h>
 
 struct ast* new_ast_node(int node_type, struct ast* left, struct ast* right) {
+
   struct ast* node = malloc(sizeof(struct ast));
 
   node->node_type = node_type;

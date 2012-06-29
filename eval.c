@@ -111,6 +111,7 @@ struct ast* eval_ast(struct ast* node) {
       case N_OP_EQUAL : {
                               struct identifier_node* left = (struct identifier_node*) node->left;
                               put_sym(SYM_VAR, left->name, eval_ast(node->right), NULL);
+                              return NULL;
                               break;
       };
 /*      case N_OP_PLUS_EQ : {
@@ -590,7 +591,10 @@ struct ast* eval_ast(struct ast* node) {
       };
 
       case N_WHILE : {
-                              //
+                              while (eval_cond(eval_ast(node->left)) == 1) {
+                                print_sym_table();
+                                eval_ast(node->right);
+                              };
                               break;
       };
 /*      case N_CLASS : {

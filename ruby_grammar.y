@@ -26,15 +26,16 @@ struct scope* sym_table = 0;
 }
 
 %left RETURN
+%right <ast_type> OP_EQUAL OP_PLUS_EQ OP_MINUS_EQ OP_MUL_EQ OP_DIV_EQ OP_MODULO_EQ
 %left <ast_type> OP_CMP_OR
 %left <ast_type> OP_CMP_AND
 %left <ast_type> OP_CMP_EQ OP_CMP_EQ_EQ OP_CMP_INEQ OP_CMP_NEG
 %left <ast_type> OP_CMP_GT OP_CMP_LE OP_CMP_GT_EQ OP_CMP_LE_EQ
 %left <ast_type> OP_PLUS OP_MINUS
 %left <ast_type> OP_MUL OP_DIV OP_MODULO
-%left <ast_type> OP_NOT
 %left <ast_type> OP_EXP
-%right <ast_type> OP_EQUAL OP_PLUS_EQ OP_MINUS_EQ OP_MUL_EQ OP_DIV_EQ OP_MODULO_EQ
+%left <ast_type> OP_NOT
+
 
 %token STRING1 STRING2
 %token INTEGER
@@ -62,7 +63,7 @@ struct scope* sym_table = 0;
 
 program    : comp_statement                  { $$ = $1; 
                                                push_scope();
-                                               struct ast* eval = eval_ast($1);
+                                               struct ast* eval = eval_ast($1); 
                                                print_ast(eval); }
            ;
 
