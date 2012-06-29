@@ -7,6 +7,11 @@
 
 #include "structures.h"
 #include "st.h"
+#include "errors.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdarg.h>
 
 
 struct ast* new_ast_node(int, struct ast*, struct ast*);

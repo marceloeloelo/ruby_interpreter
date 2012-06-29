@@ -1,9 +1,4 @@
 #include "ast.h"
-#include "errors.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdarg.h>
 
 struct ast* new_ast_node(int node_type, struct ast* left, struct ast* right) {
 
@@ -72,8 +67,18 @@ struct list_node* new_list_node(int node_type, struct ast* arg, struct list_node
   struct list_node* node = malloc(sizeof(struct list_node));
   node->node_type = node_type;
   node->arg = arg;
-  node->next = next;
-  return node;
+  node->next = NULL;
+  //Inserto al final de la lista
+  struct list_node* list = next;
+  if (next == NULL){
+    return node;
+  } else{
+    while (list->next != NULL){
+      list = list->next;
+    }
+    list->next = node;
+    return list;
+  }
 };
 
 struct ast* new_function_node(char* name, struct list_node* args, struct ast* stmts) {
