@@ -53,8 +53,8 @@ struct scope* sym_table = 0;
 %type <string> STRING1 STRING2 IDENTIFIER SYMBOL
 %type <int_number> INTEGER
 %type <double_number> DOUBLE
-%type <ast_type> program comp_statement statement end_of_line expression primary literal declarations method_call if_remain optional_block  attr_statement
-%type <list_type> arg_list arg_decl arg_decl_fn optional_ids arg_decl2 arg_list2 sym_list comp_class_statement
+%type <ast_type> program comp_statement statement end_of_line expression primary literal declarations method_call if_remain optional_block  attr_statement sym_list array array_content
+%type <list_type> arg_list arg_decl arg_decl_fn optional_ids arg_decl2 arg_list2 comp_class_statement
 
 %start program
 
@@ -81,7 +81,7 @@ method_call : IDENTIFIER DOT IDENTIFIER arg_decl2 optional_block   { $$ = new_me
             ;
 
 optional_block : DO PIPE optional_ids PIPE NL comp_statement END   { $$ = new_opt_block_node($3, $6); }
-               | /* empty */                                       { $$ = NULL;                              }
+               | /* empty */                                       { $$ = NULL;                       }
                ;
 
 optional_ids : optional_ids COMMA IDENTIFIER { $$ = new_list_node(N_OPT_IDS, new_identifier_node($3), $1);   }
@@ -101,13 +101,13 @@ comp_class_statement : comp_class_statement statement       { $$ = new_list_node
                      | /* empty */                          { $$ = NULL; }
                      ;
 
-attr_statement : ATTR_ACCESSOR sym_list end_of_line  { $$ = NULL; }
-               | ATTR_READER sym_list end_of_line    { $$ = NULL; }
-               | ATTR_WRITER sym_list end_of_line    { $$ = NULL; }
+attr_statement : ATTR_ACCESSOR sym_list end_of_line  { $$ = new_ast_node(N_ATTR_ACCESSOR, $2, NULL); }
+               | ATTR_READER sym_list end_of_line    { $$ = new_ast_node(N_ATTR_READER, $2, NULL);   }
+               | ATTR_WRITER sym_list end_of_line    { $$ = new_ast_node(N_ATTR_WRITER, $2, NULL);   }
                ;
 
-sym_list : sym_list COMMA SYMBOL { $$ = new_list_node(N_SYM_LIST, new_symbol_node($3), $1);   }
-         | SYMBOL                { $$ = new_list_node(N_SYM_LIST, new_symbol_node($1), NULL); }
+sym_list : sym_list COMMA SYMBOL { $$ = new_ast_node(N_SYM_LIST, new_symbol_node($3), $1);   }
+         | SYMBOL                { $$ = new_ast_node(N_SYM_LIST, new_symbol_node($1), NULL); }
          ;
 
 if_remain : ELSIF expression NL comp_statement if_remain     { $$ = new_if_node($2, $4, $5); }
@@ -180,12 +180,12 @@ arg_list2  : arg_list2 COMMA expression     { $$ = new_list_node(N_ARG_LIST, $3,
           | expression                      { $$ = new_list_node(N_ARG_LIST, $1, NULL); }
           ;
 
-array : L_SQ_BRACK array_content R_SQ_BRACK
-      | L_SQ_BRACK R_SQ_BRACK
+array : L_SQ_BRACK array_content R_SQ_BRACK { $$ = new_ast_node(N_ARRAY, $2, NULL); }
+      | L_SQ_BRACK R_SQ_BRACK               { $$ = NULL;                            }
       ;
 
-array_content : array_content COMMA primary
-              | primary
+array_content : array_content COMMA primary { $$ = new_ast_node(N_ARRAY_CONTENT, $3, $1);   }
+              | primary                     { $$ = new_ast_node(N_ARRAY_CONTENT, $1, NULL); }
               ;
 
 literal    : INTEGER                     { $$ = new_integer_node($1);             }
@@ -193,8 +193,8 @@ literal    : INTEGER                     { $$ = new_integer_node($1);           
            | SYMBOL                      { $$ = new_symbol_node($1);              }
            | STRING1                     { $$ = new_string_node(drop_quotes($1)); }
            | STRING2                     { $$ = new_string_node(drop_quotes($1)); }
-           | TRUE_BOOL                   { $$ = new_bool_node(1); }
-           | FALSE_BOOL                  { $$ = new_bool_node(0); }
+           | TRUE_BOOL                   { $$ = new_bool_node(1);                 }
+           | FALSE_BOOL                  { $$ = new_bool_node(0);                 }
            ;
 
 end_of_line : NL                         { $$ = NULL; }
