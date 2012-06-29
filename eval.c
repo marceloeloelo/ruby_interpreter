@@ -104,7 +104,7 @@ struct ast* eval_ast(struct ast* node) {
                                   pop_scope(); // pop del scope pusheado
                                 } else {
                                   undefined_variable_error(i->name);
-                                };  
+                                };
                               };
                               break;
       };
@@ -114,37 +114,173 @@ struct ast* eval_ast(struct ast* node) {
                               return NULL;
                               break;
       };
-/*      case N_OP_PLUS_EQ : {
-                              print_ast(node->left);
-                              printf(" += ");
-                              print_ast(node->right);
+      case N_OP_PLUS_EQ : {
+                              struct identifier_node* id_node = (struct identifier_node*)node->left;
+                              struct sym* s = get_sym(SYM_VAR, id_node->name);
+
+                              if (s != NULL) {
+                                struct ast* left = s->ast;
+                                struct ast* right = eval_ast(node->right);
+
+                                // int += int
+                                if (left->node_type == N_INTEGER && right->node_type == N_INTEGER) {
+                                  s->ast = new_integer_node(int_value(left) + int_value(right));
+
+                                // double += double
+                                } else if (left->node_type == N_DOUBLE && right->node_type == N_DOUBLE) {
+                                  s->ast = new_double_node(double_value(left) + double_value(right));
+
+                                // double += double || double += int || int += double
+                                } else if ((left->node_type == N_DOUBLE && right->node_type == N_DOUBLE)  ||
+                                           (left->node_type == N_DOUBLE && right->node_type == N_INTEGER) ||
+                                           (left->node_type == N_INTEGER && right->node_type == N_DOUBLE)) {
+                                  s->ast = new_double_node(double_value(left) + double_value(right));
+
+                                // string += string
+                                } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1) {
+                                  char* s_left = string_value(left);
+                                  char* s_right = string_value(right);
+                                  char* res = malloc((strlen(s_left) + strlen(s_right) + 1)*sizeof(char));
+                                  strcpy(res, s_left);
+                                  strcat(res, s_right);
+                                  s->ast = new_string_node(res);
+                                } else if (left->node_type != N_INTEGER &&
+                                           left->node_type != N_DOUBLE  &&
+                                           left->node_type != N_STRING_1) {
+                                  no_method_error("+=", left);
+
+                                } else {
+                                  type_error(left->node_type, right->node_type);
+                                };
+                              } else {
+                                undefined_variable_error(id_node->name);
+                              };
                               break;
       };
       case N_OP_MINUS_EQ : {
-                              print_ast(node->left);
-                              printf(" -= ");
-                              print_ast(node->right);
+                              struct identifier_node* id_node = (struct identifier_node*)node->left;
+                              struct sym* s = get_sym(SYM_VAR, id_node->name);
+
+                              if (s != NULL) {
+                                struct ast* left = s->ast;
+                                struct ast* right = eval_ast(node->right);
+
+                                // int -= int
+                                if (left->node_type == N_INTEGER && right->node_type == N_INTEGER) {
+                                  s->ast = new_integer_node(int_value(left) - int_value(right));
+
+                                // double -= double || double -= int || int -= double
+                                } else if ((left->node_type == N_DOUBLE && right->node_type == N_DOUBLE)  ||
+                                           (left->node_type == N_DOUBLE && right->node_type == N_INTEGER) ||
+                                           (left->node_type == N_INTEGER && right->node_type == N_DOUBLE)) {
+                                  s->ast = new_double_node(double_value(left) - double_value(right));
+                                } else if (left->node_type != N_INTEGER &&
+                                           left->node_type != N_DOUBLE ) {
+                                  no_method_error("-=", left);
+
+                                } else {
+                                  type_error(left->node_type, right->node_type);
+                                };
+                              } else {
+                                undefined_variable_error(id_node->name);
+                              };
                               break;
       };
       case N_OP_MUL_EQ : {
-                              print_ast(node->left);
-                              printf(" *= ");
-                              print_ast(node->right);
+                              struct identifier_node* id_node = (struct identifier_node*)node->left;
+                              struct sym* s = get_sym(SYM_VAR, id_node->name);
+
+                              if (s != NULL) {
+                                struct ast* left = s->ast;
+                                struct ast* right = eval_ast(node->right);
+
+                                // int *= int
+                                if (left->node_type == N_INTEGER && right->node_type == N_INTEGER) {
+                                  s->ast = new_integer_node(int_value(left) * int_value(right));
+
+                                // double *= int || int *= double
+                                } else if ((left->node_type == N_DOUBLE && right->node_type == N_DOUBLE)  ||
+                                           (left->node_type == N_DOUBLE && right->node_type == N_INTEGER) ||
+                                           (left->node_type == N_INTEGER && right->node_type == N_DOUBLE)) {
+                                  s->ast = new_double_node(double_value(left) * double_value(right));
+
+                                // string *= int
+                                } else if (left->node_type == N_STRING_1 && right->node_type == N_INTEGER) {
+                                  char* s_left = string_value(left);
+                                  int n = int_value(right);
+                                  char* res = malloc((strlen(s_left)*n + 1)*sizeof(char));
+                                  res = string_repeat(n, s_left);
+                                  s->ast = new_string_node(res);
+
+                                // int *= string
+                                } else if (left->node_type == N_INTEGER && right->node_type == N_STRING_1) {
+                                  char* s_right = string_value(right);
+                                  int n = int_value(left);
+                                  char* res = malloc((strlen(s_right)*n + 1)*sizeof(char));
+                                  res = string_repeat(n, s_right);
+                                  s->ast = new_string_node(res);
+                                } else if (left->node_type != N_INTEGER &&
+                                           left->node_type != N_DOUBLE  &&
+                                           left->node_type != N_STRING_1) {
+                                  no_method_error("*=", left);
+
+                                } else {
+                                  type_error(N_INTEGER, left->node_type);
+                                };
+                              } else {
+                                undefined_variable_error(id_node->name);
+                              };
+
                               break;
       };
       case N_OP_DIV_EQ : {
-                              print_ast(node->left);
-                              printf(" /= ");
-                              print_ast(node->right);
+                              struct identifier_node* id_node = (struct identifier_node*)node->left;
+                              struct sym* s = get_sym(SYM_VAR, id_node->name);
+
+                              if (s != NULL) {
+                                struct ast* left = s->ast;
+                                struct ast* right = eval_ast(node->right);
+
+                                // int /= int
+                                if (left->node_type == N_INTEGER && right->node_type == N_INTEGER) {
+                                  if (int_value(right) != 0) {
+                                    s->ast = new_integer_node(int_value(left) / int_value(right));
+                                  } else {
+                                    /* ERROR !!!! */
+                                  }
+
+                                // double /= double || double /= int || int /= double
+                                } else if ((left->node_type == N_DOUBLE && right->node_type == N_DOUBLE)  ||
+                                           (left->node_type == N_DOUBLE && right->node_type == N_INTEGER) ||
+                                           (left->node_type == N_INTEGER && right->node_type == N_DOUBLE)) {
+                                  if (double_value(right) != 0) {
+                                    s->ast = new_double_node(double_value(left) * double_value(right));
+                                  } else {
+                                    /* ERROR !!! */
+                                  }
+
+                                } else if (left->node_type != N_INTEGER &&
+                                           left->node_type != N_DOUBLE) {
+                                  no_method_error("/=", left);
+                                } else {
+                                  type_error(left->node_type, right->node_type);
+                                };
+                              } else {
+                                undefined_variable_error(id_node->name);
+                              };
                               break;
       };
       case N_OP_MODULO_EQ : {
-                              print_ast(node->left);
-                              printf(" mod= ");
-                              print_ast(node->right);
+                              struct identifier_node* id_node = (struct identifier_node*)node->left;
+                              struct sym* s = get_sym(SYM_VAR, id_node->name);
+
+                              if (s != NULL) {
+                              } else {
+                                undefined_variable_error(id_node->name);
+                              };
                               break;
       };
-      case N_ARG_LIST : {
+/*      case N_ARG_LIST : {
                               struct arg_list_node* l = (struct arg_list_node*)node;
                               print_arg_list(l); 
                               break;
@@ -277,7 +413,7 @@ struct ast* eval_ast(struct ast* node) {
                               } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1) {
                                 char* s_left = string_value(left);
                                 char* s_right = string_value(right);
-                                char* res = malloc((sizeof(s_left) + sizeof(s_right) + 1)*sizeof(char));
+                                char* res = malloc((strlen(s_left) + strlen(s_right) + 1)*sizeof(char));
                                 strcpy(res, s_left);
                                 strcat(res, s_right);
                                 return new_string_node(res);
@@ -619,7 +755,7 @@ struct ast* eval_ast(struct ast* node) {
                               break;
       }; 
       default : {
-                              printf("ERROR: when evaluating %c.\n", node->node_type);
+                              printf("ERROR: when evaluating %d.\n", node->node_type);
       };
     };
   } else {

@@ -14,11 +14,11 @@
 extern struct scope* sym_table;
 
 struct sym {
-  char* name; /* name of symbol */
-  int sym_type; /* type of symbol: SYM_FUNC || SYM_VAR */
-  struct ast* ast; /* value of symbol */ 
-  struct list_node* args; /* function arguments */	
-  struct sym* next; /* next symbol */
+  char* name;              /* name of symbol */
+  int sym_type;            /* type of symbol: SYM_FUNC || SYM_VAR */
+  struct ast* ast;         /* value of symbol */ 
+  struct list_node* args;  /* function arguments */	
+  struct sym* next;        /* next symbol */
 };
 
 struct scope {
