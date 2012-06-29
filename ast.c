@@ -77,7 +77,7 @@ struct list_node* new_list_node(int node_type, struct ast* arg, struct list_node
       list = list->next;
     }
     list->next = node;
-    return list;
+    return next;
   }
 };
 
