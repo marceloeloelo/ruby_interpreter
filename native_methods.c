@@ -13,6 +13,18 @@ void rputs(struct method_call_node* m){
 				printf("%s\n", string_value(evaluated));
 				break;
 			};
+			case N_INTEGER : {
+				printf("%i\n", int_value(evaluated));
+				break;
+			};
+			case N_DOUBLE : {
+				printf("%f\n", double_value(evaluated));
+				break;
+			};
+			case N_BOOL : {
+				printf("%s\n", bool_value(evaluated) ? "true" : "false");
+				break;
+			};
 			default:{
 				printf("Not supported type for puts, sorry :D\n");
 				break;
