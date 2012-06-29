@@ -9,17 +9,6 @@
 //
 // aux functions /////////////////////////////////////
 
-void print_list(struct list_node* args) {
-  printf("(");
-  struct list_node* aux = args;
-  while (aux != NULL) {
-    print_ast(aux->arg);
-    aux = aux->next;
-    if (aux != NULL) { printf(", "); };
-  };
-  printf(")\n");
-}; 
-
 char* drop_quotes(char* str) {
   char* res = malloc((strlen(str)+1)*sizeof(char));
   strcpy(res, str);
@@ -65,6 +54,11 @@ void eval_end_push_args(struct list_node* fn_args, struct list_node* call_args) 
   } else {
     wrong_arguments_error(i, j);
   };
+};
+
+int eval_cond(struct ast* cond) {
+  return (!((cond->node_type == N_NIL) || 
+           ((cond->node_type == N_BOOL) && (((struct bool_node*) cond)->value == 0))));
 };
 
 //
@@ -582,16 +576,24 @@ struct ast* eval_ast(struct ast* node) {
                               print_ast(node->left); // expression
                               printf("\n");
                               break;
-      };
-      case N_WHILE : {
-                              printf("while ");
-                              print_ast(node->left); // expression
-                              printf("\n");
-                              print_ast(node->right); // comp_statements
-                              printf("\nend");
+      }; */
+
+      case N_IF : {
+                              struct if_node* i = (struct if_node*) node;
+
+                              if (eval_cond(eval_ast(i->condition)) == 1) {
+                                return eval_ast(i->th);
+                              } else {
+                                return eval_ast(i->el);
+                              };
                               break;
       };
-      case N_CLASS : {
+
+      case N_WHILE : {
+                              //
+                              break;
+      };
+/*      case N_CLASS : {
                               struct class_node* c = (struct class_node*)node;
                               printf("class %s\n", c->name); // class name
                               print_ast(c->stmts); // comp_statements

@@ -5,6 +5,17 @@
 #include <string.h>
 #include <stdarg.h>
 
+void print_list(struct list_node* args) {
+  printf("(");
+  struct list_node* aux = args;
+  while (aux != NULL) {
+    print_ast(aux->arg);
+    aux = aux->next;
+    if (aux != NULL) { printf(", "); };
+  };
+  printf(")\n");
+}; 
+
 void print_ast(struct ast* node) {
   if (node != NULL) {
     switch(node->node_type) {

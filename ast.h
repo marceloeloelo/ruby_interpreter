@@ -21,7 +21,7 @@ struct list_node* new_list_node(int, struct ast*, struct list_node*);
 struct ast* new_function_node(char*, struct list_node*, struct ast*);
 struct ast* new_class_node(char*, struct list_node*);
 struct ast* new_method_call_node(int, char*, char*, struct list_node*, struct ast*);
-struct ast* new_if_node(int, struct ast*, struct ast*, struct ast*);
+struct ast* new_if_node(struct ast*, struct ast*, struct ast*);
 struct ast* new_opt_block_node(struct list_node*, struct ast*);
 
 

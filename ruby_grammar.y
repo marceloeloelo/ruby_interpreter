@@ -92,7 +92,7 @@ declarations : CLASS IDENTIFIER NL comp_class_statement END        { $$ = new_cl
              | DEF IDENTIFIER arg_decl NL comp_statement END       { $$ = new_function_node($2, $3, $5);    }
              | RETURN expression                                   { $$ = new_ast_node(N_RETURN, $2, NULL); }
              | WHILE expression NL comp_statement END              { $$ = new_ast_node(N_WHILE, $2, $4);    }
-             | IF expression NL comp_statement if_remain END       { $$ = new_if_node(N_IF, $2, $4, $5);    }
+             | IF expression NL comp_statement if_remain END       { $$ = new_if_node($2, $4, $5);    }
              | CASE expression NL case_when case_remain END        { $$ = NULL; }
              ;
 
@@ -110,7 +110,7 @@ sym_list : sym_list COMMA SYMBOL { $$ = new_list_node(N_SYM_LIST, new_symbol_nod
          | SYMBOL                { $$ = new_list_node(N_SYM_LIST, new_symbol_node($1), NULL); }
          ;
 
-if_remain : ELSIF expression NL comp_statement if_remain     { $$ = new_if_node(N_IF_REM, $2, $4, $5); }
+if_remain : ELSIF expression NL comp_statement if_remain     { $$ = new_if_node($2, $4, $5); }
           | ELSE NL comp_statement                           { $$ = $3;                                }
           | /* empty */                                      { $$ = NULL;                              }
           ;
