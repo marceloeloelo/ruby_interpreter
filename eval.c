@@ -240,7 +240,7 @@ struct ast* eval_ast(struct ast* node) {
                                            (left->node_type == N_DOUBLE && right->node_type == N_INTEGER) ||
                                            (left->node_type == N_INTEGER && right->node_type == N_DOUBLE)) {
                                   if (double_value(right) != 0) {
-                                    s->ast = new_double_node(double_value(left) * double_value(right));
+                                    s->ast = new_double_node(double_value(left) / double_value(right));
                                   } else {
                                     /* ERROR !!! */
                                   }
@@ -320,7 +320,7 @@ struct ast* eval_ast(struct ast* node) {
                                 if (int_value(right) != 0) {
                                   return new_integer_node(int_value(left) / int_value(right));
                                 } else {
-                                  /* ERROR !!!! */
+                                  zero_division_error();
                                 }
 
                               // double / double || double / int || int / double
@@ -328,9 +328,9 @@ struct ast* eval_ast(struct ast* node) {
                                          (left->node_type == N_DOUBLE && right->node_type == N_INTEGER) ||
                                          (left->node_type == N_INTEGER && right->node_type == N_DOUBLE)) {
                                 if (double_value(right) != 0) {
-                                  return new_double_node(double_value(left) * double_value(right));
+                                  return new_double_node(double_value(left) / double_value(right));
                                 } else {
-                                  /* ERROR !!! */
+                                  zero_division_error();
                                 }
 
                               } else if (left->node_type != N_INTEGER &&

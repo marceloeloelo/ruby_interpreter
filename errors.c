@@ -77,3 +77,7 @@ int unexpected_type_error(int type) {
   printf("syntax error, unexpected %s\n", type_name(type));
   exit(1);
 };
+int zero_division_error(){
+  printf("ZeroDivisionError: divided by 0");
+  exit(1);
+};
