@@ -59,6 +59,7 @@
 #define N_ATTR_WRITTER    52
 #define N_ARRAY           53
 #define N_ARRAY_CONTENT   54
+#define N_METHOD_CALL_0   55
 
 extern int yylineno;
 void yyerror(char const*);

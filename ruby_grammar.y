@@ -47,12 +47,12 @@ struct class* class_table = 0;
 %token IF ELSIF ELSE CASE WHEN THEN
 %token WHILE EACH
 %token ATTR_READER ATTR_WRITTER ATTR_ACCESSOR
-%token IDENTIFIER SYMBOL
+%token IDENTIFIER SYMBOL CONSTANT
 %token L_PAREN R_PAREN L_BRACE R_BRACE L_SQ_BRACK R_SQ_BRACK
 %token HASH DOT COMMA SEMI_COLON OP_QUESTION NL PIPE
 
 
-%type <string> STRING1 STRING2 IDENTIFIER SYMBOL
+%type <string> STRING1 STRING2 IDENTIFIER SYMBOL CONSTANT
 %type <int_number> INTEGER
 %type <double_number> DOUBLE
 %type <ast_type> program comp_statement statement end_of_line expression primary literal declarations method_call if_remain optional_block  attr_statement sym_list array array_content
@@ -78,7 +78,8 @@ statement  : end_of_line                     { $$ = $1; }
            | method_call end_of_line         { $$ = $1; }
            ;
 
-method_call : IDENTIFIER DOT IDENTIFIER arg_decl2 optional_block   { $$ = new_method_call_node(N_METHOD_CALL_1, $1, $3, $4, $5);   }
+method_call : CONSTANT DOT IDENTIFIER arg_decl2 optional_block     { $$ = new_method_call_node(N_METHOD_CALL_0, $1, $3, $4, $5);   }
+            | IDENTIFIER DOT IDENTIFIER arg_decl2 optional_block   { $$ = new_method_call_node(N_METHOD_CALL_1, $1, $3, $4, $5);   }
             | IDENTIFIER arg_decl_fn optional_block                { $$ = new_method_call_node(N_METHOD_CALL_2, NULL, $1, $2, $3); }
             ;
 
@@ -90,7 +91,7 @@ optional_ids : optional_ids COMMA IDENTIFIER { $$ = new_list_node(N_OPT_IDS, new
              | IDENTIFIER                    { $$ = new_list_node(N_OPT_IDS, new_identifier_node($1), NULL); }
              ;
 
-declarations : CLASS IDENTIFIER NL comp_class_statement END        { $$ = new_class_node($2, $4);           }
+declarations : CLASS CONSTANT NL comp_class_statement END          { $$ = new_class_node($2, $4);           }
              | DEF IDENTIFIER arg_decl NL comp_statement END       { $$ = new_function_node($2, $3, $5);    }
              | RETURN expression                                   { $$ = new_ast_node(N_RETURN, $2, NULL); }
              | WHILE expression NL comp_statement END              { $$ = new_ast_node(N_WHILE, $2, $4);    }
@@ -105,7 +106,7 @@ comp_class_statement : comp_class_statement statement       { $$ = new_list_node
 
 attr_statement : ATTR_ACCESSOR sym_list end_of_line  { $$ = new_ast_node(N_ATTR_ACCESSOR, $2, NULL); }
                | ATTR_READER sym_list end_of_line    { $$ = new_ast_node(N_ATTR_READER, $2, NULL);   }
-               | ATTR_WRITTER sym_list end_of_line   { $$ = new_ast_node(N_ATTR_WRITTER, $2, NULL);  }
+               | ATTR_WRITTER sym_list end_of_line   { $$ = new_ast_node(N_ATTR_WRITTER, $2, NULL);   }
                ;
 
 sym_list : sym_list COMMA SYMBOL { $$ = new_ast_node(N_SYM_LIST, new_symbol_node($3), $1);   }
