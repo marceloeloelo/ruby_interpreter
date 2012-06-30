@@ -17,7 +17,7 @@ do
   res_file=`echo $file | sed 's/\(.*\.\)rb/\1res/'`
 
   # run tests
-  ./ruby < $file > $res_file
+  ./ruby $file > $res_file
 
   # run diff command
   errors=`diff $res_file $out_file 2>&1`
