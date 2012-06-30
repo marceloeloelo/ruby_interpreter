@@ -1,6 +1,10 @@
 #!/bin/bash
 
-files=`find . -name *.in`
+if [ -z "$1" ]; then
+  files=`find . -name *.in`
+else
+  files=`find $1`
+fi 
 passed_counter=0
 failed_counter=0
 
