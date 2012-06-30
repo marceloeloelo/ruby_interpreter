@@ -1,9 +1,4 @@
-
 #include "eval.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdarg.h>
 
 //
 //
@@ -26,15 +21,6 @@ char * string_repeat( int n, const char * s ) {
   }
   *p = '\0';
   return dest;
-};
-
-int list_length(struct list_node* list) {
-  int i = 0;
-  while (list != NULL) {
-    i = i + 1;
-    list = list->next;
-  };
-  return i;
 };
 
 void eval_end_push_args(struct list_node* fn_args, struct list_node* call_args) {
@@ -733,26 +719,37 @@ struct ast* eval_ast(struct ast* node) {
                               };
                               break;
       };
-/*      case N_CLASS : {
-                              struct class_node* c = (struct class_node*)node;
-                              printf("class %s\n", c->name); // class name
-                              print_ast(c->stmts); // comp_statements
-                              printf("end");
+      case N_CLASS : {
+                              struct class_node* c = (struct class_node*) node;
+                              push_scope();
+
+                              struct list_node* s;
+                              for (s = c->stmts; s != NULL; s = s->next) {
+                                eval_ast(s->arg);
+                              };
+
+                              pop_scope_and_define_class(c->name);
+                              //print_class_table();
                               break;
-      }; */
+      };
       case N_METHOD_CALL_2 : { 
                               struct method_call_node* m = (struct method_call_node*) node;
-                              struct sym* sym = get_sym(SYM_FUNC, m->method_name); // busco función
-                              if (sym != NULL) {
-                                push_scope(); // pusheo nuevo scope
-                                eval_end_push_args(sym->args, m->args);
-                                struct ast* eval = eval_ast(sym->ast);                                 
-                                pop_scope(); // pop del scope pusheado
-                                return eval; // retorno función evaluada
+                              if (is_native_method(m)){
+                                eval_native_method(m);
+                                return NULL;
                               } else {
-                                undefined_variable_error(m->method_name);
-                              };  
-                              break;
+                                struct sym* sym = get_sym(SYM_FUNC, m->method_name); // busco función
+                                if (sym != NULL) {
+                                  push_scope(); // pusheo nuevo scope
+                                  eval_end_push_args(sym->args, m->args);
+                                  struct ast* eval = eval_ast(sym->ast);                                 
+                                  pop_scope(); // pop del scope pusheado
+                                  return eval; // retorno función evaluada
+                                } else {
+                                  undefined_variable_error(m->method_name);
+                                };  
+                              };
+                              break;                              
       }; 
       default : {
                               printf("ERROR: when evaluating %d.\n", node->node_type);

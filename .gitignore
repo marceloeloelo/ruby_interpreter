@@ -16,3 +16,11 @@
 
 # Test Result Files
 *.res
+interpreter
+lex.yy.c
+ruby_grammar.output
+ruby_grammar.tab.c
+ruby_grammar.tab.h
+
+#unix swap files
+*.swp
