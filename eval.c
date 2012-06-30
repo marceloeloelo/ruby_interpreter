@@ -4,6 +4,19 @@
 //
 // aux functions /////////////////////////////////////
 
+char* concat_strings(char* str1, char* str2) {
+  char* res = malloc((strlen(str1) + strlen(str2) + 1)*sizeof(char));
+  strcpy(res, str1);
+  strcat(res, str2);
+  return res;
+};
+
+char* drop_colon(char* str) {
+  char* new_str = malloc((strlen(str)+1)*sizeof(char));
+  strcpy(new_str, str);
+  return new_str + 1;
+};
+
 char* drop_quotes(char* str) {
   char* res = malloc((strlen(str)+1)*sizeof(char));
   strcpy(res, str);
@@ -749,8 +762,73 @@ struct ast* eval_ast(struct ast* node) {
                                   undefined_variable_error(m->method_name);
                                 };  
                               };
-                              break;                              
+                              break;        
       }; 
+      case N_ATTR_ACCESSOR : {
+                              struct ast* sym_list; 
+                              for (sym_list = node->left; sym_list != NULL; sym_list = sym_list->right) {
+                                
+                                // obtengo symbolo 
+                                struct symbol_node* s = (struct symbol_node*) sym_list->left;
+
+                                // creo variable de instancia
+                                char* sym_name = drop_colon(s->name);
+                                char* at_name = concat_strings("@", sym_name);
+                                put_sym(SYM_VAR, at_name, new_nil_node(), NULL);
+
+                                // creo getter
+                                put_sym(SYM_FUNC, sym_name, new_identifier_node(at_name), NULL);
+
+                                // creo setter
+                                struct ast* assign = new_ast_node(N_OP_EQUAL, new_identifier_node(at_name), new_identifier_node("arg")); 
+                                struct list_node* param = new_list_node(N_ARG_LIST, new_identifier_node("arg"), NULL);
+                                put_sym(SYM_FUNC, concat_strings(sym_name, "="), assign, param);
+                                
+                              };
+                              break;
+                              
+      };
+      case N_ATTR_READER : {
+                              struct ast* sym_list; 
+                              for (sym_list = node->left; sym_list != NULL; sym_list = sym_list->right) {
+                                
+                                // obtengo symbolo 
+                                struct symbol_node* s = (struct symbol_node*) sym_list->left;
+
+                                // creo variable de instancia
+                                char* sym_name = drop_colon(s->name);
+                                char* at_name = concat_strings("@", sym_name);
+                                put_sym(SYM_VAR, at_name, new_nil_node(), NULL);
+
+                                // creo getter
+                                put_sym(SYM_FUNC, sym_name, new_identifier_node(at_name), NULL);
+                                
+                              };
+                              break;
+      };  
+      case N_ATTR_WRITTER : {
+                              struct ast* sym_list; 
+                              for (sym_list = node->left; sym_list != NULL; sym_list = sym_list->right) {
+                                
+                                // obtengo symbolo 
+                                struct symbol_node* s = (struct symbol_node*) sym_list->left;
+
+                                // creo variable de instancia
+                                char* sym_name = drop_colon(s->name);
+                                char* at_name = concat_strings("@", sym_name);
+                                put_sym(SYM_VAR, at_name, new_nil_node(), NULL);
+
+                                // creo setter
+                                struct ast* assign = new_ast_node(N_OP_EQUAL, new_identifier_node(at_name), new_identifier_node("arg")); 
+                                struct list_node* param = new_list_node(N_ARG_LIST, new_identifier_node("arg"), NULL);
+                                put_sym(SYM_FUNC, concat_strings(sym_name, "="), assign, param);
+                                
+                              };
+                              break;
+      };
+
+
+
       default : {
                               printf("ERROR: when evaluating %d.\n", node->node_type);
       };

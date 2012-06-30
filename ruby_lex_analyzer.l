@@ -68,7 +68,7 @@
 "when"                   { return WHEN; }
 "then"                   { return THEN; }
 "attr_reader"            { return ATTR_READER; }
-"attr_writer"            { return ATTR_WRITER; }
+"attr_writter"           { return ATTR_WRITTER; }
 "attr_accessor"          { return ATTR_ACCESSOR; }
 "true"                   { return TRUE_BOOL; }
 "false"                  { return FALSE_BOOL; }
