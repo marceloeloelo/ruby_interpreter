@@ -43,7 +43,7 @@ void eval_end_push_args(struct list_node* fn_args, struct list_node* call_args) 
 };
 
 int eval_cond(struct ast* cond) {
-  return (!((cond->node_type == N_NIL) || 
+  return (!((cond->node_type == N_NIL) ||
            ((cond->node_type == N_BOOL) && (((struct bool_node*) cond)->value == 0))));
 };
 
@@ -268,7 +268,7 @@ struct ast* eval_ast(struct ast* node) {
       };
 /*      case N_ARG_LIST : {
                               struct arg_list_node* l = (struct arg_list_node*)node;
-                              print_arg_list(l); 
+                              print_arg_list(l);
                               break;
       };*/
       case N_OP_MUL : {
@@ -614,7 +614,7 @@ struct ast* eval_ast(struct ast* node) {
                                 int value = (double_value(left) == double_value(right)) ? 0 : 1;
                                 return new_bool_node(value);
 
-                              // string 
+                              // string
                               } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1) {
                                 int value = (strcmp(string_value(left), string_value(right)) == 0) ? 0 : 1;
                                 return new_bool_node(value);
@@ -653,7 +653,7 @@ struct ast* eval_ast(struct ast* node) {
                               if (left->node_type == N_INTEGER) {
                                 return new_integer_node(int_value(left));
 
-                              // double 
+                              // double
                               } else if (left->node_type == N_DOUBLE) {
                                 return new_double_node(double_value(left));
 
@@ -670,7 +670,7 @@ struct ast* eval_ast(struct ast* node) {
                               if (left->node_type == N_INTEGER) {
                                 return new_integer_node(int_value(left) * (-1));
 
-                              // double 
+                              // double
                               } else if (left->node_type == N_DOUBLE) {
                                 return new_double_node(double_value(left) * (-1));
 
@@ -684,7 +684,7 @@ struct ast* eval_ast(struct ast* node) {
                               struct ast* left = eval_ast(node->left);
                               return new_bool_node(!bool_value(left));
                               break;
-      }; 
+      };
       case N_STMT_LIST : {
                               return new_ast_node(N_STMT_LIST, eval_ast(node->left), eval_ast(node->right));
       };
@@ -705,12 +705,8 @@ struct ast* eval_ast(struct ast* node) {
                               break;
       };
 /*      case N_RETURN : {
-                              printf("return ");
-                              print_ast(node->left); // expression
-                              printf("\n");
                               break;
-      }; */
-
+      };*/
       case N_IF : {
                               struct if_node* i = (struct if_node*) node;
 
@@ -721,7 +717,6 @@ struct ast* eval_ast(struct ast* node) {
                               };
                               break;
       };
-
       case N_WHILE : {
                               while (eval_cond(eval_ast(node->left)) == 1) {
                                 print_sym_table();
@@ -742,7 +737,7 @@ struct ast* eval_ast(struct ast* node) {
                               //print_class_table();
                               break;
       };
-      case N_METHOD_CALL_2 : { 
+      case N_METHOD_CALL_2 : {
                               struct method_call_node* m = (struct method_call_node*) node;
                               if (is_native_method(m)){
                                 eval_native_method(m);
@@ -752,15 +747,15 @@ struct ast* eval_ast(struct ast* node) {
                                 if (sym != NULL) {
                                   push_scope(); // pusheo nuevo scope
                                   eval_end_push_args(sym->args, m->args);
-                                  struct ast* eval = eval_ast(sym->ast);                                 
+                                  struct ast* eval = eval_ast(sym->ast);
                                   pop_scope(); // pop del scope pusheado
                                   return eval; // retorno función evaluada
                                 } else {
                                   undefined_variable_error(m->method_name);
-                                };  
+                                };
                               };
-                              break;                              
-      }; 
+                              break;
+      };
       default : {
                               printf("ERROR: when evaluating %d.\n", node->node_type);
       };

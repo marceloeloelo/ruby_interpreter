@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ -z "$1" ]; then
-  files=`find . -name *.in`
+  files=`find . -name *.rb`
 else
   files=`find $1`
 fi 
@@ -12,12 +12,12 @@ for file in $files
 do
 
   # generate file paths
-  file_name=`echo $file | sed 's/\(.*\).\in/\1/'`
-  out_file=`echo $file | sed 's/\(.*\.\)in/\1out/'`
-  res_file=`echo $file | sed 's/\(.*\.\)in/\1res/'`
+  file_name=`echo $file | sed 's/\(.*\).\rb/\1/'`
+  out_file=`echo $file | sed 's/\(.*\.\)rb/\1out/'`
+  res_file=`echo $file | sed 's/\(.*\.\)rb/\1res/'`
 
   # run tests
-  ./interpreter < $file > $res_file
+  ./ruby < $file > $res_file
 
   # run diff command
   errors=`diff $res_file $out_file 2>&1`
@@ -27,7 +27,7 @@ do
   	tput setaf 2 # green
     echo "."
     passed_counter=`expr $passed_counter + 1`
-  #errors   
+  #errors
   else
     tput setaf 1 # red
 
@@ -35,12 +35,12 @@ do
     if [ -e "$out_file" ] && [ -e "$res_file" ]; then
   	  echo "Diff for file $file_name"
     fi
-    
+
     echo "$errors"
     failed_counter=`expr $failed_counter + 1`
   fi
   tput setaf 1 # red
-  
+
 done
 
 tput setaf 2 # green

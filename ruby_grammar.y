@@ -157,7 +157,7 @@ expression : IDENTIFIER OP_EQUAL expression         { $$ = new_ast_node(N_OP_EQU
 primary    : literal                     { $$ = $1;                      }
            | IDENTIFIER                  { $$ = new_identifier_node($1); }
            | NIL                         { $$ = new_nil_node();          }
-           | array                       { $$ = $1; }
+           | array                       { $$ = $1;                      }
            ;
 
 arg_decl  : L_PAREN arg_list R_PAREN     { $$ = $2;   }
