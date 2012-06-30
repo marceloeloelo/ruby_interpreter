@@ -591,7 +591,10 @@ struct ast* eval_ast(struct ast* node) {
 
                               // string <= string
                               } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1) {
-                                return new_integer_node(strcmp(string_value(left), string_value(right)));
+                                int cmp = strcmp(string_value(left), string_value(right));
+                                cmp = cmp > 0 ?  1 : cmp;
+                                cmp = cmp < 0 ? -1 : cmp;
+                                return new_integer_node(cmp);
 
                               } else {
                                 no_method_error("<=>", left);
