@@ -31,8 +31,12 @@ void rputs(struct method_call_node* m){
 				printf("%s\n", bool_value(evaluated) ? "true" : "false");
 				break;
 			};
+			case N_NIL : {
+				printf("%s\n", "");
+				break;
+			};
 			default:{
-				printf("Not supported type for puts, sorry :D\n");
+				printf("Puts doesn't support %s type, sorry :D\n", type_name(evaluated->node_type));
 				break;
 			};
 		};

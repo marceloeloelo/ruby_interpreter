@@ -1,0 +1,258 @@
+# int vs int
+
+1 <=> 2
+-1
+2 <=> 1
+1
+2 <=> 2
+0
+
+# double vs double
+
+1.1 <=> 2.1
+-1
+2.1 <=> 1.1
+1
+2.1 <=> 2.1
+0
+
+# int vs double
+
+1 <=> 2.1
+-1
+1.1 <=> 2
+-1
+1 <=> 1.0
+0
+
+# string vs string
+
+"foo" <=> "bar"
+1
+"bar" <=> "foo"
+-1
+"foo" <=> "foo"
+0
+"" <=> "foo"
+-1
+"" <=> ""
+0
+
+# string vs int
+
+"foo" <=> 1
+nil
+2 <=> "foo"
+nil
+2 <=> "2"
+nil
+
+# string vs double
+
+2.1 <=> "foo"
+nil
+"foo" <=> 1.1
+nil
+"1.1" <=> 1.1
+nil
+
+# bool vs bool
+
+true <=> false
+NoMethodError: undefined method `<=>' for true:TrueClass
+	from (irb):41
+	from :0
+true <=> true
+NoMethodError: undefined method `<=>' for true:TrueClass
+	from (irb):42
+	from :0
+false <=> true
+NoMethodError: undefined method `<=>' for false:FalseClass
+	from (irb):43
+	from :0
+false <=> false
+NoMethodError: undefined method `<=>' for false:FalseClass
+	from (irb):44
+	from :0
+
+# bool vs int
+
+true <=> 2
+NoMethodError: undefined method `<=>' for true:TrueClass
+	from (irb):48
+	from :0
+true <=> 1
+NoMethodError: undefined method `<=>' for true:TrueClass
+	from (irb):49
+	from :0
+true <=> 0
+NoMethodError: undefined method `<=>' for true:TrueClass
+	from (irb):50
+	from :0
+2 <=> true
+nil
+1 <=> true
+nil
+0 <=> true
+nil
+
+false <=> 2
+NoMethodError: undefined method `<=>' for false:FalseClass
+	from (irb):55
+	from :0
+false <=> 1
+NoMethodError: undefined method `<=>' for false:FalseClass
+	from (irb):56
+	from :0
+false <=> 0
+NoMethodError: undefined method `<=>' for false:FalseClass
+	from (irb):57
+	from :0
+2 <=> false
+nil
+1 <=> false
+nil
+0 <=> false
+nil
+
+# bool vs nil
+
+true <=> nil
+NoMethodError: undefined method `<=>' for true:TrueClass
+	from (irb):64
+	from :0
+nil <=> true
+NoMethodError: undefined method `<=>' for nil:NilClass
+	from (irb):65
+	from :0
+
+false <=> nil
+NoMethodError: undefined method `<=>' for false:FalseClass
+	from (irb):67
+	from :0
+nil <=> false
+NoMethodError: undefined method `<=>' for nil:NilClass
+	from (irb):68
+	from :0
+
+# bool vs string
+
+true <=> "foo"
+NoMethodError: undefined method `<=>' for true:TrueClass
+	from (irb):72
+	from :0
+true <=> ""
+NoMethodError: undefined method `<=>' for true:TrueClass
+	from (irb):73
+	from :0
+"foo" <=> true
+nil
+"" <=> true
+nil
+
+false <=> "foo"
+NoMethodError: undefined method `<=>' for false:FalseClass
+	from (irb):77
+	from :0
+false <=> ""
+NoMethodError: undefined method `<=>' for false:FalseClass
+	from (irb):78
+	from :0
+"foo" <=> false
+nil
+"" <=> false
+nil
+
+# bool vs double
+
+true <=> 2.1
+NoMethodError: undefined method `<=>' for true:TrueClass
+	from (irb):84
+	from :0
+true <=> 1.0
+NoMethodError: undefined method `<=>' for true:TrueClass
+	from (irb):85
+	from :0
+true <=> 0.0
+NoMethodError: undefined method `<=>' for true:TrueClass
+	from (irb):86
+	from :0
+2.1 <=> true
+nil
+1.0 <=> true
+nil
+0.0 <=> true
+nil
+
+false <=> 2.1
+NoMethodError: undefined method `<=>' for false:FalseClass
+	from (irb):91
+	from :0
+false <=> 1.0
+NoMethodError: undefined method `<=>' for false:FalseClass
+	from (irb):92
+	from :0
+false <=> 0.0
+NoMethodError: undefined method `<=>' for false:FalseClass
+	from (irb):93
+	from :0
+2.1 <=> false
+nil
+1.0 <=> false
+nil
+0.0 <=> false
+nil
+
+# nil vs nil
+
+nil <=> nil
+NoMethodError: undefined method `<=>' for nil:NilClass
+	from (irb):100
+	from :0
+
+# nil vs int
+
+2 <=> nil
+nil
+1 <=> nil
+nil
+0 <=> nil
+nil
+
+nil <=> 2
+NoMethodError: undefined method `<=>' for nil:NilClass
+	from (irb):108
+	from :0
+nil <=> 1
+NoMethodError: undefined method `<=>' for nil:NilClass
+	from (irb):109
+	from :0
+nil <=> 0
+NoMethodError: undefined method `<=>' for nil:NilClass
+	from (irb):110
+	from :0
+
+# nil vs double
+
+2.1 <=> nil
+nil
+1.0 <=> nil
+nil
+0.0 <=> nil
+nil
+
+nil <=> 2.1
+NoMethodError: undefined method `<=>' for nil:NilClass
+	from (irb):118
+	from :0
+nil <=> 1.0
+NoMethodError: undefined method `<=>' for nil:NilClass
+	from (irb):119
+	from :0
+nil <=> 0.0
+NoMethodError: undefined method `<=>' for nil:NilClass
+	from (irb):120
+	from :0
+
+ 
+nil
