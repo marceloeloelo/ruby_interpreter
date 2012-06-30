@@ -9,7 +9,7 @@
 extern int yylineno;
 
 void yyerror(char const * error) {
-  printf("ERROR: Line %d, %s\n", yylineno, error);
+  fprintf(stderr, "ERROR: Line %d, %s\n", yylineno, error);
 }
 
 // install sym_table
@@ -61,14 +61,14 @@ struct scope* sym_table = 0;
 
 %%
 
-program    : comp_statement                  { $$ = $1; 
+program    : comp_statement                  { $$ = $1;
                                                push_scope();
-                                               struct ast* eval = eval_ast($1); 
+                                               struct ast* eval = eval_ast($1);
                                                print_ast(eval); }
            ;
 
 comp_statement  : comp_statement statement   { $$ = new_ast_node(N_STMT_LIST, $2, $1); }
-                | /* empty */                { $$ = NULL; }
+                | /* empty */                { $$ = NULL;                              }
                 ;
 
 statement  : end_of_line                     { $$ = $1; }
@@ -93,8 +93,8 @@ declarations : CLASS IDENTIFIER NL comp_class_statement END        { $$ = new_cl
              | DEF IDENTIFIER arg_decl NL comp_statement END       { $$ = new_function_node($2, $3, $5);    }
              | RETURN expression                                   { $$ = new_ast_node(N_RETURN, $2, NULL); }
              | WHILE expression NL comp_statement END              { $$ = new_ast_node(N_WHILE, $2, $4);    }
-             | IF expression NL comp_statement if_remain END       { $$ = new_if_node($2, $4, $5);    }
-             | CASE expression NL case_when case_remain END        { $$ = NULL; }
+             | IF expression NL comp_statement if_remain END       { $$ = new_if_node($2, $4, $5);          }
+             | CASE expression NL case_when case_remain END        { $$ = NULL;                             }
              ;
 
 comp_class_statement : comp_class_statement statement       { $$ = new_list_node(N_COMP_CLASS_STMT, $2, $1); }
@@ -112,8 +112,8 @@ sym_list : sym_list COMMA SYMBOL { $$ = new_ast_node(N_SYM_LIST, new_symbol_node
          ;
 
 if_remain : ELSIF expression NL comp_statement if_remain     { $$ = new_if_node($2, $4, $5); }
-          | ELSE NL comp_statement                           { $$ = $3;                                }
-          | /* empty */                                      { $$ = NULL;                              }
+          | ELSE NL comp_statement                           { $$ = $3;                      }
+          | /* empty */                                      { $$ = NULL;                    }
           ;
 
 case_when : WHEN expression NL comp_statement
@@ -156,7 +156,7 @@ expression : IDENTIFIER OP_EQUAL expression         { $$ = new_ast_node(N_OP_EQU
 primary    : literal                     { $$ = $1;                      }
            | IDENTIFIER                  { $$ = new_identifier_node($1); }
            | NIL                         { $$ = new_nil_node();          }
-           | array                       { $$ = NULL; }
+           | array                       { $$ = $1; }
            ;
 
 arg_decl  : L_PAREN arg_list R_PAREN     { $$ = $2;   }
@@ -205,6 +205,8 @@ end_of_line : NL                         { $$ = NULL; }
 %%
 
 int main(int argc, char** argv) {
+  if (open_file(argv[1])) {
+    return yyparse();
+  };
+};
 
-  return yyparse();
-}
