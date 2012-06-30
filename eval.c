@@ -719,13 +719,19 @@ struct ast* eval_ast(struct ast* node) {
                               };
                               break;
       };
-/*      case N_CLASS : {
-                              struct class_node* c = (struct class_node*)node;
-                              printf("class %s\n", c->name); // class name
-                              print_ast(c->stmts); // comp_statements
-                              printf("end");
+      case N_CLASS : {
+                              struct class_node* c = (struct class_node*) node;
+                              push_scope();
+
+                              struct list_node* s;
+                              for (s = c->stmts; s != NULL; s = s->next) {
+                                eval_ast(s->arg);
+                              };
+
+                              pop_scope_and_define_class(c->name);
+                              //print_class_table();
                               break;
-      }; */
+      };
       case N_METHOD_CALL_2 : { 
                               struct method_call_node* m = (struct method_call_node*) node;
                               if (is_native_method(m)){

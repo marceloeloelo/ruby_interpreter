@@ -14,6 +14,7 @@ void yyerror(char const * error) {
 
 // install sym_table
 struct scope* sym_table = 0;
+struct class* class_table = 0;
 
 %}
 
