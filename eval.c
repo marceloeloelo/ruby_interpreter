@@ -566,7 +566,7 @@ struct ast* eval_ast(struct ast* node) {
                                 int value = (double_value(left) == double_value(right)) ? 1 : 0;
                                 return new_bool_node(value);
 
-                              // string 
+                              // string
                               } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1) {
                                 int value = (strcmp(string_value(left), string_value(right)) == 0) ? 1 : 0;
                                 return new_bool_node(value);
@@ -574,6 +574,11 @@ struct ast* eval_ast(struct ast* node) {
                               // nil
                               } else if (left->node_type == N_NIL && right->node_type == N_NIL) {
                                 return new_bool_node(1);
+
+                              // boolean
+                              } else if (left->node_type == N_BOOL && right->node_type == N_BOOL) {
+                                int value = (bool_value(left) == bool_value(right));
+                                return new_bool_node(value);
 
                               } else {
                                 return new_bool_node(0);
@@ -595,11 +600,11 @@ struct ast* eval_ast(struct ast* node) {
                               if ((left->node_type == N_INTEGER  || left->node_type == N_DOUBLE) &&
                                   (right->node_type == N_INTEGER || right->node_type == N_DOUBLE)) {
                                 if (double_value(left) == double_value(right)) {
-                                  return new_integer_node(0);    
+                                  return new_integer_node(0);
                                 } else if (double_value(left) > double_value(right)) {
-                                  return new_integer_node(1);   
+                                  return new_integer_node(1);
                                 } else {
-                                  return new_integer_node(-1);   
+                                  return new_integer_node(-1);
                                 };
 
                               // string <= string
@@ -630,6 +635,11 @@ struct ast* eval_ast(struct ast* node) {
                               // nil
                               } else if (left->node_type == N_NIL && right->node_type == N_NIL) {
                                 return new_bool_node(0);
+
+                              // boolean
+                              } else if (left->node_type == N_BOOL && right->node_type == N_BOOL) {
+                                int value = (bool_value(left) != bool_value(right));
+                                return new_bool_node(value);
 
                               } else {
                                 return new_bool_node(1);

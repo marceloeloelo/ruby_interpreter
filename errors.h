@@ -12,5 +12,9 @@ int no_method_error(char*, struct ast*);
 int undefined_variable_error(char*);
 int wrong_arguments_error(int, int);
 int unexpected_type_error(int);
+int file_load_error(char*);
+int file_bad_inclusion_line_error(int);
+int memory_out_of_space_error();
+int invalid_token_error(int, char*);
 
 #endif
