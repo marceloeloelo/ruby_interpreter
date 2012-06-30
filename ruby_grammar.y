@@ -46,7 +46,7 @@ struct class* class_table = 0;
 %token DEF CLASS END DO
 %token IF ELSIF ELSE CASE WHEN THEN
 %token WHILE EACH
-%token ATTR_READER ATTR_WRITER ATTR_ACCESSOR
+%token ATTR_READER ATTR_WRITTER ATTR_ACCESSOR
 %token IDENTIFIER SYMBOL
 %token L_PAREN R_PAREN L_BRACE R_BRACE L_SQ_BRACK R_SQ_BRACK
 %token HASH DOT COMMA SEMI_COLON OP_QUESTION NL PIPE
@@ -105,7 +105,7 @@ comp_class_statement : comp_class_statement statement       { $$ = new_list_node
 
 attr_statement : ATTR_ACCESSOR sym_list end_of_line  { $$ = new_ast_node(N_ATTR_ACCESSOR, $2, NULL); }
                | ATTR_READER sym_list end_of_line    { $$ = new_ast_node(N_ATTR_READER, $2, NULL);   }
-               | ATTR_WRITER sym_list end_of_line    { $$ = new_ast_node(N_ATTR_WRITER, $2, NULL);   }
+               | ATTR_WRITTER sym_list end_of_line   { $$ = new_ast_node(N_ATTR_WRITTER, $2, NULL);  }
                ;
 
 sym_list : sym_list COMMA SYMBOL { $$ = new_ast_node(N_SYM_LIST, new_symbol_node($3), $1);   }
