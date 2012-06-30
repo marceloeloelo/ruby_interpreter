@@ -4,6 +4,19 @@
 //
 // aux functions /////////////////////////////////////
 
+char* concat_strings(char* str1, char* str2) {
+  char* res = malloc((strlen(str1) + strlen(str2) + 1)*sizeof(char));
+  strcpy(res, str1);
+  strcat(res, str2);
+  return res;
+};
+
+char* drop_colon(char* str) {
+  char* new_str = malloc((strlen(str)+1)*sizeof(char));
+  strcpy(new_str, str);
+  return new_str + 1;
+};
+
 char* drop_quotes(char* str) {
   char* res = malloc((strlen(str)+1)*sizeof(char));
   strcpy(res, str);
@@ -43,7 +56,7 @@ void eval_end_push_args(struct list_node* fn_args, struct list_node* call_args) 
 };
 
 int eval_cond(struct ast* cond) {
-  return (!((cond->node_type == N_NIL) || 
+  return (!((cond->node_type == N_NIL) ||
            ((cond->node_type == N_BOOL) && (((struct bool_node*) cond)->value == 0))));
 };
 
@@ -268,7 +281,7 @@ struct ast* eval_ast(struct ast* node) {
       };
 /*      case N_ARG_LIST : {
                               struct arg_list_node* l = (struct arg_list_node*)node;
-                              print_arg_list(l); 
+                              print_arg_list(l);
                               break;
       };*/
       case N_OP_MUL : {
@@ -553,7 +566,7 @@ struct ast* eval_ast(struct ast* node) {
                                 int value = (double_value(left) == double_value(right)) ? 1 : 0;
                                 return new_bool_node(value);
 
-                              // string 
+                              // string
                               } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1) {
                                 int value = (strcmp(string_value(left), string_value(right)) == 0) ? 1 : 0;
                                 return new_bool_node(value);
@@ -561,6 +574,11 @@ struct ast* eval_ast(struct ast* node) {
                               // nil
                               } else if (left->node_type == N_NIL && right->node_type == N_NIL) {
                                 return new_bool_node(1);
+
+                              // boolean
+                              } else if (left->node_type == N_BOOL && right->node_type == N_BOOL) {
+                                int value = (bool_value(left) == bool_value(right));
+                                return new_bool_node(value);
 
                               } else {
                                 return new_bool_node(0);
@@ -583,20 +601,18 @@ struct ast* eval_ast(struct ast* node) {
                                 if ((left->node_type == N_INTEGER  || left->node_type == N_DOUBLE) &&
                                     (right->node_type == N_INTEGER || right->node_type == N_DOUBLE)) {
                                   if (double_value(left) == double_value(right)) {
-                                    return new_integer_node(0);    
+                                    return new_integer_node(0);
                                   } else if (double_value(left) > double_value(right)) {
-                                    return new_integer_node(1);   
+                                    return new_integer_node(1);
                                   } else {
-                                    return new_integer_node(-1);   
+                                    return new_integer_node(-1);
                                   };
-
                                 // string <= string
                                 } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1) {
                                   int cmp = strcmp(string_value(left), string_value(right));
                                   cmp = cmp > 0 ?  1 : cmp;
                                   cmp = cmp < 0 ? -1 : cmp;
                                   return new_integer_node(cmp);
-
                                 } else if (left->node_type == N_NIL || left->node_type == N_BOOL) {
                                   no_method_error("<=>", left);
                                 } else if (right->node_type == N_NIL || right->node_type == N_BOOL){
@@ -619,7 +635,7 @@ struct ast* eval_ast(struct ast* node) {
                                 int value = (double_value(left) == double_value(right)) ? 0 : 1;
                                 return new_bool_node(value);
 
-                              // string 
+                              // string
                               } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1) {
                                 int value = (strcmp(string_value(left), string_value(right)) == 0) ? 0 : 1;
                                 return new_bool_node(value);
@@ -627,6 +643,11 @@ struct ast* eval_ast(struct ast* node) {
                               // nil
                               } else if (left->node_type == N_NIL && right->node_type == N_NIL) {
                                 return new_bool_node(0);
+
+                              // boolean
+                              } else if (left->node_type == N_BOOL && right->node_type == N_BOOL) {
+                                int value = (bool_value(left) != bool_value(right));
+                                return new_bool_node(value);
 
                               } else {
                                 return new_bool_node(1);
@@ -653,7 +674,7 @@ struct ast* eval_ast(struct ast* node) {
                               if (left->node_type == N_INTEGER) {
                                 return new_integer_node(int_value(left));
 
-                              // double 
+                              // double
                               } else if (left->node_type == N_DOUBLE) {
                                 return new_double_node(double_value(left));
 
@@ -670,7 +691,7 @@ struct ast* eval_ast(struct ast* node) {
                               if (left->node_type == N_INTEGER) {
                                 return new_integer_node(int_value(left) * (-1));
 
-                              // double 
+                              // double
                               } else if (left->node_type == N_DOUBLE) {
                                 return new_double_node(double_value(left) * (-1));
 
@@ -684,7 +705,7 @@ struct ast* eval_ast(struct ast* node) {
                               struct ast* left = eval_ast(node->left);
                               return new_bool_node(!bool_value(left));
                               break;
-      }; 
+      };
       case N_STMT_LIST : {
                               return new_ast_node(N_STMT_LIST, eval_ast(node->left), eval_ast(node->right));
       };
@@ -705,12 +726,8 @@ struct ast* eval_ast(struct ast* node) {
                               break;
       };
 /*      case N_RETURN : {
-                              printf("return ");
-                              print_ast(node->left); // expression
-                              printf("\n");
                               break;
-      }; */
-
+      };*/
       case N_IF : {
                               struct if_node* i = (struct if_node*) node;
 
@@ -721,7 +738,6 @@ struct ast* eval_ast(struct ast* node) {
                               };
                               break;
       };
-
       case N_WHILE : {
                               while (eval_cond(eval_ast(node->left)) == 1) {
                                 print_sym_table();
@@ -729,14 +745,20 @@ struct ast* eval_ast(struct ast* node) {
                               };
                               break;
       };
-/*      case N_CLASS : {
-                              struct class_node* c = (struct class_node*)node;
-                              printf("class %s\n", c->name); // class name
-                              print_ast(c->stmts); // comp_statements
-                              printf("end");
+      case N_CLASS : {
+                              struct class_node* c = (struct class_node*) node;
+                              push_scope();
+
+                              struct list_node* s;
+                              for (s = c->stmts; s != NULL; s = s->next) {
+                                eval_ast(s->arg);
+                              };
+
+                              pop_scope_and_define_class(c->name);
+                              //print_class_table();
                               break;
-      }; */
-      case N_METHOD_CALL_2 : { 
+      };
+      case N_METHOD_CALL_2 : {
                               struct method_call_node* m = (struct method_call_node*) node;
                               if (is_native_method(m)){
                                 eval_native_method(m);
@@ -746,15 +768,76 @@ struct ast* eval_ast(struct ast* node) {
                                 if (sym != NULL) {
                                   push_scope(); // pusheo nuevo scope
                                   eval_end_push_args(sym->args, m->args);
-                                  struct ast* eval = eval_ast(sym->ast);                                 
+                                  struct ast* eval = eval_ast(sym->ast);
                                   pop_scope(); // pop del scope pusheado
                                   return eval; // retorno función evaluada
                                 } else {
                                   undefined_variable_error(m->method_name);
-                                };  
+                                };
                               };
-                              break;                              
-      }; 
+      };
+      case N_ATTR_ACCESSOR : {
+                              struct ast* sym_list;
+                              for (sym_list = node->left; sym_list != NULL; sym_list = sym_list->right) {
+
+                                // obtengo symbolo
+                                struct symbol_node* s = (struct symbol_node*) sym_list->left;
+
+                                // creo variable de instancia
+                                char* sym_name = drop_colon(s->name);
+                                char* at_name = concat_strings("@", sym_name);
+                                put_sym(SYM_VAR, at_name, new_nil_node(), NULL);
+
+                                // creo getter
+                                put_sym(SYM_FUNC, sym_name, new_identifier_node(at_name), NULL);
+
+                                // creo setter
+                                struct ast* assign = new_ast_node(N_OP_EQUAL, new_identifier_node(at_name), new_identifier_node("arg"));
+                                struct list_node* param = new_list_node(N_ARG_LIST, new_identifier_node("arg"), NULL);
+                                put_sym(SYM_FUNC, concat_strings(sym_name, "="), assign, param);
+
+                              };
+                              break;
+
+      };
+      case N_ATTR_READER : {
+                              struct ast* sym_list;
+                              for (sym_list = node->left; sym_list != NULL; sym_list = sym_list->right) {
+
+                                // obtengo symbolo
+                                struct symbol_node* s = (struct symbol_node*) sym_list->left;
+
+                                // creo variable de instancia
+                                char* sym_name = drop_colon(s->name);
+                                char* at_name = concat_strings("@", sym_name);
+                                put_sym(SYM_VAR, at_name, new_nil_node(), NULL);
+
+                                // creo getter
+                                put_sym(SYM_FUNC, sym_name, new_identifier_node(at_name), NULL);
+
+                              };
+                              break;
+      };
+      case N_ATTR_WRITTER : {
+                              struct ast* sym_list;
+                              for (sym_list = node->left; sym_list != NULL; sym_list = sym_list->right) {
+
+                                // obtengo symbolo
+                                struct symbol_node* s = (struct symbol_node*) sym_list->left;
+
+                                // creo variable de instancia
+                                char* sym_name = drop_colon(s->name);
+                                char* at_name = concat_strings("@", sym_name);
+                                put_sym(SYM_VAR, at_name, new_nil_node(), NULL);
+
+                                // creo setter
+                                struct ast* assign = new_ast_node(N_OP_EQUAL, new_identifier_node(at_name), new_identifier_node("arg")); 
+                                struct list_node* param = new_list_node(N_ARG_LIST, new_identifier_node("arg"), NULL);
+                                put_sym(SYM_FUNC, concat_strings(sym_name, "="), assign, param);
+
+                              };
+                              break;
+      };
       default : {
                               printf("ERROR: when evaluating %d.\n", node->node_type);
       };

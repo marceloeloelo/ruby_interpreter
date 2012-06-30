@@ -14,5 +14,9 @@ int wrong_arguments_error(int, int);
 int unexpected_type_error(int);
 char* type_name(int node_type);
 int zero_division_error();
+int file_load_error(char*);
+int file_bad_inclusion_line_error(int);
+int memory_out_of_space_error();
+int invalid_token_error(int, char*);
 
 #endif
