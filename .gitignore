@@ -16,7 +16,7 @@
 
 # Test Result Files
 *.res
-interpreter
+ruby
 lex.yy.c
 ruby_grammar.output
 ruby_grammar.tab.c
