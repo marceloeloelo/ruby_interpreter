@@ -18,7 +18,13 @@ void rputs(struct method_call_node* m){
 				break;
 			};
 			case N_DOUBLE : {
-				printf("%f\n", double_value(evaluated));
+				double d = double_value(evaluated);
+			    if ( d - floor(d) == 0.0 ) {
+			        printf( "%g.0\n", d );
+			    }
+			    else {
+			        printf( "%g\n", d );
+			    }
 				break;
 			};
 			case N_BOOL : {

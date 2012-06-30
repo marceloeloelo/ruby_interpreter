@@ -7,6 +7,7 @@
 #include "eval.h"
 #include "utils.h"
 #include <stdio.h>
+#include <math.h>
 
 #define PUTS "puts"
 #define GETS "gets"
