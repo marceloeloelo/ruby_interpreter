@@ -756,6 +756,37 @@ struct ast* eval_ast(struct ast* node) {
                               break;
       };
       case N_METHOD_CALL_1 : { 
+                              struct method_call_node* m = (struct method_call_node*) node;
+
+                              // comportamiento para métodos de clase
+                              if (class_exists(m->class_name) == 1) {
+
+                                // .new por ejemplo
+                                if (is_class_native_method(m)) {
+
+                                  eval_class_native_method(m);
+                                  return NULL;
+
+                                // otra llamada
+                                } else {
+
+                                  struct sym* sym = get_sym(SYM_FUNC, m->method_name); // busco función
+                                  if (sym != NULL) {
+                                    push_scope(); // pusheo nuevo scope
+                                    eval_end_push_args(sym->args, m->args);
+                                    struct ast* eval = eval_ast(sym->ast);                                 
+                                    pop_scope(); // pop del scope pusheado
+                                    return eval; // retorno función evaluada
+                                  } else {
+                                    undefined_method_error(m->class_name, m->method_name);
+                                  };  
+                                  
+                                };
+
+                              // si no existe la clase, error  
+                              } else {
+                                uninitialized_constant_error(m->class_name);
+                              };
                               break;        
       }; 
       case N_METHOD_CALL_2 : { 

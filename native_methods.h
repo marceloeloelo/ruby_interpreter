@@ -12,8 +12,12 @@
 
 #define PUTS "puts"
 #define GETS "gets"
+#define NEW  "new"
 
 int is_native_method(struct method_call_node*);
 void eval_native_method(struct method_call_node*);
+
+int is_class_native_method(struct method_call_node*);
+void eval_class_native_method(struct method_call_node*);
 
 #endif

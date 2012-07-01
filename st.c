@@ -97,6 +97,45 @@ void pop_scope_and_define_class(char* name) {
 
 };
 
+int class_exists(char* class_name) {
+
+  struct class* c;
+  for (c = class_table; c != NULL; c = c->next) {
+    if (strcmp(c->name, class_name) == 0){
+      return 1;
+    };
+  };
+  return 0;
+
+};
+
+struct class* find_class(char* class_name) {
+
+  struct class* c;
+  for (c = class_table; c != NULL; c = c->next) {
+    if (strcmp(c->name, class_name) == 0){
+      return c;
+    };
+  };
+  return NULL;
+
+};
+
+struct sym* find_method_for_class(char* class_name, char* method_name){
+
+  // obtengo class
+  struct class* c = find_class(class_name);
+  struct sym* s;
+
+  for (s = c->sym_list; s != 0; s = s->next) {
+    if ((strcmp(s->name, method_name) == 0) && (s->sym_type == SYM_FUNC)){
+      return s;
+    };
+  };
+  return NULL;
+
+};
+
 void print_class_table() {
 
   struct class* c;
