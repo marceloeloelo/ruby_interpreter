@@ -82,7 +82,10 @@ int is_native_method(struct ast* m){
 
   char* method_name;
   char** native_methods_array;
-  if (m->node_type == N_METHOD_CALL_1) {
+  if (m->node_type == N_METHOD_CALL_0) {
+    method_name = strdup(((struct method_call_node*)m)->method_name);
+    native_methods_array = class_native_methods;
+  } else if (m->node_type == N_METHOD_CALL_1) {
     method_name = strdup(((struct method_call_node*)m)->method_name);
     native_methods_array = instance_native_methods;
   } else if (m->node_type == N_METHOD_CALL_2) {
@@ -134,23 +137,6 @@ struct ast* eval_instance_native_method(struct ast* m) {
     };
 	};
   return new_nil_node();
-};
-
-//
-//
-// class_native_methods
-
-int is_class_native_method(struct method_call_node* m){
-  if (m == NULL) { 
-	return 0;
-  };
-  int i = 0;
-  int encontre = 0;
-  while(!encontre && i < array_size((void*)class_native_methods)){
-    encontre = !strcmp(m->method_name, class_native_methods[i]);
-    i = i + 1;
-  };
-  return encontre;
 };
 
 struct ast* eval_class_native_method(struct method_call_node* m){
