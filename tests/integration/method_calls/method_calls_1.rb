@@ -1,3 +1,4 @@
+=begin
 puts "foo"
 
 d.ladrar
@@ -35,3 +36,4 @@ end
 foo(nil) do |k, v, i|
   true
 end
+=end

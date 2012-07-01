@@ -33,7 +33,7 @@ struct class {
   struct class* next;
 };
 
-struct scope {
+ struct scope {
   struct sym* sym_list;
   struct scope* next;
 };
@@ -44,7 +44,9 @@ struct scope {
 
 void put_sym(int, char*, struct ast*, struct list_node*);
 struct sym* get_sym(int, char*);
+struct scope* build_scope();
 void push_scope();
+void push_scope_on_copy(struct scope* new_scope);
 void pop_scope();
 void print_sym_table();
 

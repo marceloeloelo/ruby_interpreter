@@ -39,17 +39,19 @@ char * string_repeat( int n, const char * s ) {
 void eval_end_push_args(struct list_node* fn_args, struct list_node* call_args) {
   int i = list_length(fn_args);
   int j = list_length(call_args);
+  struct scope* aux_scope = build_scope();
   if (i == j) {
     while (fn_args != NULL) { // paso parámetros
       struct ast* fn_arg = fn_args->arg;
       struct ast* call_arg = call_args->arg;
 
       struct identifier_node* i = (struct identifier_node*) fn_arg;
-      put_sym(SYM_VAR, i->name, eval_ast(call_arg), NULL);
+      put_sym_for_scope(aux_scope, SYM_VAR, i->name, eval_ast(call_arg), NULL);
 
       fn_args = fn_args->next;
       call_args = call_args->next;
     };
+    push_scope_on_copy(sym_table);
   } else {
     wrong_arguments_error(i, j);
   };
@@ -102,8 +104,9 @@ struct ast* eval_ast(struct ast* node) {
                                   if (sym != NULL) {
                                     push_scope(); // pusheo nuevo scope
                                     // no pasamos parámetros porque estamos en nodo identifier
-                                    return eval_ast(sym->ast); // retorno función evaluada
+                                    struct ast* evaluated = eval_ast(sym->ast); // retorno función evaluada
                                     pop_scope(); // pop del scope pusheado
+                                    return evaluated;
                                   } else {
                                     undefined_variable_error(i->name);
                                   };
@@ -773,7 +776,6 @@ struct ast* eval_ast(struct ast* node) {
                               } else {
                                 struct sym* sym = get_sym(SYM_FUNC, m->method_name); // busco función
                                 if (sym != NULL) {
-                                  push_scope(); // pusheo nuevo scope
                                   eval_end_push_args(sym->args, m->args);
                                   struct ast* eval = eval_ast(sym->ast);
                                   pop_scope(); // pop del scope pusheado
