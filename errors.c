@@ -65,6 +65,10 @@ int undefined_variable_error(char* variable_name) {
   exit(1);
 };
 
+int undefined_method_error(char* class_name, char* method_name) {
+  printf( "NoMethodError: undefined method `%s' for %s:Class", method_name, class_name);
+  exit(1);
+};
 
 int wrong_arguments_error(int x, int y) {
   printf( "ArgumentError: wrong number of arguments (%i for %i)\n", x, y);
@@ -95,7 +99,13 @@ int invalid_token_error(int line_number, char* file_name) {
   printf( "ERROR: Line %d, invalid token \"%s\"\n", line_number, file_name);
   exit(1);
 };
+
 int zero_division_error(){
   printf("ZeroDivisionError: divided by 0");
+  exit(1);
+};
+
+int uninitialized_constant_error(char* constant) {
+  printf( "NameError: uninitialized constant %s\n", constant);
   exit(1);
 };

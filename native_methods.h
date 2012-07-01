@@ -4,6 +4,7 @@
 
 #include "structures.h"
 #include "ast.h"
+#include "st.h"
 #include "eval.h"
 #include "utils.h"
 #include "errors.h"
@@ -12,8 +13,12 @@
 
 #define PUTS "puts"
 #define GETS "gets"
+#define NEW  "new"
 
 int is_native_method(struct ast*);
 struct ast* eval_native_method(struct ast*);
+
+int is_class_native_method(struct method_call_node*);
+struct ast* eval_class_native_method(struct method_call_node*);
 
 #endif

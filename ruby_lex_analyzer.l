@@ -142,10 +142,11 @@ int is_file_already_opened(char*);
 "when"                           { return WHEN;          }
 "then"                           { return THEN;          }
 "attr_reader"                    { return ATTR_READER;   }
-"attr_writer"                    { return ATTR_WRITTER;  }
+"attr_writter"                   { return ATTR_WRITTER;  }
 "attr_accessor"                  { return ATTR_ACCESSOR; }
 "true"                           { return TRUE_BOOL;     }
 "false"                          { return FALSE_BOOL;    }
+
 :[@]?[a-zA-Z_@][a-zA-Z0-9_]*     {
                                    yylval.string = malloc((strlen(yytext)+1)*sizeof(char));
                                    strcpy(yylval.string, yytext);
@@ -155,12 +156,12 @@ int is_file_already_opened(char*);
                                    yylval.string = malloc((strlen(yytext)+1)*sizeof(char));
                                    strcpy(yylval.string, yytext);
                                    return CONSTANT;
-                                 }
+                                 } 
 [@]?[a-zA-Z_@][a-zA-Z0-9_]*      {
                                    yylval.string = malloc((strlen(yytext)+1)*sizeof(char));
                                    strcpy(yylval.string, yytext);
                                    return IDENTIFIER;
-                                 }
+                                 }        
 
 "("                              { return L_PAREN;                        }
 ")"                              { return R_PAREN;                        }

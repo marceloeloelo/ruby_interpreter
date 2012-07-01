@@ -22,6 +22,7 @@ struct ast* new_double_node(double);
 struct ast* new_string_node(char*);
 struct ast* new_identifier_node(char*);
 struct ast* new_symbol_node(char*);
+struct ast* new_object_node(struct class*, struct sym*);
 struct list_node* new_list_node(int, struct ast*, struct list_node*);
 struct ast* new_function_node(char*, struct list_node*, struct ast*);
 struct ast* new_class_node(char*, struct list_node*);

@@ -39,24 +39,26 @@ char * string_repeat( int n, const char * s ) {
 void eval_end_push_args(struct list_node* fn_args, struct list_node* call_args) {
   int i = list_length(fn_args);
   int j = list_length(call_args);
+  struct scope* aux_scope = build_scope();
   if (i == j) {
     while (fn_args != NULL) { // paso parámetros
       struct ast* fn_arg = fn_args->arg;
       struct ast* call_arg = call_args->arg;
 
       struct identifier_node* i = (struct identifier_node*) fn_arg;
-      put_sym(SYM_VAR, i->name, eval_ast(call_arg), NULL);
+      put_sym_for_scope(aux_scope, SYM_VAR, i->name, eval_ast(call_arg), NULL);
 
       fn_args = fn_args->next;
       call_args = call_args->next;
     };
+    push_scope_on_copy(sym_table);
   } else {
     wrong_arguments_error(i, j);
   };
 };
 
 int eval_cond(struct ast* cond) {
-  return (!((cond->node_type == N_NIL) ||
+  return (!((cond->node_type == N_NIL) || 
            ((cond->node_type == N_BOOL) && (((struct bool_node*) cond)->value == 0))));
 };
 
@@ -102,8 +104,9 @@ struct ast* eval_ast(struct ast* node) {
                                   if (sym != NULL) {
                                     push_scope(); // pusheo nuevo scope
                                     // no pasamos parámetros porque estamos en nodo identifier
-                                    return eval_ast(sym->ast); // retorno función evaluada
+                                    struct ast* evaluated = eval_ast(sym->ast); // retorno función evaluada
                                     pop_scope(); // pop del scope pusheado
+                                    return evaluated;
                                   } else {
                                     undefined_variable_error(i->name);
                                   };
@@ -286,7 +289,7 @@ struct ast* eval_ast(struct ast* node) {
       };
 /*      case N_ARG_LIST : {
                               struct arg_list_node* l = (struct arg_list_node*)node;
-                              print_arg_list(l);
+                              print_arg_list(l); 
                               break;
       };*/
       case N_OP_MUL : {
@@ -641,7 +644,7 @@ struct ast* eval_ast(struct ast* node) {
                                 int value = (double_value(left) == double_value(right)) ? 0 : 1;
                                 return new_bool_node(value);
 
-                              // string
+                              // string 
                               } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1) {
                                 int value = (strcmp(string_value(left), string_value(right)) == 0) ? 0 : 1;
                                 return new_bool_node(value);
@@ -680,7 +683,7 @@ struct ast* eval_ast(struct ast* node) {
                               if (left->node_type == N_INTEGER) {
                                 return new_integer_node(int_value(left));
 
-                              // double
+                              // double 
                               } else if (left->node_type == N_DOUBLE) {
                                 return new_double_node(double_value(left));
 
@@ -697,7 +700,7 @@ struct ast* eval_ast(struct ast* node) {
                               if (left->node_type == N_INTEGER) {
                                 return new_integer_node(int_value(left) * (-1));
 
-                              // double
+                              // double 
                               } else if (left->node_type == N_DOUBLE) {
                                 return new_double_node(double_value(left) * (-1));
 
@@ -711,7 +714,7 @@ struct ast* eval_ast(struct ast* node) {
                               struct ast* left = eval_ast(node->left);
                               return new_bool_node(!bool_value(left));
                               break;
-      };
+      }; 
       case N_STMT_LIST : {
                               return new_ast_node(N_STMT_LIST, eval_ast(node->left), eval_ast(node->right));
                               break;
@@ -733,8 +736,12 @@ struct ast* eval_ast(struct ast* node) {
                               break;
       };
 /*      case N_RETURN : {
+                              printf("return ");
+                              print_ast(node->left); // expression
+                              printf("\n");
                               break;
-      };*/
+      }; */
+
       case N_IF : {
                               struct if_node* i = (struct if_node*) node;
 
@@ -745,6 +752,7 @@ struct ast* eval_ast(struct ast* node) {
                               };
                               break;
       };
+
       case N_WHILE : {
                               while (eval_cond(eval_ast(node->left)) == 1) {
                                 eval_ast(node->right);
@@ -764,88 +772,144 @@ struct ast* eval_ast(struct ast* node) {
                               //print_class_table();
                               break;
       };
-/*      case N_METHOD_CALL_1 : {
-      };*/
-      case N_METHOD_CALL_2 : {
+      case N_METHOD_CALL_0 : { 
+                              struct method_call_node* m = (struct method_call_node*) node;
+
+                              // comportamiento para métodos de clase
+                              if (class_exists(m->class_name) == 1) {
+
+                                // .new por ejemplo
+                                if (is_class_native_method(m)) {
+
+                                  return eval_class_native_method(m);
+
+                                // otra llamada
+                                } else {
+                                    undefined_method_error(m->class_name, m->method_name);  
+                                };
+
+                              // si no existe la clase, error  
+                              } else {
+                                uninitialized_constant_error(m->class_name);
+                              };
+                              break;        
+      }; 
+      case N_METHOD_CALL_1 : { 
+                              struct method_call_node* m = (struct method_call_node*) node;
+
+                              // comportamiento para métodos de clase
+                              if (class_exists(m->class_name) == 1) {
+
+                                // .new por ejemplo
+                                if (is_class_native_method(m)) {
+
+                                  eval_class_native_method(m);
+                                  return NULL;
+
+                                // otra llamada
+                                } else {
+
+                                  struct sym* sym = get_sym(SYM_FUNC, m->method_name); // busco función
+                                  if (sym != NULL) {
+                                    push_scope(); // pusheo nuevo scope
+                                    eval_end_push_args(sym->args, m->args);
+                                    struct ast* eval = eval_ast(sym->ast);                                 
+                                    pop_scope(); // pop del scope pusheado
+                                    return eval; // retorno función evaluada
+                                  } else {
+                                    undefined_method_error(m->class_name, m->method_name);
+                                  };  
+                                  
+                                };
+
+                              // si no existe la clase, error  
+                              } else {
+                                uninitialized_constant_error(m->class_name);
+                              };
+                              break;        
+      }; 
+      case N_METHOD_CALL_2 : { 
                               struct method_call_node* m = (struct method_call_node*) node;
                               if (is_native_method(node)){
                                 return eval_native_method(node);
                               } else {
                                 struct sym* sym = get_sym(SYM_FUNC, m->method_name); // busco función
                                 if (sym != NULL) {
-                                  push_scope(); // pusheo nuevo scope
                                   eval_end_push_args(sym->args, m->args);
-                                  struct ast* eval = eval_ast(sym->ast);
+                                  struct ast* eval = eval_ast(sym->ast);                                 
                                   pop_scope(); // pop del scope pusheado
                                   return eval; // retorno función evaluada
                                 } else {
                                   undefined_variable_error(m->method_name);
-                                };
+                                };  
                               };
                               break;
       };
       case N_ATTR_ACCESSOR : {
-                              struct ast* sym_list;
+                              struct ast* sym_list; 
                               for (sym_list = node->left; sym_list != NULL; sym_list = sym_list->right) {
-
-                                // obtengo symbolo
+                                
+                                // obtengo symbolo 
                                 struct symbol_node* s = (struct symbol_node*) sym_list->left;
 
                                 // creo variable de instancia
                                 char* sym_name = drop_colon(s->name);
                                 char* at_name = concat_strings("@", sym_name);
-                                put_sym(SYM_VAR, at_name, new_nil_node(), NULL);
+                                put_sym(SYM_INST_VAR, at_name, new_nil_node(), NULL);
 
                                 // creo getter
                                 put_sym(SYM_FUNC, sym_name, new_identifier_node(at_name), NULL);
-
-                                // creo setter
-                                struct ast* assign = new_ast_node(N_OP_EQUAL, new_identifier_node(at_name), new_identifier_node("arg"));
-                                struct list_node* param = new_list_node(N_ARG_LIST, new_identifier_node("arg"), NULL);
-                                put_sym(SYM_FUNC, concat_strings(sym_name, "="), assign, param);
-
-                              };
-                              break;
-
-      };
-      case N_ATTR_READER : {
-                              struct ast* sym_list;
-                              for (sym_list = node->left; sym_list != NULL; sym_list = sym_list->right) {
-
-                                // obtengo symbolo
-                                struct symbol_node* s = (struct symbol_node*) sym_list->left;
-
-                                // creo variable de instancia
-                                char* sym_name = drop_colon(s->name);
-                                char* at_name = concat_strings("@", sym_name);
-                                put_sym(SYM_VAR, at_name, new_nil_node(), NULL);
-
-                                // creo getter
-                                put_sym(SYM_FUNC, sym_name, new_identifier_node(at_name), NULL);
-
-                              };
-                              break;
-      };
-      case N_ATTR_WRITTER : {
-                              struct ast* sym_list;
-                              for (sym_list = node->left; sym_list != NULL; sym_list = sym_list->right) {
-
-                                // obtengo symbolo
-                                struct symbol_node* s = (struct symbol_node*) sym_list->left;
-
-                                // creo variable de instancia
-                                char* sym_name = drop_colon(s->name);
-                                char* at_name = concat_strings("@", sym_name);
-                                put_sym(SYM_VAR, at_name, new_nil_node(), NULL);
 
                                 // creo setter
                                 struct ast* assign = new_ast_node(N_OP_EQUAL, new_identifier_node(at_name), new_identifier_node("arg")); 
                                 struct list_node* param = new_list_node(N_ARG_LIST, new_identifier_node("arg"), NULL);
                                 put_sym(SYM_FUNC, concat_strings(sym_name, "="), assign, param);
+                                
+                              };
+                              break;
+                              
+      };
+      case N_ATTR_READER : {
+                              struct ast* sym_list; 
+                              for (sym_list = node->left; sym_list != NULL; sym_list = sym_list->right) {
+                                
+                                // obtengo symbolo 
+                                struct symbol_node* s = (struct symbol_node*) sym_list->left;
 
+                                // creo variable de instancia
+                                char* sym_name = drop_colon(s->name);
+                                char* at_name = concat_strings("@", sym_name);
+                                put_sym(SYM_INST_VAR, at_name, new_nil_node(), NULL);
+
+                                // creo getter
+                                put_sym(SYM_FUNC, sym_name, new_identifier_node(at_name), NULL);
+                                
+                              };
+                              break;
+      };  
+      case N_ATTR_WRITTER : {
+                              struct ast* sym_list; 
+                              for (sym_list = node->left; sym_list != NULL; sym_list = sym_list->right) {
+                                
+                                // obtengo symbolo 
+                                struct symbol_node* s = (struct symbol_node*) sym_list->left;
+
+                                // creo variable de instancia
+                                char* sym_name = drop_colon(s->name);
+                                char* at_name = concat_strings("@", sym_name);
+                                put_sym(SYM_INST_VAR, at_name, new_nil_node(), NULL);
+
+                                // creo setter
+                                struct ast* assign = new_ast_node(N_OP_EQUAL, new_identifier_node(at_name), new_identifier_node("arg")); 
+                                struct list_node* param = new_list_node(N_ARG_LIST, new_identifier_node("arg"), NULL);
+                                put_sym(SYM_FUNC, concat_strings(sym_name, "="), assign, param);
+                                
                               };
                               break;
       };
+
+
+
       default : {
                               printf("ERROR: when evaluating %d.\n", node->node_type);
       };

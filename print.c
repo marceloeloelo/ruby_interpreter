@@ -48,6 +48,13 @@ void print_ast(struct ast* node) {
                               printf("%s", i->name);
                               break;
       };
+      case N_OBJECT : {
+                              struct object_node* o = (struct object_node*)node;
+                              printf("Class: %s\n", o->class_ptr->name);
+                              printf("Inst Vars:\n");
+                              print_sym_list(o->sym_list);
+                              break;
+      };
       case N_OP_EQUAL : {
                               print_ast(node->left);
                               printf(" = ");

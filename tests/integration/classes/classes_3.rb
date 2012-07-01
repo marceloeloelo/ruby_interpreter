@@ -1,7 +1,7 @@
 class Hola
   attr_accessor :hola
   attr_reader :gola
-  attr_writer :gola
+  attr_writter :gola
 end
 
 class Foo
