@@ -10,7 +10,7 @@ else
  y = 3
 end
 
-puts y # 3
+puts (y) # 3
 
 if x == 1
   z = 0
@@ -20,4 +20,4 @@ elsif x == 3
   z = 2
 end
 
-puts z #NoMethod error z
+puts (z) #NoMethod error z

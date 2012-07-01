@@ -1,19 +1,19 @@
 while false
-  puts "no me imprimas!"
+  puts ("no me imprimas!")
 end
 
 x = 0
 while false
   x += 1
-  puts "no me imprimas!"
+  puts ("no me imprimas!")
 end
-puts x
+puts (x)
 
 x = 5
 while (x > 0)
   x -= 1
-  puts x
+  puts (x)
 end
 
-puts x
+puts (x)
 

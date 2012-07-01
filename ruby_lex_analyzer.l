@@ -163,6 +163,12 @@ int is_file_already_opened(char*);
                                    return IDENTIFIER;
                                  }        
 
+"["[0-9]+"]"                     {
+                                   yylval.string = malloc((strlen(yytext)+1)*sizeof(char));
+                                   strcpy(yylval.string, yytext);
+                                   return ARRAY_ACCESS;
+                                 }
+
 "("                              { return L_PAREN;                        }
 ")"                              { return R_PAREN;                        }
 "{"                              { return L_BRACE;                        }

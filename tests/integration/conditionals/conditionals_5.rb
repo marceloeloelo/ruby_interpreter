@@ -1,50 +1,50 @@
 var = 1
 
 if ( var && var )
-  puts "bien"
+  puts ("bien")
 else
-  puts "mal"
+  puts ("mal")
 end
 
 if ( var || var )
-  puts "bien"
+  puts ("bien")
 else
-  puts "mal"
+  puts ("mal")
 end
 
 if ( var && nil )
-  puts "mal"
+  puts ("mal")
 else
-  puts "bien"
+  puts ("bien")
 end
 
 if ( var || nil )
-  puts "bien"
+  puts ("bien")
 else
-  puts "mal"
+  puts ("mal")
 end
 
 if ( var && nil || nil && 1 )
-  puts "mal"
+  puts ("mal")
 else
-  puts "bien"
+  puts ("bien")
 end
 
 if ( var && nil || nil && 1 )
-  puts "mal"
+  puts ("mal")
 elsif ( true )
-  puts "bien"
+  puts ("bien")
 end
 
 if ( var >= 1 || var <= 1 )
-  puts "bien"
+  puts ("bien")
 else
-  puts "mal"
+  puts ("mal")
 end
 
 if ( var > 5 && var >= 10 && var == nil || var )
-  puts "bien"
+  puts ("bien")
 else
-  puts "mal"
+  puts ("mal")
 end
 

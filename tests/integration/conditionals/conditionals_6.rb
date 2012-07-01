@@ -1,21 +1,21 @@
 if ( a = true )
-  puts "bien"
-  puts a
+  puts ("bien")
+  puts (a)
 end
 
 if ( "hola" )
-  puts "bien"
+  puts ("bien")
 end
 
 if ( a = "condition" )
-  puts a
+  puts (a)
 else
-  puts "mal"
+  puts ("mal")
 end
 
 if ( a = ( 1 == 1 ))
-  puts a
+  puts (a)
 else
-  puts "mal"
+  puts ("mal")
 end
 
