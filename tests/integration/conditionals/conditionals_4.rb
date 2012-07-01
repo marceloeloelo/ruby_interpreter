@@ -1,3 +1,5 @@
+# Case Not supported
+=begin
 xyz = 10
 
 case xyz
@@ -24,4 +26,4 @@ when 1 * 1
  puts 'impar'
 end
  
-  
+=end

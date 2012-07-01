@@ -747,7 +747,6 @@ struct ast* eval_ast(struct ast* node) {
       };
       case N_WHILE : {
                               while (eval_cond(eval_ast(node->left)) == 1) {
-                                print_sym_table();
                                 eval_ast(node->right);
                               };
                               break;
