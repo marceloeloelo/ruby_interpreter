@@ -716,7 +716,9 @@ struct ast* eval_ast(struct ast* node) {
                               break;
       }; 
       case N_STMT_LIST : {
-                              return new_ast_node(N_STMT_LIST, eval_ast(node->left), eval_ast(node->right));
+                              struct ast* eval_right = eval_ast(node->right);
+                              struct ast* eval_left = eval_ast(node->left);
+                              return eval_left;
                               break;
       };
       case N_FUNCTION : {
@@ -735,13 +737,10 @@ struct ast* eval_ast(struct ast* node) {
                               put_sym(SYM_FUNC, f->name, f->stmts, f->args);
                               break;
       };
-/*      case N_RETURN : {
-                              printf("return ");
-                              print_ast(node->left); // expression
-                              printf("\n");
-                              break;
-      }; */
-
+      case N_RETURN : {
+                              //return eval_ast(node->left);
+                              //break;
+      };
       case N_IF : {
                               struct if_node* i = (struct if_node*) node;
 
