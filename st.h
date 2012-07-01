@@ -55,6 +55,8 @@ void print_sym_table();
 // class_table
 
 void pop_scope_and_define_class(char*);
+int class_exists(char*);
+struct sym* find_method_for_class(char*, char*);
 void print_class_table();
 
 #endif
