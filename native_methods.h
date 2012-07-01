@@ -13,7 +13,7 @@
 #define PUTS "puts"
 #define GETS "gets"
 
-int is_native_method(struct method_call_node*);
-void eval_native_method(struct method_call_node*);
+int is_native_method(struct ast*);
+struct ast* eval_native_method(struct ast*);
 
 #endif
