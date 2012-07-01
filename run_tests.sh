@@ -23,7 +23,7 @@ do
   errors=`diff $res_file $out_file 2>&1`
 
   # success
-  if [ "$errors" == "" ]; then
+  if [ -z "$errors" ]; then
   	tput setaf 2 # green
     echo "."
     passed_counter=`expr $passed_counter + 1`
