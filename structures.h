@@ -60,6 +60,8 @@
 #define N_ARRAY           53
 #define N_ARRAY_CONTENT   54
 #define N_METHOD_CALL_0   55
+#define N_ARRAY_ACCESS    56
+#define N_CONSTANT        57
 
 extern int yylineno;
 void yyerror(char const*);
@@ -104,6 +106,11 @@ struct symbol_node {
   char* name;
 };
 
+struct constant_node {
+  int node_type;
+  char* value;
+};
+
 struct list_node {
   int node_type;
   struct ast* arg;
@@ -125,7 +132,7 @@ struct class_node {
 
 struct method_call_node {
   int node_type;
-  char* class_name;
+  struct ast* left_ast;
   char* method_name;
   struct list_node* args;
   struct ast* opt_block;
@@ -142,6 +149,12 @@ struct opt_block_node {
   int node_type;
   struct list_node* opt_ids;
   struct ast* stmts;
+};
+
+struct array_access_node {
+  int node_type;
+  char* array_name;
+  int entry;
 };
 
 #endif

@@ -764,8 +764,24 @@ struct ast* eval_ast(struct ast* node) {
                               //print_class_table();
                               break;
       };
-/*      case N_METHOD_CALL_1 : {
-      };*/
+      case N_METHOD_CALL_1 : {
+                               struct method_call_node* m = (struct method_call_node*)node;
+                               if (is_native_method(node)) {
+                                 return eval_instance_native_method(node);
+                               } else {
+                                 struct sym* sym = get_sym(SYM_FUNC, m->method_name);
+                                 if (sym != NULL) {
+                                   push_scope();
+                                   eval_end_push_args(sym->args, m->args);
+                                   struct ast* eval = eval_ast(sym->ast);
+                                   pop_scope();
+                                   return eval;
+                                 } else {
+                                  undefined_variable_error(m->method_name);
+                                 };
+                               };
+                              break;
+      };
       case N_METHOD_CALL_2 : {
                               struct method_call_node* m = (struct method_call_node*) node;
                               if (is_native_method(node)){

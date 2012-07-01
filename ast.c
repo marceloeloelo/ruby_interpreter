@@ -63,6 +63,14 @@ struct ast* new_symbol_node(char* name) {
   return (struct ast*)node;
 };
 
+struct ast* new_constant_node(char* value) {
+  struct constant_node* node = malloc(sizeof(struct constant_node));
+  node->node_type = N_CONSTANT;
+  node->value = malloc((strlen(value)+1)*sizeof(char));
+  strcpy(node->value, value);
+  return (struct ast*)node;
+};
+
 struct list_node* new_list_node(int node_type, struct ast* arg, struct list_node* next) {
   struct list_node* node = malloc(sizeof(struct list_node));
   node->node_type = node_type;
@@ -100,17 +108,16 @@ struct ast* new_class_node(char* name, struct list_node* stmts) {
   return (struct ast*)node;
 };
 
-struct ast* new_method_call_node(int node_type, char* class_name, char* method_name, struct list_node* args, struct ast* opt_block) {
+struct ast* new_method_call_node(int node_type, struct ast* left_ast, char* method_name, struct list_node* args, struct ast* opt_block) {
   struct method_call_node* node = malloc(sizeof(struct method_call_node));
   node->node_type = node_type;
   node->method_name = malloc((strlen(method_name)+1)*sizeof(char));
   strcpy(node->method_name, method_name);
 
   if (node_type == N_METHOD_CALL_1) {
-    node->class_name = malloc((strlen(class_name)+1)*sizeof(char));
-    strcpy(node->class_name, class_name);
+    node->left_ast = left_ast;
   } else {
-    node->class_name = NULL;
+    node->left_ast = NULL;
   };
 
   node->args = args;
@@ -133,7 +140,16 @@ struct ast* new_opt_block_node(struct list_node* opt_ids, struct ast* stmts) {
   node->opt_ids = opt_ids;
   node->stmts = stmts;
   return (struct ast*)node;
-}
+};
+
+struct ast* new_array_access_node(char* array_name, int entry) {
+  struct array_access_node* node = malloc(sizeof(struct array_access_node));
+  node->node_type = N_ARRAY_ACCESS;
+  node->array_name = malloc((strlen(array_name)+1)*sizeof(char));
+  strcpy(node->array_name, array_name);
+  node->entry = entry;
+  return (struct ast*)node;
+};
 
 //
 //

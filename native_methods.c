@@ -51,9 +51,28 @@ struct ast* rgets() {
   return new_string_node(strdup(input_string));
 };
 
+struct ast* rlength(struct method_call_node* m) {
+  struct ast* evaluated = eval_ast(m->left_ast);
+  switch (evaluated->node_type) {
+    case N_STRING_1: {
+                           return new_integer_node(strlen(string_value(evaluated)));
+                           break;
+    };
+    /* case N_ARRAY: {*/
+    /*                        break;*/
+    /* };*/
+    /* case N_ARRAY_ACCESS: {*/
+    /*                        break;*/
+    /* };*/
+    /* default: {*/
+		/*                        break;*/
+		/* };*/
+  };
+  return new_nil_node();
+};
 
-
-char* native_methods[2] = {PUTS, GETS};
+char* native_methods[2] = { PUTS, GETS };
+char* instance_native_methods[3] = { LENGTH, EACH_ITERATOR, RESPOND_TO };
 
 int is_native_method(struct ast* m){
 	if (m == NULL){
@@ -61,16 +80,22 @@ int is_native_method(struct ast* m){
 	};
 
   char* method_name;
-  if (m->node_type == N_METHOD_CALL_2) {
+  char** native_methods_array;
+  if (m->node_type == N_METHOD_CALL_1) {
     method_name = strdup(((struct method_call_node*)m)->method_name);
+    native_methods_array = instance_native_methods;
+  } else if (m->node_type == N_METHOD_CALL_2) {
+    method_name = strdup(((struct method_call_node*)m)->method_name);
+    native_methods_array = native_methods;
   } else if (m->node_type == N_IDENTIFIER) {
     method_name = strdup(((struct identifier_node*)m)->name);
+    native_methods_array = native_methods;
   };
 
 	int i = 0;
 	int encontre = 0;
-	while(!encontre && i < array_size((void*)native_methods)){
-		encontre = !strcmp(method_name, native_methods[i]);
+	while(!encontre && i < array_size((void*)native_methods_array)){
+		encontre = !strcmp(method_name, native_methods_array[i]);
 		i = i + 1;
 	};
 	return encontre;
@@ -94,3 +119,18 @@ struct ast* eval_native_method(struct ast* m){
   return new_nil_node();
 };
 
+struct ast* eval_instance_native_method(struct ast* m) {
+	if (m != NULL){
+    char* method_name;
+    if (m->node_type == N_METHOD_CALL_1) {
+      method_name = strdup(((struct method_call_node*)m)->method_name);
+    };
+
+		if (!strcmp(method_name, LENGTH)) {
+     return rlength((struct method_call_node*)m);
+    } else if (!strcmp(method_name, EACH_ITERATOR)) {
+    } else if (!strcmp(method_name, RESPOND_TO)) {
+    };
+	};
+  return new_nil_node();
+};
