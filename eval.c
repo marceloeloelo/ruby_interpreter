@@ -56,7 +56,7 @@ void eval_end_push_args(struct list_node* fn_args, struct list_node* call_args) 
 };
 
 int eval_cond(struct ast* cond) {
-  return (!((cond->node_type == N_NIL) ||
+  return (!((cond->node_type == N_NIL) || 
            ((cond->node_type == N_BOOL) && (((struct bool_node*) cond)->value == 0))));
 };
 
@@ -109,9 +109,8 @@ struct ast* eval_ast(struct ast* node) {
       };
       case N_OP_EQUAL : {
                               struct identifier_node* left = (struct identifier_node*) node->left;
-                              struct ast* expression = NULL;
-                              put_sym(SYM_VAR, left->name, expression = eval_ast(node->right), NULL);
-                              return expression;
+                              put_sym(SYM_VAR, left->name, eval_ast(node->right), NULL);
+                              return NULL;
                               break;
       };
       case N_OP_PLUS_EQ : {
@@ -254,7 +253,7 @@ struct ast* eval_ast(struct ast* node) {
                                            (left->node_type == N_DOUBLE && right->node_type == N_INTEGER) ||
                                            (left->node_type == N_INTEGER && right->node_type == N_DOUBLE)) {
                                   if (double_value(right) != 0) {
-                                    s->ast = new_double_node(double_value(left) / double_value(right));
+                                    s->ast = new_double_node(double_value(left) * double_value(right));
                                   } else {
                                     /* ERROR !!! */
                                   }
@@ -282,7 +281,7 @@ struct ast* eval_ast(struct ast* node) {
       };
 /*      case N_ARG_LIST : {
                               struct arg_list_node* l = (struct arg_list_node*)node;
-                              print_arg_list(l);
+                              print_arg_list(l); 
                               break;
       };*/
       case N_OP_MUL : {
@@ -334,7 +333,7 @@ struct ast* eval_ast(struct ast* node) {
                                 if (int_value(right) != 0) {
                                   return new_integer_node(int_value(left) / int_value(right));
                                 } else {
-                                  zero_division_error();
+                                  /* ERROR !!!! */
                                 }
 
                               // double / double || double / int || int / double
@@ -342,9 +341,9 @@ struct ast* eval_ast(struct ast* node) {
                                          (left->node_type == N_DOUBLE && right->node_type == N_INTEGER) ||
                                          (left->node_type == N_INTEGER && right->node_type == N_DOUBLE)) {
                                 if (double_value(right) != 0) {
-                                  return new_double_node(double_value(left) / double_value(right));
+                                  return new_double_node(double_value(left) * double_value(right));
                                 } else {
-                                  zero_division_error();
+                                  /* ERROR !!! */
                                 }
 
                               } else if (left->node_type != N_INTEGER &&
@@ -597,33 +596,25 @@ struct ast* eval_ast(struct ast* node) {
                               struct ast* left = eval_ast(node->left);
                               struct ast* right = eval_ast(node->right);
 
-                              if (left != NULL && right !=NULL){
-                                // int, double
-                                if ((left->node_type == N_INTEGER  || left->node_type == N_DOUBLE) &&
-                                    (right->node_type == N_INTEGER || right->node_type == N_DOUBLE)) {
-                                  if (double_value(left) == double_value(right)) {
-                                    return new_integer_node(0);
-                                  } else if (double_value(left) > double_value(right)) {
-                                    return new_integer_node(1);
-                                  } else {
-                                    return new_integer_node(-1);
-                                  };
-                                // string <= string
-                                } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1) {
-                                  int cmp = strcmp(string_value(left), string_value(right));
-                                  cmp = cmp > 0 ?  1 : cmp;
-                                  cmp = cmp < 0 ? -1 : cmp;
-                                  return new_integer_node(cmp);
-                                } else if (left->node_type == N_NIL || left->node_type == N_BOOL) {
-                                  no_method_error("<=>", left);
-                                } else if (right->node_type == N_NIL || right->node_type == N_BOOL){
-                                  no_method_error("<=>", right);
-                                } else{
-                                  return new_nil_node();
+                              // int, double
+                              if ((left->node_type == N_INTEGER  || left->node_type == N_DOUBLE) &&
+                                  (right->node_type == N_INTEGER || right->node_type == N_DOUBLE)) {
+                                if (double_value(left) == double_value(right)) {
+                                  return new_integer_node(0);
+                                } else if (double_value(left) > double_value(right)) {
+                                  return new_integer_node(1);
+                                } else {
+                                  return new_integer_node(-1);
                                 };
+
+                              // string <= string
+                              } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1) {
+                                return new_integer_node(strcmp(string_value(left), string_value(right)));
+
                               } else {
-                                no_method_error("<=>", NULL);
+                                no_method_error("<=>", left);
                               };
+
                               break;
       };
       case N_OP_CMP_NEG : {
@@ -636,7 +627,7 @@ struct ast* eval_ast(struct ast* node) {
                                 int value = (double_value(left) == double_value(right)) ? 0 : 1;
                                 return new_bool_node(value);
 
-                              // string
+                              // string 
                               } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1) {
                                 int value = (strcmp(string_value(left), string_value(right)) == 0) ? 0 : 1;
                                 return new_bool_node(value);
@@ -675,7 +666,7 @@ struct ast* eval_ast(struct ast* node) {
                               if (left->node_type == N_INTEGER) {
                                 return new_integer_node(int_value(left));
 
-                              // double
+                              // double 
                               } else if (left->node_type == N_DOUBLE) {
                                 return new_double_node(double_value(left));
 
@@ -692,7 +683,7 @@ struct ast* eval_ast(struct ast* node) {
                               if (left->node_type == N_INTEGER) {
                                 return new_integer_node(int_value(left) * (-1));
 
-                              // double
+                              // double 
                               } else if (left->node_type == N_DOUBLE) {
                                 return new_double_node(double_value(left) * (-1));
 
@@ -706,7 +697,7 @@ struct ast* eval_ast(struct ast* node) {
                               struct ast* left = eval_ast(node->left);
                               return new_bool_node(!bool_value(left));
                               break;
-      };
+      }; 
       case N_STMT_LIST : {
                               return new_ast_node(N_STMT_LIST, eval_ast(node->left), eval_ast(node->right));
       };
@@ -727,8 +718,12 @@ struct ast* eval_ast(struct ast* node) {
                               break;
       };
 /*      case N_RETURN : {
+                              printf("return ");
+                              print_ast(node->left); // expression
+                              printf("\n");
                               break;
-      };*/
+      }; */
+
       case N_IF : {
                               struct if_node* i = (struct if_node*) node;
 
@@ -739,6 +734,7 @@ struct ast* eval_ast(struct ast* node) {
                               };
                               break;
       };
+
       case N_WHILE : {
                               while (eval_cond(eval_ast(node->left)) == 1) {
                                 print_sym_table();
@@ -759,7 +755,10 @@ struct ast* eval_ast(struct ast* node) {
                               //print_class_table();
                               break;
       };
-      case N_METHOD_CALL_2 : {
+      case N_METHOD_CALL_1 : { 
+                              break;        
+      }; 
+      case N_METHOD_CALL_2 : { 
                               struct method_call_node* m = (struct method_call_node*) node;
                               if (is_native_method(m)){
                                 eval_native_method(m);
@@ -769,19 +768,20 @@ struct ast* eval_ast(struct ast* node) {
                                 if (sym != NULL) {
                                   push_scope(); // pusheo nuevo scope
                                   eval_end_push_args(sym->args, m->args);
-                                  struct ast* eval = eval_ast(sym->ast);
+                                  struct ast* eval = eval_ast(sym->ast);                                 
                                   pop_scope(); // pop del scope pusheado
                                   return eval; // retorno función evaluada
                                 } else {
                                   undefined_variable_error(m->method_name);
-                                };
+                                };  
                               };
-      };
+                              break;        
+      }; 
       case N_ATTR_ACCESSOR : {
-                              struct ast* sym_list;
+                              struct ast* sym_list; 
                               for (sym_list = node->left; sym_list != NULL; sym_list = sym_list->right) {
-
-                                // obtengo symbolo
+                                
+                                // obtengo symbolo 
                                 struct symbol_node* s = (struct symbol_node*) sym_list->left;
 
                                 // creo variable de instancia
@@ -793,19 +793,19 @@ struct ast* eval_ast(struct ast* node) {
                                 put_sym(SYM_FUNC, sym_name, new_identifier_node(at_name), NULL);
 
                                 // creo setter
-                                struct ast* assign = new_ast_node(N_OP_EQUAL, new_identifier_node(at_name), new_identifier_node("arg"));
+                                struct ast* assign = new_ast_node(N_OP_EQUAL, new_identifier_node(at_name), new_identifier_node("arg")); 
                                 struct list_node* param = new_list_node(N_ARG_LIST, new_identifier_node("arg"), NULL);
                                 put_sym(SYM_FUNC, concat_strings(sym_name, "="), assign, param);
-
+                                
                               };
                               break;
-
+                              
       };
       case N_ATTR_READER : {
-                              struct ast* sym_list;
+                              struct ast* sym_list; 
                               for (sym_list = node->left; sym_list != NULL; sym_list = sym_list->right) {
-
-                                // obtengo symbolo
+                                
+                                // obtengo symbolo 
                                 struct symbol_node* s = (struct symbol_node*) sym_list->left;
 
                                 // creo variable de instancia
@@ -815,15 +815,15 @@ struct ast* eval_ast(struct ast* node) {
 
                                 // creo getter
                                 put_sym(SYM_FUNC, sym_name, new_identifier_node(at_name), NULL);
-
+                                
                               };
                               break;
-      };
+      };  
       case N_ATTR_WRITTER : {
-                              struct ast* sym_list;
+                              struct ast* sym_list; 
                               for (sym_list = node->left; sym_list != NULL; sym_list = sym_list->right) {
-
-                                // obtengo symbolo
+                                
+                                // obtengo symbolo 
                                 struct symbol_node* s = (struct symbol_node*) sym_list->left;
 
                                 // creo variable de instancia
@@ -835,10 +835,13 @@ struct ast* eval_ast(struct ast* node) {
                                 struct ast* assign = new_ast_node(N_OP_EQUAL, new_identifier_node(at_name), new_identifier_node("arg")); 
                                 struct list_node* param = new_list_node(N_ARG_LIST, new_identifier_node("arg"), NULL);
                                 put_sym(SYM_FUNC, concat_strings(sym_name, "="), assign, param);
-
+                                
                               };
                               break;
       };
+
+
+
       default : {
                               printf("ERROR: when evaluating %d.\n", node->node_type);
       };
