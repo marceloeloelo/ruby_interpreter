@@ -760,6 +760,28 @@ struct ast* eval_ast(struct ast* node) {
                               //print_class_table();
                               break;
       };
+      case N_METHOD_CALL_0 : { 
+                              struct method_call_node* m = (struct method_call_node*) node;
+
+                              // comportamiento para métodos de clase
+                              if (class_exists(m->class_name) == 1) {
+
+                                // .new por ejemplo
+                                if (is_class_native_method(m)) {
+
+                                  return eval_class_native_method(m);
+
+                                // otra llamada
+                                } else {
+                                    undefined_method_error(m->class_name, m->method_name);  
+                                };
+
+                              // si no existe la clase, error  
+                              } else {
+                                uninitialized_constant_error(m->class_name);
+                              };
+                              break;        
+      }; 
       case N_METHOD_CALL_1 : { 
                               struct method_call_node* m = (struct method_call_node*) node;
 
@@ -822,7 +844,7 @@ struct ast* eval_ast(struct ast* node) {
                                 // creo variable de instancia
                                 char* sym_name = drop_colon(s->name);
                                 char* at_name = concat_strings("@", sym_name);
-                                put_sym(SYM_VAR, at_name, new_nil_node(), NULL);
+                                put_sym(SYM_INST_VAR, at_name, new_nil_node(), NULL);
 
                                 // creo getter
                                 put_sym(SYM_FUNC, sym_name, new_identifier_node(at_name), NULL);
@@ -846,7 +868,7 @@ struct ast* eval_ast(struct ast* node) {
                                 // creo variable de instancia
                                 char* sym_name = drop_colon(s->name);
                                 char* at_name = concat_strings("@", sym_name);
-                                put_sym(SYM_VAR, at_name, new_nil_node(), NULL);
+                                put_sym(SYM_INST_VAR, at_name, new_nil_node(), NULL);
 
                                 // creo getter
                                 put_sym(SYM_FUNC, sym_name, new_identifier_node(at_name), NULL);
@@ -864,7 +886,7 @@ struct ast* eval_ast(struct ast* node) {
                                 // creo variable de instancia
                                 char* sym_name = drop_colon(s->name);
                                 char* at_name = concat_strings("@", sym_name);
-                                put_sym(SYM_VAR, at_name, new_nil_node(), NULL);
+                                put_sym(SYM_INST_VAR, at_name, new_nil_node(), NULL);
 
                                 // creo setter
                                 struct ast* assign = new_ast_node(N_OP_EQUAL, new_identifier_node(at_name), new_identifier_node("arg")); 

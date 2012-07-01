@@ -63,6 +63,14 @@ struct ast* new_symbol_node(char* name) {
   return (struct ast*)node;
 };
 
+struct ast* new_object_node(struct class* class_ptr, struct sym* sym_list) {
+  struct object_node* node = malloc(sizeof(struct object_node));
+  node->node_type = N_OBJECT;
+  node->class_ptr = class_ptr;
+  node->sym_list = sym_list;
+  return (struct ast*)node;
+};
+
 struct list_node* new_list_node(int node_type, struct ast* arg, struct list_node* next) {
   struct list_node* node = malloc(sizeof(struct list_node));
   node->node_type = node_type;
@@ -106,7 +114,7 @@ struct ast* new_method_call_node(int node_type, char* class_name, char* method_n
   node->method_name = malloc((strlen(method_name)+1)*sizeof(char));
   strcpy(node->method_name, method_name);
 
-  if (node_type == N_METHOD_CALL_1) {
+  if ((node_type == N_METHOD_CALL_0) || (node_type == N_METHOD_CALL_1)) {
     node->class_name = malloc((strlen(class_name)+1)*sizeof(char));
     strcpy(node->class_name, class_name);
   } else {
