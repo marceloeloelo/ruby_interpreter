@@ -41,12 +41,51 @@ struct sym* get_sym(int sym_type, char* sym_name) {
 
 };
 
+/* Default constructor */
 void push_scope() {
 
   struct scope* new_scope = malloc (sizeof(struct scope)); 
   new_scope->sym_list = NULL;
   new_scope->next = sym_table;
   sym_table = new_scope; 
+
+};
+
+/* On copy constructor */
+void push_scope_on_copy(struct scope* scope){
+  
+  struct scope* new_scope = malloc (sizeof(struct scope)); 
+  new_scope->sym_list = scope->sym_list;
+  new_scope->next = sym_table;
+  sym_table = new_scope; 
+
+};
+
+/*Builds an aux scope*/
+struct scope* build_scope() {
+  struct scope* new_scope = malloc (sizeof(struct scope)); 
+  new_scope->sym_list = NULL;
+  new_scope->next = NULL;
+  return new_scope;
+};
+
+/*Puts a sym for a given scope*/
+void put_sym_for_scope(struct scope* scope, int sym_type, char* sym_name, struct ast* ast, struct list_node* args) {
+
+  struct sym* ptr = scope->sym_list;
+  while ((ptr != (struct sym*) 0) && ((strcmp(ptr->name, sym_name) != 0) || (ptr->sym_type != sym_type))) {
+    ptr = (struct sym*) ptr->next;
+  };
+  if (ptr == NULL) { // si no existe en la tabla de symbols lo creo
+    ptr = malloc (sizeof(struct sym));  
+    ptr->name = malloc (strlen(sym_name)+1);
+    strcpy(ptr->name, sym_name);
+    ptr->sym_type = sym_type;
+    ptr->next = scope->sym_list;
+    scope->sym_list = ptr; // actualizo el scope
+  };
+  ptr->ast = ast;
+  ptr->args = args;
 
 };
 
