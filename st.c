@@ -1,4 +1,5 @@
 #include "st.h"
+#include "ast.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -94,17 +95,21 @@ void pop_scope() {
 
 };
 
+void print_sym_list(struct sym* sym_list) {
+    struct sym* ptr;
+    for (ptr = sym_list; ptr != 0; ptr = ptr->next) {
+      printf("%s = ", ptr->name);
+      print_ast(ptr->ast);
+      printf("\n");
+    };
+};
+
 void print_sym_table() {
 
   struct scope* scope;
   for (scope = sym_table; scope!= 0; scope = scope->next) {
     printf("--- begin scope ---\n");
-    struct sym* ptr;
-    for (ptr = scope->sym_list; ptr != 0; ptr = ptr->next) {
-      printf("%s = ", ptr->name);
-      print_ast(ptr->ast);
-      printf("\n");
-    };
+    print_sym_list(scope->sym_list);
     printf("---- end scope ----\n");
   };
 
@@ -173,6 +178,31 @@ struct sym* find_method_for_class(char* class_name, char* method_name){
   };
   return NULL;
 
+};
+
+struct sym* copy_instance_variables_for_class(struct class* class_ptr) {
+  
+  struct sym* s;
+  struct sym* sym_list = NULL;
+
+  for (s = class_ptr->sym_list; s != 0; s = s->next) {
+    if (s->sym_type == SYM_INST_VAR) {
+
+      // copio sym
+      struct sym* s_copy = malloc (sizeof(struct sym));  
+      s_copy->name = malloc (strlen(s->name)+1);
+      strcpy(s_copy->name, s->name);
+      s_copy->sym_type = s->sym_type;
+      s_copy->ast = new_nil_node(); // inicializados en nil  
+      
+      // lo agrego a la lista
+      s_copy->next = sym_list;
+      sym_list = s_copy;
+
+    };
+  };
+  
+  return sym_list;
 };
 
 void print_class_table() {

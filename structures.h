@@ -60,6 +60,7 @@
 #define N_ARRAY           53
 #define N_ARRAY_CONTENT   54
 #define N_METHOD_CALL_0   55
+#define N_OBJECT          56
 
 extern int yylineno;
 void yyerror(char const*);
@@ -102,6 +103,12 @@ struct identifier_node {
 struct symbol_node {
   int node_type;
   char* name;
+};
+
+struct object_node {
+  int node_type;
+  struct class* class_ptr;
+  struct sym* sym_list;
 };
 
 struct list_node {

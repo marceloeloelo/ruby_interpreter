@@ -48,6 +48,7 @@ struct scope* build_scope();
 void push_scope();
 void push_scope_on_copy(struct scope* new_scope);
 void pop_scope();
+void print_sym_list(struct sym*);
 void print_sym_table();
 
 //
@@ -56,7 +57,9 @@ void print_sym_table();
 
 void pop_scope_and_define_class(char*);
 int class_exists(char*);
+struct class* find_class(char*);
 struct sym* find_method_for_class(char*, char*);
+struct sym* copy_instance_variables_for_class(struct class*);
 void print_class_table();
 
 #endif

@@ -98,7 +98,7 @@ struct ast* eval_native_method(struct ast* m){
 // class_native_methods
 
 int is_class_native_method(struct method_call_node* m){
-  if (m == NULL){ 
+  if (m == NULL) { 
 	return 0;
   };
   int i = 0;
@@ -110,22 +110,25 @@ int is_class_native_method(struct method_call_node* m){
   return encontre;
 };
 
-void eval_class_native_method(struct method_call_node* m){
-  if (m != NULL){
+struct ast* eval_class_native_method(struct method_call_node* m){
+  if (m != NULL) {
 
-  	//new
+  	// new
     if (!strcmp(m->method_name, NEW)) {
+      
+      //creo objeto
+      struct class* class_ptr = find_class(m->class_name);	
+      struct sym* sym_list = copy_instance_variables_for_class(class_ptr);
+      struct ast* new_object = new_object_node(class_ptr, sym_list);
 	  
 	  struct sym* s = find_method_for_class(m->class_name, "initialize");
-	  if (s != NULL) {
-        // initialize 
-        fprintf(stdout, "initialize");
-        fflush(stdout);
-	  } else {
-	  	// new por defecto
-	  	fprintf(stdout, "default new");
-        fflush(stdout);
-	  };
+
+	  // initialize está definido
+      if (s != NULL) { 
+      	// llamo a initialize sobre el objeto 
+      };
+
+      return new_object;
 
     };
 
