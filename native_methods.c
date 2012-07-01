@@ -1,6 +1,6 @@
 #include "native_methods.h"
 
-void rputs(struct method_call_node* m){
+struct ast* rputs(struct method_call_node* m){
 	struct list_node* arg_node = m->args;
 	while(arg_node != NULL){
 		struct ast* evaluated = eval_ast(arg_node->arg);
@@ -42,28 +42,55 @@ void rputs(struct method_call_node* m){
 		};
 		arg_node = arg_node->next;
 	};
+  return new_nil_node();
 };
+
+struct ast* rgets() {
+  char input_string[2056];
+  gets(input_string);
+  return new_string_node(strdup(input_string));
+};
+
+
 
 char* native_methods[2] = {PUTS, GETS};
 
-int is_native_method(struct method_call_node* m){
-	if (m == NULL){ 
+int is_native_method(struct ast* m){
+	if (m == NULL){
 		return 0;
 	};
+
+  char* method_name;
+  if (m->node_type == N_METHOD_CALL_2) {
+    method_name = strdup(((struct method_call_node*)m)->method_name);
+  } else if (m->node_type == N_IDENTIFIER) {
+    method_name = strdup(((struct identifier_node*)m)->name);
+  };
+
 	int i = 0;
 	int encontre = 0;
 	while(!encontre && i < array_size((void*)native_methods)){
-		encontre = !strcmp(m->method_name, native_methods[i]);
+		encontre = !strcmp(method_name, native_methods[i]);
 		i = i + 1;
 	};
 	return encontre;
 };
 
-void eval_native_method(struct method_call_node* m){
+struct ast* eval_native_method(struct ast* m){
 	if (m != NULL){
-		if (!strcmp(m->method_name, PUTS)) {
-			rputs(m);
-      	};
+    char* method_name;
+    if (m->node_type == N_METHOD_CALL_2) {
+      method_name = strdup(((struct method_call_node*)m)->method_name);
+    } else if (m->node_type == N_IDENTIFIER) {
+      method_name = strdup(((struct identifier_node*)m)->name);
+    };
+
+		if (!strcmp(method_name, PUTS)) {
+			return rputs((struct method_call_node*)m);
+    } else if (!strcmp(method_name, GETS)) {
+      return rgets();
+    };
 	};
+  return new_nil_node();
 };
 

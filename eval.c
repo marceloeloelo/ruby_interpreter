@@ -91,18 +91,22 @@ struct ast* eval_ast(struct ast* node) {
       };
       case N_IDENTIFIER : {
                               struct identifier_node* i = (struct identifier_node*) node;
-                              struct sym* sym = get_sym(SYM_VAR, i->name); // busco variable primero
-                              if (sym != NULL) {
-                                return eval_ast(sym->ast); // retorno variable
+                              if (is_native_method(node)){
+                                return eval_native_method(node);
                               } else {
-                                sym = get_sym(SYM_FUNC, i->name); // busco función
+                                struct sym* sym = get_sym(SYM_VAR, i->name); // busco variable primero
                                 if (sym != NULL) {
-                                  push_scope(); // pusheo nuevo scope
-                                  // no pasamos parámetros porque estamos en nodo identifier
-                                  return eval_ast(sym->ast); // retorno función evaluada
-                                  pop_scope(); // pop del scope pusheado
+                                  return eval_ast(sym->ast); // retorno variable
                                 } else {
-                                  undefined_variable_error(i->name);
+                                  sym = get_sym(SYM_FUNC, i->name); // busco función
+                                  if (sym != NULL) {
+                                    push_scope(); // pusheo nuevo scope
+                                    // no pasamos parámetros porque estamos en nodo identifier
+                                    return eval_ast(sym->ast); // retorno función evaluada
+                                    pop_scope(); // pop del scope pusheado
+                                  } else {
+                                    undefined_variable_error(i->name);
+                                  };
                                 };
                               };
                               break;
@@ -390,6 +394,7 @@ struct ast* eval_ast(struct ast* node) {
                               } else {
                                 type_error(left->node_type, right->node_type);
                               };
+                              break;
       };
       case N_OP_PLUS : {
                               struct ast* left = eval_ast(node->left);
@@ -709,6 +714,7 @@ struct ast* eval_ast(struct ast* node) {
       };
       case N_STMT_LIST : {
                               return new_ast_node(N_STMT_LIST, eval_ast(node->left), eval_ast(node->right));
+                              break;
       };
       case N_FUNCTION : {
                               struct function_node* f = (struct function_node*) node;
@@ -758,11 +764,12 @@ struct ast* eval_ast(struct ast* node) {
                               //print_class_table();
                               break;
       };
+/*      case N_METHOD_CALL_1 : {
+      };*/
       case N_METHOD_CALL_2 : {
                               struct method_call_node* m = (struct method_call_node*) node;
-                              if (is_native_method(m)){
-                                eval_native_method(m);
-                                return NULL;
+                              if (is_native_method(node)){
+                                return eval_native_method(node);
                               } else {
                                 struct sym* sym = get_sym(SYM_FUNC, m->method_name); // busco función
                                 if (sym != NULL) {
@@ -775,6 +782,7 @@ struct ast* eval_ast(struct ast* node) {
                                   undefined_variable_error(m->method_name);
                                 };
                               };
+                              break;
       };
       case N_ATTR_ACCESSOR : {
                               struct ast* sym_list;
