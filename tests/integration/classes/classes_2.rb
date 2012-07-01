@@ -3,8 +3,8 @@ class Perro
 
   def initialize(raza, nombre)
     # atributos
-    @raza = raza
-    @nombre = nombre
+    #@raza = raza
+    #@nombre = nombre
   end
 
   # metodo ladrar

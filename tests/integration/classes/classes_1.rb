@@ -1,5 +1,5 @@
-class class_1
+class Class_1
 end
 
-class class_2
+class Class_2
 end

@@ -1,3 +1,5 @@
+#Not supported yet
+=begin
 array = [0,1,2]
 array[0]
 array[1]
@@ -10,3 +12,4 @@ array[0]
 
 
 [[0], [1,2], [nil]]
+=end
