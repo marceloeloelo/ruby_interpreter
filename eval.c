@@ -752,7 +752,6 @@ struct ast* eval_ast(struct ast* node) {
                               };
                               break;
       };
-
       case N_WHILE : {
                               while (eval_cond(eval_ast(node->left)) == 1) {
                                 eval_ast(node->right);
@@ -772,27 +771,25 @@ struct ast* eval_ast(struct ast* node) {
                               //print_class_table();
                               break;
       };
-      case N_METHOD_CALL_0 : { 
+      case N_METHOD_CALL_0 : {
                               struct method_call_node* m = (struct method_call_node*) node;
 
                               // comportamiento para métodos de clase
                               if (class_exists(string_value(m->left_ast)) == 1) {
 
                                 // .new por ejemplo
-                                if (is_class_native_method(m)) {
-
+                                if (is_native_method(node)) {
                                   return eval_class_native_method(m);
 
                                 // otra llamada
                                 } else {
-                                    undefined_method_error(string_value(m->left_ast), m->method_name);  
+                                    undefined_method_error(string_value(m->left_ast), m->method_name);
                                 };
-
-                              // si no existe la clase, error  
+                              // si no existe la clase, error
                               } else {
                                 uninitialized_constant_error(string_value(m->left_ast));
                               };
-                              break;        
+                              break;
       }; 
       case N_METHOD_CALL_1 : {
                                struct method_call_node* m = (struct method_call_node*)node;
@@ -820,20 +817,19 @@ struct ast* eval_ast(struct ast* node) {
                                 struct sym* sym = get_sym(SYM_FUNC, m->method_name); // busco función
                                 if (sym != NULL) {
                                   eval_end_push_args(sym->args, m->args);
-                                  struct ast* eval = eval_ast(sym->ast);                                 
+                                  struct ast* eval = eval_ast(sym->ast);
                                   pop_scope(); // pop del scope pusheado
                                   return eval; // retorno función evaluada
                                 } else {
                                   undefined_variable_error(m->method_name);
-                                };  
+                                };
                               };
                               break;
       };
       case N_ATTR_ACCESSOR : {
-                              struct ast* sym_list; 
+                              struct ast* sym_list;
                               for (sym_list = node->left; sym_list != NULL; sym_list = sym_list->right) {
-                                
-                                // obtengo symbolo 
+                                // obtengo symbolo
                                 struct symbol_node* s = (struct symbol_node*) sym_list->left;
 
                                 // creo variable de instancia
@@ -845,18 +841,15 @@ struct ast* eval_ast(struct ast* node) {
                                 put_sym(SYM_FUNC, sym_name, new_identifier_node(at_name), NULL);
 
                                 // creo setter
-                                struct ast* assign = new_ast_node(N_OP_EQUAL, new_identifier_node(at_name), new_identifier_node("arg")); 
+                                struct ast* assign = new_ast_node(N_OP_EQUAL, new_identifier_node(at_name), new_identifier_node("arg"));
                                 struct list_node* param = new_list_node(N_ARG_LIST, new_identifier_node("arg"), NULL);
                                 put_sym(SYM_FUNC, concat_strings(sym_name, "="), assign, param);
-                                
                               };
                               break;
-                              
       };
       case N_ATTR_READER : {
                               struct ast* sym_list; 
                               for (sym_list = node->left; sym_list != NULL; sym_list = sym_list->right) {
-                                
                                 // obtengo symbolo 
                                 struct symbol_node* s = (struct symbol_node*) sym_list->left;
 
@@ -867,15 +860,13 @@ struct ast* eval_ast(struct ast* node) {
 
                                 // creo getter
                                 put_sym(SYM_FUNC, sym_name, new_identifier_node(at_name), NULL);
-                                
                               };
                               break;
       };  
       case N_ATTR_WRITTER : {
-                              struct ast* sym_list; 
+                              struct ast* sym_list;
                               for (sym_list = node->left; sym_list != NULL; sym_list = sym_list->right) {
-                                
-                                // obtengo symbolo 
+                                // obtengo symbolo
                                 struct symbol_node* s = (struct symbol_node*) sym_list->left;
 
                                 // creo variable de instancia
@@ -884,10 +875,9 @@ struct ast* eval_ast(struct ast* node) {
                                 put_sym(SYM_INST_VAR, at_name, new_nil_node(), NULL);
 
                                 // creo setter
-                                struct ast* assign = new_ast_node(N_OP_EQUAL, new_identifier_node(at_name), new_identifier_node("arg")); 
+                                struct ast* assign = new_ast_node(N_OP_EQUAL, new_identifier_node(at_name), new_identifier_node("arg"));
                                 struct list_node* param = new_list_node(N_ARG_LIST, new_identifier_node("arg"), NULL);
                                 put_sym(SYM_FUNC, concat_strings(sym_name, "="), assign, param);
-                                
                               };
                               break;
       };
