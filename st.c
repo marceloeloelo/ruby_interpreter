@@ -103,13 +103,13 @@ void print_class_table() {
   for (c = class_table; c != NULL; c = c->next) {
 
     struct sym* s;
-    fprintf(stdout, "--- class %s -----\n", c->name);
+    printf("--- class %s -----\n", c->name);
     for (s = c->sym_list; s != NULL; s = s->next) {
-      fprintf(stdout, "%s = ", s->name);
+      printf("%s = ", s->name);
       print_ast(s->ast);
-      fprintf(stdout, "\n");
+      printf("\n");
     };
-    fprintf(stdout, "---- end class ----\n");
+    printf("---- end class ----\n");
   };
 
 };

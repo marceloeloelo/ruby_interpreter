@@ -9,7 +9,7 @@
 extern int yylineno;
 
 void yyerror(char const * error) {
-  fprintf(stderr, "ERROR: Line %d, %s\n", yylineno, error);
+  printf("ERROR: Line %d, %s\n", yylineno, error);
 }
 
 // install sym_table
