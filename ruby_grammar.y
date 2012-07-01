@@ -65,7 +65,7 @@ struct class* class_table = 0;
 program    : comp_statement                  { $$ = $1;
                                                push_scope();
                                                struct ast* eval = eval_ast($1);
-                                               print_ast(eval); }
+                                               /*print_ast(eval);*/ }
            ;
 
 comp_statement  : comp_statement statement   { $$ = new_ast_node(N_STMT_LIST, $2, $1); }
