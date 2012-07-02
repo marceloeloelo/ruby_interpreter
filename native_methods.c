@@ -51,7 +51,7 @@ struct ast* rputs(struct ast* a){
     printf("%s\n", bool_value(a) ? "true" : "false");
 
   } else if (a->node_type == N_NIL) {
-    printf("nil\n");
+    printf("\n");
 
   } else {
     printf("Puts doesn't support %s type, sorry :D\n", type_name(a->node_type));
