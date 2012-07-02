@@ -981,6 +981,10 @@ struct ast* eval_ast(struct ast* node) {
                                };
                                break;
       };
+      case N_OBJECT : {
+                               return node;
+                               break;
+      }
       default : {
                               printf("ERROR: when evaluating %d.\n", node->node_type);
       };

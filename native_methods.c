@@ -43,6 +43,10 @@ struct ast* rputs(struct ast* a){
   } else if (a->node_type == N_NIL) {
     printf("\n");
 
+  } else if (a->node_type == N_OBJECT) {
+    struct object_node * object = (struct object_node *) a;
+    printf("<#%s:%p>\n", object->class_ptr->name, (void *)object);
+
   } else {
     printf("Puts doesn't support %s type, sorry :D\n", type_name(a->node_type));
   };
