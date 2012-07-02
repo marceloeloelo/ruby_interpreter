@@ -23,17 +23,7 @@ struct ast* rputs(struct ast* a){
   } else if (a->node_type == N_STRING_2) {
     char * str = malloc(sizeof( strlen(string_value(a)) ));
     strcpy(str, string_value(a));
-    /* convert end of lines in '\n' chars */
-  int i = 0;
-  int j = i;
-  for(i = 0; i < (strlen(str) - 1); i = i + 1){
-    if (str[i] == '\\' && str[i+1] == 'n'){
-      str[i] = '\n';
-      for(j = i + 1; j < (strlen(str)); j = j + 1){
-        str[j] = str[j + 1];
-      }
-    }
-  }
+    str = build_end_of_lines(str);
     printf("%s\n", str);
 
   } else if (a->node_type == N_INTEGER) {

@@ -1,5 +1,4 @@
 #include "utils.h"
-#include <string.h>
 
 int list_length(struct list_node* list) {
   int i = 0;
@@ -30,4 +29,5 @@ char * build_end_of_lines(char* str){
       }
     }
   }
+  return str;
 }
