@@ -1,3 +1,4 @@
+=begin
 def method_1
   return(1)
 end
@@ -29,3 +30,4 @@ end
 def method_8 x, y, z
   return (x + y) * z
 end
+=end
