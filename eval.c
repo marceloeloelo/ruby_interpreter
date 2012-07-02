@@ -794,16 +794,35 @@ struct ast* eval_ast(struct ast* node) {
                                struct method_call_node* m = (struct method_call_node*)node;
                                if (is_native_method(node)) {
                                  return eval_instance_native_method(node);
+
+                               // si es metodo de objeto  
                                } else {
-                                 struct sym* sym = get_sym(SYM_FUNC, m->method_name);
+                                 struct sym* sym = get_sym(SYM_VAR, string_value(m->left_ast)); // busco variable
                                  if (sym != NULL) {
-                                   eval_end_push_args(sym->args, m->args);
-                                   struct ast* eval = eval_ast(sym->ast);
-                                   pop_scope();
-                                   return eval;
+
+                                  // debe ser un objeto
+                                  if (sym->ast->node_type == N_OBJECT) {
+                                    struct object_node* o = (struct object_node*) sym->ast;
+                                    struct sym* method = find_method_for_class(o->class_ptr->name, m->method_name); // busco método
+
+                                    if (method != NULL) {
+
+                                      printf("ENCUENTROOO");
+
+
+                                      print_ast(sym->ast);
+                                    } else {
+                                      undefined_method_error(o->class_ptr->name, m->method_name);  
+                                    };
+                                    
+
+                                  } else {
+                                    undefined_method_error(string_value(m->left_ast), m->method_name);
+                                  };
+
                                  } else {
-                                  undefined_variable_error(m->method_name);
-                                 };
+                                   undefined_variable_error(m->method_name);
+                                 }; 
                                };
                               break;
       };
