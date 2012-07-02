@@ -3,7 +3,7 @@ class Perro
   attr_reader :raza
 
   def initialize(raza)
-	@raza= raza
+	@raza = raza
   end
 
   def ladrar
@@ -48,3 +48,46 @@ puts(a.raza())
 #a.raza= ("Salchicha") Syntax Error!
 #puts(a.raza())
 
+puts(nil)
+
+class Gato
+  def initialize(raza)
+	@raza = raza
+	@razaraza = raza*2
+  end
+
+  def maullar(maullido)
+	puts(maullido)
+  end
+
+  def info
+	puts(@raza)
+	puts(@razaraza)
+  end
+
+  def llamar_metodo_de_perro
+	ladrar
+  end
+
+  def pelear_con_perro(perro)
+	puts("Que miras " + perro.raza() + "!");
+	puts("#5!23!@#!")
+	perro.ladrar()
+	puts("!$$$%%@!!")
+	maullar("miau!")
+	perro.auyar()
+  end
+
+  def crear_perro(raza_perro)
+	Perro.new(raza_perro)
+  end
+end
+
+g = Gato.new("Siames")
+g.maullar('miau')
+g.info()
+#g.llamar_metodo_de_perro() # Deberia explotar
+g.pelear_con_perro(a)
+g.pelear_con_perro(Perro.new("Bulldog"))
+b = g.crear_perro("Pekines")
+puts(b.raza())
