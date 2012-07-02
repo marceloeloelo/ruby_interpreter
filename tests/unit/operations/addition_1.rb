@@ -21,3 +21,10 @@ puts(1.2+3)
 
 1.2+3.4
 puts(1.2+3.4)
+
+"hola " + "hola"
+puts("hola " + "hola")
+1 + "hola"
+puts(1 + "hola")
+"hola" + 1
+puts("hola" + 1)

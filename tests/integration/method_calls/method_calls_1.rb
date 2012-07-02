@@ -12,12 +12,21 @@ class Perro
 	ladrar
 	auyar
   end
+
+  def saltar(cant)
+	i = 1
+	while (i <= cant)
+	  puts("salto!: " + i)
+	  i = i + 1
+	end
+  end
 end
 
 a = Perro.new()
 a.ladrar()
 a.auyar()
 a.ruido()
+a.saltar(3)
 
 ladrar
 =begin

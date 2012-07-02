@@ -485,6 +485,29 @@ struct ast* eval_ast(struct ast* node) {
                                 return new_string_one_node(res);
 
                               // TODO manejar mejor casteo de tipos
+                              // string + int   
+                              } else if (left->node_type == N_STRING_1 && right->node_type == N_INTEGER ||
+                                         left->node_type == N_STRING_2 && right->node_type == N_INTEGER) {
+                                char* s_left  = string_value(left);
+                                int i = int_value(right);
+                                char* s_int = malloc(sizeof(i)/sizeof(int));
+                                sprintf(s_int, "%i", i);
+                                char* res = malloc((strlen(s_left) + strlen(s_int) + 1)*sizeof(char));
+                                strcpy(res, s_left);
+                                strcat(res, s_int);
+                                return new_string_one_node(res);
+                              // int + string
+                              } else if (left->node_type == N_INTEGER && right->node_type == N_STRING_1 ||
+                                         left->node_type == N_INTEGER && right->node_type == N_STRING_2) {
+                                int i = int_value(left);
+                                char* s_int = malloc(sizeof(i)/sizeof(int));
+                                sprintf(s_int, "%i", i);
+                                char* s_right  = string_value(right);
+                                char* res = malloc((strlen(s_right) + strlen(s_int) + 1)*sizeof(char));
+                                strcpy(res, s_int);
+                                strcat(res, s_right);
+                                return new_string_one_node(res);
+
                               } else if (left->node_type != N_INTEGER  &&
                                          left->node_type != N_DOUBLE   &&
                                          left->node_type != N_STRING_1 &&

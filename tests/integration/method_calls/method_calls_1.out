@@ -2,4 +2,7 @@ guau!
 auuuuu!
 guau!
 auuuuu!
+salto!: 1
+salto!: 2
+salto!: 3
 NameError: undefined local variable or method `ladrar' for main:Object
