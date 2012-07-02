@@ -208,6 +208,12 @@ char* string_value(struct ast* ast) {
   if ((ast->node_type == N_STRING_1) || (ast->node_type == N_STRING_2)) {
     struct string_node* s = (struct string_node*) ast;
     return s->value;
+  } else if (ast->node_type == N_CONSTANT) {
+    struct constant_node* c = (struct constant_node*) ast;
+    return c->value;
+  } else if (ast->node_type == N_IDENTIFIER) {
+    struct identifier_node* i = (struct identifier_node*) ast;
+    return i->name;
   } else {
     return ""; // no debería pasar
   };

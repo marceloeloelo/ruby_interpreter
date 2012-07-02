@@ -51,7 +51,7 @@ void eval_end_push_args(struct list_node* fn_args, struct list_node* call_args) 
       fn_args = fn_args->next;
       call_args = call_args->next;
     };
-    push_scope_on_copy(sym_table);
+    push_scope_on_copy(aux_scope);
   } else {
     wrong_arguments_error(i, j);
   };
@@ -725,7 +725,9 @@ struct ast* eval_ast(struct ast* node) {
                               break;
       }; 
       case N_STMT_LIST : {
-                              return new_ast_node(N_STMT_LIST, eval_ast(node->left), eval_ast(node->right));
+                              struct ast* eval_right = eval_ast(node->right);
+                              struct ast* eval_left = eval_ast(node->left);
+                              return eval_left;
                               break;
       };
       case N_FUNCTION : {
@@ -744,13 +746,10 @@ struct ast* eval_ast(struct ast* node) {
                               put_sym(SYM_FUNC, f->name, f->stmts, f->args);
                               break;
       };
-/*      case N_RETURN : {
-                              printf("return ");
-                              print_ast(node->left); // expression
-                              printf("\n");
-                              break;
-      }; */
-
+      case N_RETURN : {
+                              //return eval_ast(node->left);
+                              //break;
+      };
       case N_IF : {
                               struct if_node* i = (struct if_node*) node;
 
@@ -804,17 +803,35 @@ struct ast* eval_ast(struct ast* node) {
                                struct method_call_node* m = (struct method_call_node*)node;
                                if (is_native_method(node)) {
                                  return eval_instance_native_method(node);
+
+                               // si es metodo de objeto  
                                } else {
-                                 struct sym* sym = get_sym(SYM_FUNC, m->method_name);
+                                 struct sym* sym = get_sym(SYM_VAR, string_value(m->left_ast)); // busco variable
                                  if (sym != NULL) {
-                                   push_scope();
-                                   eval_end_push_args(sym->args, m->args);
-                                   struct ast* eval = eval_ast(sym->ast);
-                                   pop_scope();
-                                   return eval;
+
+                                  // debe ser un objeto
+                                  if (sym->ast->node_type == N_OBJECT) {
+                                    struct object_node* o = (struct object_node*) sym->ast;
+                                    struct sym* method = find_method_for_class(o->class_ptr->name, m->method_name); // busco método
+
+                                    if (method != NULL) {
+
+                                      printf("ENCUENTROOO");
+
+
+                                      print_ast(sym->ast);
+                                    } else {
+                                      undefined_method_error(o->class_ptr->name, m->method_name);  
+                                    };
+                                    
+
+                                  } else {
+                                    undefined_method_error(string_value(m->left_ast), m->method_name);
+                                  };
+
                                  } else {
-                                  undefined_variable_error(m->method_name);
-                                 };
+                                   undefined_variable_error(m->method_name);
+                                 }; 
                                };
                               break;
       };
