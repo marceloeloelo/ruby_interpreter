@@ -62,6 +62,15 @@ int eval_cond(struct ast* cond) {
            ((cond->node_type == N_BOOL) && (((struct bool_node*) cond)->value == 0))));
 };
 
+int array_tree_size(struct ast* array) {
+  if (array == NULL) {
+    return 0;
+  } else {
+    return (1 + array_tree_size(array->right));
+  };
+};
+
+
 //
 //
 //
@@ -862,7 +871,7 @@ struct ast* eval_ast(struct ast* node) {
                                 put_sym(SYM_FUNC, sym_name, new_identifier_node(at_name), NULL);
                               };
                               break;
-      };  
+      };
       case N_ATTR_WRITTER : {
                               struct ast* sym_list;
                               for (sym_list = node->left; sym_list != NULL; sym_list = sym_list->right) {
@@ -881,9 +890,37 @@ struct ast* eval_ast(struct ast* node) {
                               };
                               break;
       };
+      case N_ARRAY_CONTENT : {
+                               return node;//new_ast_node(N_ARRAY_CONTENT, node, node->right);
+                               break;
+      };
+      case N_ARRAY_ACCESS :  {
+                               struct array_access_node* arr = (struct array_access_node*)node;
+                               struct sym* sym = get_sym(SYM_VAR, arr->array_name);
 
+                               if (sym != NULL) {
+                                 int arr_size = array_tree_size(sym->ast);
+                                 struct ast* result[arr_size];
 
+                                 struct ast* ptr = sym->ast;
+                                 int i;
+                                 for (i = 0; i < arr_size; i++) {
+                                   result[i] = ptr;
+                                   ptr = ptr->right;
+                                 };
 
+                                 int index = arr_size - arr->index - 1;
+                                 if (index >= 0 && index < arr_size) {
+                                   struct ast* element = eval_ast(result[index]);
+                                   return element;
+                                 } else {
+                                   /* ERROR !!! */
+                                   /* printf("nil\n");*/
+                                   return new_nil_node();
+                                 };
+                               };
+                               break;
+      };
       default : {
                               printf("ERROR: when evaluating %d.\n", node->node_type);
       };
