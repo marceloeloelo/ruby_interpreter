@@ -5,13 +5,22 @@ char* instance_native_methods[3] = { LENGTH, EACH_ITERATOR, RESPOND_TO };
 char* class_native_methods[1] = {NEW};
 
 struct ast* rputs(struct ast* a){
+
   if (a->node_type == N_METHOD_CALL_0 || a->node_type == N_METHOD_CALL_1 || a->node_type == N_METHOD_CALL_2) {
     struct method_call_node* m = (struct method_call_node*)a;
     struct list_node* arg_node = m->args;
-    while(arg_node != NULL){
-      struct ast* evaluated = eval_ast(arg_node->arg);
-      rputs(evaluated);
-      arg_node = arg_node->next;
+
+    // caso especial: puts() sin parámetros imprime salto de línea
+    if (arg_node == NULL) {
+      printf("\n");
+
+    // comportamiento normal
+    } else {  
+      while(arg_node != NULL){
+        struct ast* evaluated = eval_ast(arg_node->arg);
+        rputs(evaluated);
+        arg_node = arg_node->next;
+      };
     };
 
   } else if (a->node_type == N_ARRAY_CONTENT) {
