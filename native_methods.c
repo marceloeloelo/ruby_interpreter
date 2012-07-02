@@ -160,10 +160,13 @@ struct ast* eval_class_native_method(struct method_call_node* m){
       struct sym* s = find_method_for_class(string_value(m->left_ast), "initialize");
 
       // initialize está definido
-        if (s != NULL) { 
+        if (s != NULL) {           
           // llamo a initialize sobre el objeto 
+          eval_and_push_args_and_object_info(s->args, m->args, new_object);
+          struct ast* eval = eval_ast(s->ast); //eval initialize
+          update_instance(new_object); //Antes de hacer pop, salvo en la instancia los cambios en sus variables de instancia
+          pop_scope(); // pop del scope pusheado
         };
-
         return new_object;
       };
   };

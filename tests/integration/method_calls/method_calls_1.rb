@@ -1,5 +1,11 @@
 class Perro
 
+  attr_reader :raza
+
+  def initialize(raza)
+	@raza= raza
+  end
+
   def ladrar
 	puts ("guau!")
   end
@@ -20,51 +26,25 @@ class Perro
 	  i = i + 1
 	end
   end
+
+  def info
+	puts(@raza)
+  end
+
+  def pluralize_raza
+	@raza = @raza + "s"
+  end
 end
 
-a = Perro.new()
+a = Perro.new("Labrador")
+puts(a.raza())
+a.info();
 a.ladrar()
 a.auyar()
 a.ruido()
 a.saltar(3)
+a.pluralize_raza()
+puts(a.raza())
+#a.raza= ("Salchicha") Syntax Error!
+#puts(a.raza())
 
-ladrar
-=begin
-puts "foo"
-
-d.ladrar
-d.ladrar x
-d.ladrar 'foo'
-d.ladrar 8
-d.saludar "hola"
-d.saludar "foo", "bar"
-d.saludar("foo")
-d.saludar("foo", "bar")
-
-# con bloques
-
-d.each do |n| 
-  puts 'foo'
-end
-
-d.foo(nil) do |n|
-  puts 'bar'
-end
-
-d.foo do |n|
-  puts 'bar'
-end
-
-foo('bar','bar') do |n|
- true
-end
-
-d.foo do |k,v|
-  puts k
-  puts v
-end
-
-foo(nil) do |k, v, i|
-  true
-end
-=end

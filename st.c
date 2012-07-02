@@ -203,6 +203,32 @@ void put_class_sym_list_in_scope(struct scope* scope, struct class* class){
   }
 }
 
+void put_sym_in_obj(struct object_node* obj, struct sym* sym){
+  struct sym* ptr = obj->sym_list;
+  while ((ptr != (struct sym*) 0) && ((strcmp(ptr->name, sym->name) != 0) || (ptr->sym_type != sym->sym_type))) {
+    ptr = (struct sym*) ptr->next;
+  };
+  if (ptr == NULL) { // si no existe en la tabla de symbols lo creo
+    ptr = malloc (sizeof(struct sym));  
+    ptr->name = malloc (strlen(sym->name)+1);
+    strcpy(ptr->name, sym->name);
+    ptr->sym_type = sym->sym_type;
+    ptr->next = obj->sym_list;
+    obj->sym_list = ptr;
+  };
+  ptr->ast = sym->ast;
+  ptr->args = sym->args;  
+}
+
+void update_instance(struct object_node* obj){
+  struct sym* s;
+  for (s = sym_table->sym_list; s != NULL; s = s->next){
+    if (s->sym_type == SYM_INST_VAR){
+      put_sym_in_obj(obj, s);
+    }
+  }
+}
+
 struct sym* copy_instance_variables_for_class(struct class* class_ptr) {
   
   struct sym* s;
@@ -231,6 +257,15 @@ struct sym* copy_instance_variables_for_class(struct class* class_ptr) {
 /*****************************************************************************************/
 /**************************************** PRINTS *****************************************/
 /*****************************************************************************************/
+void print_scope(struct scope* scope){
+  struct scope* it;
+  for (it = scope; it!= 0; it = it->next) {
+    printf("--- begin scope ---\n");
+    print_sym_list(it->sym_list);
+    printf("---- end scope ----\n");
+  };  
+}
+
 void print_sym_table() {
 
   struct scope* scope;

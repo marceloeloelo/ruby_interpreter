@@ -4,6 +4,14 @@
 //
 // aux functions /////////////////////////////////////
 
+int var_type(char* var_name){
+  if (var_name[0] == '@'){
+    return SYM_INST_VAR;
+  } else {
+    return SYM_VAR;
+  }
+}
+
 char* concat_strings(char* str1, char* str2) {
   char* res = malloc((strlen(str1) + strlen(str2) + 1)*sizeof(char));
   strcpy(res, str1);
@@ -37,8 +45,8 @@ char * string_repeat( int n, const char * s ) {
 };
 
 void push_object_info(struct scope* scope, struct object_node * object ){
-  put_object_sym_list_in_scope(scope, object);
   put_class_sym_list_in_scope(scope, object->class_ptr);
+  put_object_sym_list_in_scope(scope, object);
 }
 
 void push_method_info(struct scope* scope, struct list_node* fn_args, struct list_node* call_args){
@@ -50,7 +58,7 @@ void push_method_info(struct scope* scope, struct list_node* fn_args, struct lis
         struct ast* call_arg = call_args->arg;
 
         struct identifier_node* i = (struct identifier_node*) fn_arg;
-        put_sym_for_scope(scope, SYM_VAR, i->name, eval_ast(call_arg), NULL);
+        put_sym_for_scope(scope, var_type(i->name), i->name, eval_ast(call_arg), NULL);
 
         fn_args = fn_args->next;
         call_args = call_args->next;
@@ -78,7 +86,7 @@ void eval_end_push_args(struct list_node* fn_args, struct list_node* call_args) 
       struct ast* call_arg = call_args->arg;
 
       struct identifier_node* i = (struct identifier_node*) fn_arg;
-      put_sym_for_scope(aux_scope, SYM_VAR, i->name, eval_ast(call_arg), NULL);
+      put_sym_for_scope(aux_scope, var_type(i->name), i->name, eval_ast(call_arg), NULL);
 
       fn_args = fn_args->next;
       call_args = call_args->next;
@@ -141,7 +149,7 @@ struct ast* eval_ast(struct ast* node) {
                               if (is_native_method(node)){
                                 return eval_native_method(node);
                               } else {
-                                struct sym* sym = get_sym(SYM_VAR, i->name); // busco variable primero
+                                struct sym* sym = get_sym(var_type(i->name), i->name); // busco variable primero
                                 if (sym != NULL) {
                                   return eval_ast(sym->ast); // retorno variable
                                 } else {
@@ -162,13 +170,13 @@ struct ast* eval_ast(struct ast* node) {
       case N_OP_EQUAL : {
                               struct identifier_node* left = (struct identifier_node*) node->left;
                               struct ast* expression = NULL;
-                              put_sym(SYM_VAR, left->name, expression = eval_ast(node->right), NULL);
+                              put_sym(var_type(left->name), left->name, expression = eval_ast(node->right), NULL);
                               return expression;
                               break;
       };
       case N_OP_PLUS_EQ : {
                               struct identifier_node* id_node = (struct identifier_node*)node->left;
-                              struct sym* s = get_sym(SYM_VAR, id_node->name);
+                              struct sym* s = get_sym(var_type(id_node->name), id_node->name);
 
                               if (s != NULL) {
                                 struct ast* left = s->ast;
@@ -215,7 +223,7 @@ struct ast* eval_ast(struct ast* node) {
       };
       case N_OP_MINUS_EQ : {
                               struct identifier_node* id_node = (struct identifier_node*)node->left;
-                              struct sym* s = get_sym(SYM_VAR, id_node->name);
+                              struct sym* s = get_sym(var_type(id_node->name), id_node->name);
 
                               if (s != NULL) {
                                 struct ast* left = s->ast;
@@ -244,7 +252,7 @@ struct ast* eval_ast(struct ast* node) {
       };
       case N_OP_MUL_EQ : {
                               struct identifier_node* id_node = (struct identifier_node*)node->left;
-                              struct sym* s = get_sym(SYM_VAR, id_node->name);
+                              struct sym* s = get_sym(var_type(id_node->name), id_node->name);
 
                               if (s != NULL) {
                                 struct ast* left = s->ast;
@@ -294,7 +302,7 @@ struct ast* eval_ast(struct ast* node) {
       };
       case N_OP_DIV_EQ : {
                               struct identifier_node* id_node = (struct identifier_node*)node->left;
-                              struct sym* s = get_sym(SYM_VAR, id_node->name);
+                              struct sym* s = get_sym(var_type(id_node->name), id_node->name);
 
                               if (s != NULL) {
                                 struct ast* left = s->ast;
@@ -331,7 +339,7 @@ struct ast* eval_ast(struct ast* node) {
       };
       case N_OP_MODULO_EQ : {
                               struct identifier_node* id_node = (struct identifier_node*)node->left;
-                              struct sym* s = get_sym(SYM_VAR, id_node->name);
+                              struct sym* s = get_sym(var_type(id_node->name), id_node->name);
 
                               if (s != NULL) {
                               } else {
@@ -874,7 +882,6 @@ struct ast* eval_ast(struct ast* node) {
                               };
 
                               pop_scope_and_define_class(c->name);
-                              //print_class_table();
                               break;
       };
       case N_METHOD_CALL_0 : {
@@ -886,7 +893,6 @@ struct ast* eval_ast(struct ast* node) {
                                 // .new por ejemplo
                                 if (is_native_method(node)) {
                                   return eval_class_native_method(m);
-
                                 // otra llamada
                                 } else {
                                     undefined_method_error(string_value(m->left_ast), m->method_name);
@@ -901,10 +907,9 @@ struct ast* eval_ast(struct ast* node) {
                                struct method_call_node* m = (struct method_call_node*)node;
                                if (is_native_method(node)) {
                                  return eval_instance_native_method(node);
-
                                // si es metodo de objeto  
                                } else {
-                                 struct sym* sym = get_sym(SYM_VAR, string_value(m->left_ast)); // busco variable
+                                 struct sym* sym = get_sym(var_type(string_value(m->left_ast)), string_value(m->left_ast)); // busco variable
                                  if (sym != NULL) {
 
                                   // debe ser un objeto
@@ -915,14 +920,11 @@ struct ast* eval_ast(struct ast* node) {
                                     if (method != NULL) {
 
                                       eval_and_push_args_and_object_info(method->args, m->args, o);
-                                      //print_sym_table();
-                                      //print_sym_list_for_object(o);
 
                                       struct ast* eval = eval_ast(method->ast);
+                                      update_instance(o); //Antes de hacer pop, salvo en la instancia los cambios en sus variables de instancia
                                       pop_scope(); // pop del scope pusheado
                                       return eval; // retorno función evaluada
-
-                                      print_ast(sym->ast);
                                     } else {
                                       undefined_method_error(o->class_ptr->name, m->method_name);  
                                     };
@@ -1016,7 +1018,7 @@ struct ast* eval_ast(struct ast* node) {
       };
       case N_ARRAY_ACCESS :  {
                                struct array_access_node* arr = (struct array_access_node*)node;
-                               struct sym* sym = get_sym(SYM_VAR, arr->array_name);
+                               struct sym* sym = get_sym(var_type(arr->array_name), arr->array_name);
 
                                if (sym != NULL) {
                                  int arr_size = array_tree_size(sym->ast);
@@ -1035,7 +1037,6 @@ struct ast* eval_ast(struct ast* node) {
                                    return element;
                                  } else {
                                    /* ERROR !!! */
-                                   /* printf("nil\n");*/
                                    return new_nil_node();
                                  };
                                };

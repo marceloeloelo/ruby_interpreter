@@ -152,7 +152,7 @@ int is_file_already_opened(char*);
                                    strcpy(yylval.string, yytext);
                                    return SYMBOL;
                                  }
-[A-Z_@][a-zA-Z0-9_]*             {
+[A-Z_][a-zA-Z0-9_]*              {
                                    yylval.string = malloc((strlen(yytext)+1)*sizeof(char));
                                    strcpy(yylval.string, yytext);
                                    return CONSTANT;

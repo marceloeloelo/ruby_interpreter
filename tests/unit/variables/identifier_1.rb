@@ -1,7 +1,9 @@
-identifier
+identifier = 1
 
-identifier1
+identifier1 = 1
 
-identifier_1009
+identifier_1009 = 1
 
-identifier_1_ident
+identifier_1_ident = 1
+
+@var = 1

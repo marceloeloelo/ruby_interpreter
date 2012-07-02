@@ -18,6 +18,6 @@ class Perro
   end
 end
 
-a = Perro.new()
+a = Perro.new("Labrador", "Chicho")
 #puts(a)
 #puts(Perro.new())
