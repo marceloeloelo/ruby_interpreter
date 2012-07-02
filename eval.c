@@ -51,7 +51,7 @@ void eval_end_push_args(struct list_node* fn_args, struct list_node* call_args) 
       fn_args = fn_args->next;
       call_args = call_args->next;
     };
-    push_scope_on_copy(sym_table);
+    push_scope_on_copy(aux_scope);
   } else {
     wrong_arguments_error(i, j);
   };
@@ -797,7 +797,6 @@ struct ast* eval_ast(struct ast* node) {
                                } else {
                                  struct sym* sym = get_sym(SYM_FUNC, m->method_name);
                                  if (sym != NULL) {
-                                   push_scope();
                                    eval_end_push_args(sym->args, m->args);
                                    struct ast* eval = eval_ast(sym->ast);
                                    pop_scope();
