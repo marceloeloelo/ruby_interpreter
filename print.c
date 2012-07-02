@@ -43,6 +43,10 @@ void print_ast(struct ast* node) {
                               printf("%s", string_value(node));
                               break;
       };
+      case N_STRING_2: {
+                              printf("%s", string_value(node));
+                              break;
+      };
       case N_IDENTIFIER : {
                               struct identifier_node* i = (struct identifier_node*)node;
                               printf("%s", i->name);

@@ -187,13 +187,13 @@ array_content : array_content COMMA primary { $$ = new_ast_node(N_ARRAY_CONTENT,
               | primary                     { $$ = new_ast_node(N_ARRAY_CONTENT, $1, NULL); }
               ;
 
-literal    : INTEGER                     { $$ = new_integer_node($1);             }
-           | DOUBLE                      { $$ = new_double_node($1);              }
-           | SYMBOL                      { $$ = new_symbol_node($1);              }
-           | STRING1                     { $$ = new_string_node(drop_quotes($1)); }
-           | STRING2                     { $$ = new_string_node(drop_quotes($1)); }
-           | TRUE_BOOL                   { $$ = new_bool_node(1);                 }
-           | FALSE_BOOL                  { $$ = new_bool_node(0);                 }
+literal    : INTEGER                     { $$ = new_integer_node($1);                 }
+           | DOUBLE                      { $$ = new_double_node($1);                  }
+           | SYMBOL                      { $$ = new_symbol_node($1);                  }
+           | STRING1                     { $$ = new_string_one_node(drop_quotes($1)); }
+           | STRING2                     { $$ = new_string_two_node(drop_quotes($1)); }
+           | TRUE_BOOL                   { $$ = new_bool_node(1);                     }
+           | FALSE_BOOL                  { $$ = new_bool_node(0);                     }
            ;
 
 end_of_line : NL                         { $$ = NULL; }

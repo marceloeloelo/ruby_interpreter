@@ -12,6 +12,7 @@ char* type_name(int node_type) {
     case N_INTEGER  : { return "Fixnum";   };
     case N_DOUBLE   : { return "Float";    };
     case N_STRING_1 : { return "String";   };
+    case N_STRING_2 : { return "String";   };
     case N_NIL      : { return "NilClass"; };
     case N_BOOL     : { return "Bool"; };
     default         : { return "FALTA CONSIDERAR TIPO"; };
@@ -31,6 +32,11 @@ int no_method_error(char* method, struct ast* ast) {
       break;
     };
     case N_STRING_1 : {
+      struct string_node* s = (struct string_node*) ast;
+      printf( "NoMethodError: undefined method `%s' for \"%s\":%s\n", method, s->value, type_name(s->node_type));
+      break;
+    };
+    case N_STRING_2 : {
       struct string_node* s = (struct string_node*) ast;
       printf( "NoMethodError: undefined method `%s' for \"%s\":%s\n", method, s->value, type_name(s->node_type));
       break;

@@ -88,7 +88,11 @@ struct ast* eval_ast(struct ast* node) {
                               break;
       };
       case N_STRING_1: {
-                              return new_string_node(string_value(node));
+                              return new_string_one_node(string_value(node));
+                              break;
+      };
+      case N_STRING_2: {
+                              return new_string_two_node(string_value(node));
                               break;
       };
       case N_IDENTIFIER : {
@@ -144,16 +148,20 @@ struct ast* eval_ast(struct ast* node) {
                                   s->ast = new_double_node(double_value(left) + double_value(right));
 
                                 // string += string
-                                } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1) {
+                                } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1 ||
+                                           left->node_type == N_STRING_2 && right->node_type == N_STRING_1 ||
+                                           left->node_type == N_STRING_1 && right->node_type == N_STRING_2 ||
+                                           left->node_type == N_STRING_2 && right->node_type == N_STRING_2) {
                                   char* s_left = string_value(left);
                                   char* s_right = string_value(right);
                                   char* res = malloc((strlen(s_left) + strlen(s_right) + 1)*sizeof(char));
                                   strcpy(res, s_left);
                                   strcat(res, s_right);
-                                  s->ast = new_string_node(res);
-                                } else if (left->node_type != N_INTEGER &&
-                                           left->node_type != N_DOUBLE  &&
-                                           left->node_type != N_STRING_1) {
+                                  s->ast = new_string_one_node(res);
+                                } else if (left->node_type != N_INTEGER  &&
+                                           left->node_type != N_DOUBLE   &&
+                                           left->node_type != N_STRING_1 &&
+                                           left->node_type != N_STRING_2) {
                                   no_method_error("+=", left);
 
                                 } else {
@@ -212,23 +220,26 @@ struct ast* eval_ast(struct ast* node) {
                                   s->ast = new_double_node(double_value(left) * double_value(right));
 
                                 // string *= int
-                                } else if (left->node_type == N_STRING_1 && right->node_type == N_INTEGER) {
+                                } else if (left->node_type == N_STRING_1 && right->node_type == N_INTEGER ||
+                                           left->node_type == N_STRING_2 && right->node_type == N_INTEGER) {
                                   char* s_left = string_value(left);
                                   int n = int_value(right);
                                   char* res = malloc((strlen(s_left)*n + 1)*sizeof(char));
                                   res = string_repeat(n, s_left);
-                                  s->ast = new_string_node(res);
+                                  s->ast = new_string_one_node(res);
 
                                 // int *= string
-                                } else if (left->node_type == N_INTEGER && right->node_type == N_STRING_1) {
+                                } else if (left->node_type == N_INTEGER && right->node_type == N_STRING_1 ||
+                                           left->node_type == N_INTEGER && right->node_type == N_STRING_2) {
                                   char* s_right = string_value(right);
                                   int n = int_value(left);
                                   char* res = malloc((strlen(s_right)*n + 1)*sizeof(char));
                                   res = string_repeat(n, s_right);
-                                  s->ast = new_string_node(res);
-                                } else if (left->node_type != N_INTEGER &&
-                                           left->node_type != N_DOUBLE  &&
-                                           left->node_type != N_STRING_1) {
+                                  s->ast = new_string_one_node(res);
+                                } else if (left->node_type != N_INTEGER  &&
+                                           left->node_type != N_DOUBLE   &&
+                                           left->node_type != N_STRING_1 &&
+                                           left->node_type != N_STRING_2) {
                                   no_method_error("*=", left);
 
                                 } else {
@@ -307,24 +318,27 @@ struct ast* eval_ast(struct ast* node) {
                                 return new_double_node(double_value(left) * double_value(right));
 
                               // string * int
-                              } else if (left->node_type == N_STRING_1 && right->node_type == N_INTEGER) {
+                              } else if (left->node_type == N_STRING_1 && right->node_type == N_INTEGER ||
+                                         left->node_type == N_STRING_2 && right->node_type == N_INTEGER) {
                                 char* s_left = string_value(left);
                                 int n = int_value(right);
                                 char* res = malloc((strlen(s_left)*n + 1)*sizeof(char));
                                 res = string_repeat(n, s_left);
-                                return new_string_node(res);
+                                return new_string_one_node(res);
 
                               // int * string
-                              } else if (left->node_type == N_INTEGER && right->node_type == N_STRING_1) {
+                              } else if (left->node_type == N_INTEGER && right->node_type == N_STRING_1 ||
+                                         left->node_type == N_INTEGER && right->node_type == N_STRING_2) {
                                 char* s_right = string_value(right);
                                 int n = int_value(left);
                                 char* res = malloc((strlen(s_right)*n + 1)*sizeof(char));
                                 res = string_repeat(n, s_right);
-                                return new_string_node(res);
+                                return new_string_one_node(res);
 
-                              } else if (left->node_type != N_INTEGER &&
-                                         left->node_type != N_DOUBLE  &&
-                                         left->node_type != N_STRING_1) {
+                              } else if (left->node_type != N_INTEGER  &&
+                                         left->node_type != N_DOUBLE   &&
+                                         left->node_type != N_STRING_1 &&
+                                         left->node_type != N_STRING_2) {
                                 no_method_error("*", left);
 
                               } else {
@@ -418,18 +432,22 @@ struct ast* eval_ast(struct ast* node) {
                                 return new_double_node(double_value(left) + double_value(right));
 
                               // string + string
-                              } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1) {
+                              } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1 ||
+                                         left->node_type == N_STRING_2 && right->node_type == N_STRING_1 ||
+                                         left->node_type == N_STRING_1 && right->node_type == N_STRING_2 ||
+                                         left->node_type == N_STRING_2 && right->node_type == N_STRING_2) {
                                 char* s_left = string_value(left);
                                 char* s_right = string_value(right);
                                 char* res = malloc((strlen(s_left) + strlen(s_right) + 1)*sizeof(char));
                                 strcpy(res, s_left);
                                 strcat(res, s_right);
-                                return new_string_node(res);
+                                return new_string_one_node(res);
 
                               // TODO manejar mejor casteo de tipos
-                              } else if (left->node_type != N_INTEGER &&
-                                         left->node_type != N_DOUBLE  &&
-                                         left->node_type != N_STRING_1) {
+                              } else if (left->node_type != N_INTEGER  &&
+                                         left->node_type != N_DOUBLE   &&
+                                         left->node_type != N_STRING_1 &&
+                                         left->node_type != N_STRING_2) {
                                 no_method_error("+", left);
 
                               } else {
@@ -472,13 +490,17 @@ struct ast* eval_ast(struct ast* node) {
                                 return new_bool_node(value);
 
                               // string > string
-                              } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1) {
+                              } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1 ||
+                                         left->node_type == N_STRING_2 && right->node_type == N_STRING_1 ||
+                                         left->node_type == N_STRING_1 && right->node_type == N_STRING_2 ||
+                                         left->node_type == N_STRING_2 && right->node_type == N_STRING_2) {
                                 int value = (strcmp(string_value(left), string_value(right)) > 0) ? 1 : 0;
                                 return new_bool_node(value);
 
-                              } else if (left->node_type != N_INTEGER &&
-                                         left->node_type != N_DOUBLE  &&
-                                         left->node_type != N_STRING_1) {
+                              } else if (left->node_type != N_INTEGER  &&
+                                         left->node_type != N_DOUBLE   &&
+                                         left->node_type != N_STRING_1 &&
+                                         left->node_type != N_STRING_2) {
                                 no_method_error(">", left);
 
                               } else {
@@ -498,13 +520,17 @@ struct ast* eval_ast(struct ast* node) {
                                 return new_bool_node(value);
 
                               // string >= string
-                              } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1) {
+                              } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1 ||
+                                         left->node_type == N_STRING_2 && right->node_type == N_STRING_1 ||
+                                         left->node_type == N_STRING_1 && right->node_type == N_STRING_2 ||
+                                         left->node_type == N_STRING_2 && right->node_type == N_STRING_2) {
                                 int value = (strcmp(string_value(left), string_value(right)) >= 0) ? 1 : 0;
                                 return new_bool_node(value);
 
-                              } else if (left->node_type != N_INTEGER &&
-                                         left->node_type != N_DOUBLE  &&
-                                         left->node_type != N_STRING_1) {
+                              } else if (left->node_type != N_INTEGER  &&
+                                         left->node_type != N_DOUBLE   &&
+                                         left->node_type != N_STRING_1 &&
+                                         left->node_type != N_STRING_2) {
                                 no_method_error(">=", left);
 
                               } else {
@@ -524,13 +550,17 @@ struct ast* eval_ast(struct ast* node) {
                                 return new_bool_node(value);
 
                               // string < string
-                              } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1) {
+                              } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1 ||
+                                         left->node_type == N_STRING_2 && right->node_type == N_STRING_1 ||
+                                         left->node_type == N_STRING_1 && right->node_type == N_STRING_2 ||
+                                         left->node_type == N_STRING_2 && right->node_type == N_STRING_2) {
                                 int value = (strcmp(string_value(left), string_value(right)) < 0) ? 1 : 0;
                                 return new_bool_node(value);
 
-                              } else if (left->node_type != N_INTEGER &&
-                                         left->node_type != N_DOUBLE  &&
-                                         left->node_type != N_STRING_1) {
+                              } else if (left->node_type != N_INTEGER  &&
+                                         left->node_type != N_DOUBLE   &&
+                                         left->node_type != N_STRING_1 &&
+                                         left->node_type != N_STRING_2) {
                                 no_method_error("<", left);
 
                               } else {
@@ -550,13 +580,17 @@ struct ast* eval_ast(struct ast* node) {
                                 return new_bool_node(value);
 
                               // string <= string
-                              } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1) {
+                              } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1 ||
+                                         left->node_type == N_STRING_2 && right->node_type == N_STRING_1 ||
+                                         left->node_type == N_STRING_1 && right->node_type == N_STRING_2 ||
+                                         left->node_type == N_STRING_2 && right->node_type == N_STRING_2) {
                                 int value = (strcmp(string_value(left), string_value(right)) <= 0) ? 1 : 0;
                                 return new_bool_node(value);
 
-                              } else if (left->node_type != N_INTEGER &&
-                                         left->node_type != N_DOUBLE  &&
-                                         left->node_type != N_STRING_1) {
+                              } else if (left->node_type != N_INTEGER  &&
+                                         left->node_type != N_DOUBLE   &&
+                                         left->node_type != N_STRING_1 &&
+                                         left->node_type != N_STRING_2) {
                                 no_method_error("<=", left);
 
                               } else {
@@ -576,7 +610,10 @@ struct ast* eval_ast(struct ast* node) {
                                 return new_bool_node(value);
 
                               // string
-                              } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1) {
+                              } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1 ||
+                                         left->node_type == N_STRING_2 && right->node_type == N_STRING_1 ||
+                                         left->node_type == N_STRING_1 && right->node_type == N_STRING_2 ||
+                                         left->node_type == N_STRING_2 && right->node_type == N_STRING_2) {
                                 int value = (strcmp(string_value(left), string_value(right)) == 0) ? 1 : 0;
                                 return new_bool_node(value);
 
@@ -617,7 +654,10 @@ struct ast* eval_ast(struct ast* node) {
                                     return new_integer_node(-1);
                                   };
                                 // string <= string
-                                } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1) {
+                                } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1 ||
+                                           left->node_type == N_STRING_2 && right->node_type == N_STRING_1 ||
+                                           left->node_type == N_STRING_1 && right->node_type == N_STRING_2 ||
+                                           left->node_type == N_STRING_2 && right->node_type == N_STRING_2) {
                                   int cmp = strcmp(string_value(left), string_value(right));
                                   cmp = cmp > 0 ?  1 : cmp;
                                   cmp = cmp < 0 ? -1 : cmp;
@@ -645,7 +685,10 @@ struct ast* eval_ast(struct ast* node) {
                                 return new_bool_node(value);
 
                               // string 
-                              } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1) {
+                              } else if (left->node_type == N_STRING_1 && right->node_type == N_STRING_1 ||
+                                         left->node_type == N_STRING_2 && right->node_type == N_STRING_1 ||
+                                         left->node_type == N_STRING_1 && right->node_type == N_STRING_2 ||
+                                         left->node_type == N_STRING_2 && right->node_type == N_STRING_2) {
                                 int value = (strcmp(string_value(left), string_value(right)) == 0) ? 0 : 1;
                                 return new_bool_node(value);
 

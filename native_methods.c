@@ -8,13 +8,28 @@ struct ast* rputs(struct method_call_node* m){
 	struct list_node* arg_node = m->args;
 	while(arg_node != NULL){
 		struct ast* evaluated = eval_ast(arg_node->arg);
+    int a = evaluated->node_type;
 		switch(evaluated->node_type){
 			case N_STRING_1 : {
-				printf("%s\n", string_value(evaluated));
+        printf("%s\n", string_value(evaluated));        
 				break;
 			};
 			case N_STRING_2 : {
-				printf("%s\n", string_value(evaluated));
+        char * str = malloc(sizeof( strlen(string_value(evaluated)) ));
+        strcpy(str, string_value(evaluated));
+        
+        /* convert end of lines int '\n' chars */
+        int i = 0;
+        int j = i;
+        for(i = 0; i < (strlen(str) - 1); i = i + 1){
+          if (str[i] == '\\' && str[i+1] == 'n'){
+            str[i] = '\n';
+            for(j = i + 1; j < (strlen(str)); j = j + 1){
+              str[j] = str[j + 1];
+            }
+          }
+        }
+        printf("%s\n", str);
 				break;
 			};
 			case N_INTEGER : {
@@ -52,13 +67,17 @@ struct ast* rputs(struct method_call_node* m){
 struct ast* rgets() {
   char input_string[2056];
   gets(input_string);
-  return new_string_node(strdup(input_string));
+  return new_string_one_node(strdup(input_string));
 };
 
 struct ast* rlength(struct method_call_node* m) {
   struct ast* evaluated = eval_ast(m->left_ast);
   switch (evaluated->node_type) {
     case N_STRING_1: {
+                           return new_integer_node(strlen(string_value(evaluated)));
+                           break;
+    };
+    case N_STRING_2: {
                            return new_integer_node(strlen(string_value(evaluated)));
                            break;
     };

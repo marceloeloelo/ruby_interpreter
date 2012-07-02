@@ -39,9 +39,17 @@ struct ast* new_double_node(double value) {
 };
 
 // TODO crear string_nodo para interpolación
-struct ast* new_string_node(char* value) {
+struct ast* new_string_one_node(char* value) {
   struct string_node* node = malloc(sizeof(struct string_node));
   node->node_type = N_STRING_1;
+  node->value = malloc((strlen(value)+1)*sizeof(char));
+  strcpy(node->value, value);
+  return (struct ast*)node;
+};
+
+struct ast* new_string_two_node(char* value) {
+  struct string_node* node = malloc(sizeof(struct string_node));
+  node->node_type = N_STRING_2;
   node->value = malloc((strlen(value)+1)*sizeof(char));
   strcpy(node->value, value);
   return (struct ast*)node;
