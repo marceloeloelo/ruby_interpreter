@@ -1,3 +1,25 @@
+class Perro
+
+  def ladrar
+	puts ("guau!")
+  end
+
+  def auyar
+	puts('auuuuu!')
+  end
+  
+  def ruido
+	ladrar
+	auyar
+  end
+end
+
+a = Perro.new()
+a.ladrar()
+a.auyar()
+a.ruido()
+
+ladrar
 =begin
 puts "foo"
 

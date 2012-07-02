@@ -95,27 +95,6 @@ void pop_scope() {
 
 };
 
-void print_sym_list(struct sym* sym_list) {
-    struct sym* ptr;
-    for (ptr = sym_list; ptr != 0; ptr = ptr->next) {
-      printf("%s = ", ptr->name);
-      print_ast(ptr->ast);
-      printf("\n");
-    };
-};
-
-void print_sym_table() {
-
-  struct scope* scope;
-  for (scope = sym_table; scope!= 0; scope = scope->next) {
-    printf("--- begin scope ---\n");
-    print_sym_list(scope->sym_list);
-    printf("---- end scope ----\n");
-  };
-
-};
-
-
 //
 //
 // class_table
@@ -180,6 +159,50 @@ struct sym* find_method_for_class(char* class_name, char* method_name){
 
 };
 
+struct list_node* copy_list_node(struct list_node* list){
+  if (list == NULL){
+    return NULL;
+  } else{
+    struct list_node* new_list_node = malloc(sizeof(struct list_node));
+    new_list_node->node_type = list->node_type;
+    new_list_node->arg       = list->arg;
+    new_list_node->next      = copy_list_node(list->next);
+    return new_list_node;
+  }
+}
+
+struct sym* copy_sym_list(struct sym* sym_list){
+  if (sym_list == NULL){
+    return NULL;
+  } else{
+    struct sym* new_sym_list = malloc(sizeof(struct sym));
+    new_sym_list->name      = sym_list->name;
+    new_sym_list->sym_type  = sym_list->sym_type;
+    new_sym_list->ast       = sym_list->ast;
+    new_sym_list->args      = copy_list_node(sym_list->args);
+    new_sym_list->next      = copy_sym_list(sym_list->next);
+    return new_sym_list;
+  }
+}
+
+/* Copy the sym_table of the given object and puts it in the passed scope */
+void put_object_sym_list_in_scope(struct scope* scope, struct object_node* object){
+  struct sym* sym_list = copy_sym_list(object->sym_list);
+  struct sym* s;
+  for(s = sym_list; s != NULL; s = s->next){
+    put_sym_for_scope(scope, s->sym_type, s->name, s->ast, s->args);
+  }
+}
+
+/* Copy the sym_table of the given class and puts it in the passed scope */
+void put_class_sym_list_in_scope(struct scope* scope, struct class* class){
+  struct sym* sym_list = copy_sym_list(class->sym_list);
+  struct sym* s;
+  for(s = sym_list; s != NULL; s = s->next){
+    put_sym_for_scope(scope, s->sym_type, s->name, s->ast, s->args);
+  }
+}
+
 struct sym* copy_instance_variables_for_class(struct class* class_ptr) {
   
   struct sym* s;
@@ -204,6 +227,40 @@ struct sym* copy_instance_variables_for_class(struct class* class_ptr) {
   
   return sym_list;
 };
+
+/*****************************************************************************************/
+/**************************************** PRINTS *****************************************/
+/*****************************************************************************************/
+void print_sym_table() {
+
+  struct scope* scope;
+  for (scope = sym_table; scope!= 0; scope = scope->next) {
+    printf("--- begin scope ---\n");
+    print_sym_list(scope->sym_list);
+    printf("---- end scope ----\n");
+  };
+
+};
+
+void print_sym_list(struct sym* sym_list) {
+    struct sym* ptr;
+    for (ptr = sym_list; ptr != 0; ptr = ptr->next) {
+      printf("%s = ", ptr->name);
+      print_ast(ptr->ast);
+      printf("\n");
+    };
+};
+
+void print_sym_list_for_object(struct object_node* obj){
+    printf("----start object symlist----\n");
+    struct sym* ptr;
+    for (ptr = obj->sym_list; ptr != 0; ptr = ptr->next) {
+      printf("%s = ", ptr->name);
+      print_ast(ptr->ast);
+      printf("\n");
+    };  
+    printf("---- end object symlist ----\n");
+}
 
 void print_class_table() {
 

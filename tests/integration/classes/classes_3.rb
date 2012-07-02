@@ -13,3 +13,5 @@ class Foo
   end
 end
 
+Hola.new()
+a = Foo.new()

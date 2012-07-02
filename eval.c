@@ -36,6 +36,38 @@ char * string_repeat( int n, const char * s ) {
   return dest;
 };
 
+void push_object_info(struct scope* scope, struct object_node * object ){
+  put_object_sym_list_in_scope(scope, object);
+  put_class_sym_list_in_scope(scope, object->class_ptr);
+}
+
+void push_method_info(struct scope* scope, struct list_node* fn_args, struct list_node* call_args){
+  int i = list_length(fn_args);
+  int j = list_length(call_args);
+  if (i == j) {
+    while (fn_args != NULL) { // paso parámetros
+        struct ast* fn_arg = fn_args->arg;
+        struct ast* call_arg = call_args->arg;
+
+        struct identifier_node* i = (struct identifier_node*) fn_arg;
+        put_sym_for_scope(scope, SYM_VAR, i->name, eval_ast(call_arg), NULL);
+
+        fn_args = fn_args->next;
+        call_args = call_args->next;
+      };
+  } else{
+    wrong_arguments_error(i, j);
+  }
+}
+
+void eval_and_push_args_and_object_info(struct list_node* fn_args, struct list_node* call_args, 
+                                        struct object_node * object){
+  struct scope* aux_scope = build_scope();
+  push_object_info(aux_scope, object);
+  push_method_info(aux_scope, fn_args, call_args);
+  push_scope_on_copy(aux_scope);
+};
+
 void eval_end_push_args(struct list_node* fn_args, struct list_node* call_args) {
   int i = list_length(fn_args);
   int j = list_length(call_args);
@@ -859,8 +891,13 @@ struct ast* eval_ast(struct ast* node) {
 
                                     if (method != NULL) {
 
-                                      printf("ENCUENTROOO");
+                                      eval_and_push_args_and_object_info(method->args, m->args, o);
+                                      //print_sym_table();
+                                      //print_sym_list_for_object(o);
 
+                                      struct ast* eval = eval_ast(method->ast);
+                                      pop_scope(); // pop del scope pusheado
+                                      return eval; // retorno función evaluada
 
                                       print_ast(sym->ast);
                                     } else {
@@ -873,7 +910,7 @@ struct ast* eval_ast(struct ast* node) {
                                   };
 
                                  } else {
-                                   undefined_variable_error(m->method_name);
+                                   undefined_variable_error(string_value(m->left_ast));
                                  }; 
                                };
                               break;

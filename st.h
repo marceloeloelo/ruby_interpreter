@@ -48,8 +48,12 @@ struct scope* build_scope();
 void push_scope();
 void push_scope_on_copy(struct scope* new_scope);
 void pop_scope();
+struct sym* copy_sym_list(struct sym*);
+void put_object_sym_list_in_scope(struct scope* , struct object_node*);
+void put_class_sym_list_in_scope(struct scope*, struct class*);
 void print_sym_list(struct sym*);
 void print_sym_table();
+void print_sym_list_for_object(struct object_node*);
 
 //
 //
