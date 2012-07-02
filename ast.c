@@ -158,12 +158,20 @@ struct ast* new_opt_block_node(struct list_node* opt_ids, struct ast* stmts) {
   return (struct ast*)node;
 };
 
-struct ast* new_array_access_node(char* array_name, int entry) {
+
+char* drop_brackets(char* str) {
+  char* res = malloc((strlen(str)+1)*sizeof(char));
+  strcpy(res, str);
+  res[strlen(res) - 1] = '\0';
+  return res + 1;
+};
+
+struct ast* new_array_access_node(struct ast* array_name, char* index) {
   struct array_access_node* node = malloc(sizeof(struct array_access_node));
   node->node_type = N_ARRAY_ACCESS;
-  node->array_name = malloc((strlen(array_name)+1)*sizeof(char));
-  strcpy(node->array_name, array_name);
-  node->entry = entry;
+  node->array_name = malloc(strlen(((struct identifier_node*)array_name)->name)+1);
+  strcpy(node->array_name, ((struct identifier_node*)array_name)->name);
+  node->index = atoi(drop_brackets(index));
   return (struct ast*)node;
 };
 
@@ -208,6 +216,12 @@ char* string_value(struct ast* ast) {
   if ((ast->node_type == N_STRING_1) || (ast->node_type == N_STRING_2)) {
     struct string_node* s = (struct string_node*) ast;
     return s->value;
+  } else if (ast->node_type == N_CONSTANT) {
+    struct constant_node* c = (struct constant_node*) ast;
+    return c->value;
+  } else if (ast->node_type == N_IDENTIFIER) {
+    struct identifier_node* i = (struct identifier_node*) ast;
+    return i->name;
   } else {
     return ""; // no debería pasar
   };

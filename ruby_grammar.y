@@ -52,8 +52,8 @@ struct class* class_table = 0;
 %token L_PAREN R_PAREN L_BRACE R_BRACE L_SQ_BRACK R_SQ_BRACK
 %token HASH DOT COMMA SEMI_COLON OP_QUESTION NL PIPE
 
-%type <string> STRING1 STRING2 IDENTIFIER SYMBOL CONSTANT
-%type <int_number> INTEGER ARRAY_ACCESS
+%type <string> STRING1 STRING2 IDENTIFIER SYMBOL CONSTANT ARRAY_ACCESS
+%type <int_number> INTEGER
 %type <double_number> DOUBLE
 %type <ast_type> program comp_statement statement end_of_line expression primary literal declarations method_call if_remain optional_block  attr_statement sym_list array array_content
 %type <list_type> arg_list arg_decl optional_ids arg_decl2 arg_list2 comp_class_statement
@@ -160,7 +160,7 @@ primary    : literal                     { $$ = $1;                            }
            | IDENTIFIER                  { $$ = new_identifier_node($1);       }
            | NIL                         { $$ = new_nil_node();                }
            | array                       { $$ = $1;                            }
-           | IDENTIFIER ARRAY_ACCESS     { $$ = new_array_access_node($1, $2); }
+           | IDENTIFIER ARRAY_ACCESS     { $$ = new_array_access_node(new_identifier_node($1), $2); }
            ;
 
 arg_decl  : arg_list                     { $$ = $1;   }
@@ -176,11 +176,11 @@ arg_decl2  : arg_list2                   { $$ = $1;   }
            ;
 
 arg_list2  : expression                 %prec FIRST  { $$ = new_list_node(N_ARG_LIST, $1, NULL); }
-           | arg_list2 COMMA expression  { $$ = new_list_node(N_ARG_LIST, $3, $1);   }
+           | arg_list2 COMMA expression              { $$ = new_list_node(N_ARG_LIST, $3, $1);   }
            ;
 
-array : L_SQ_BRACK array_content R_SQ_BRACK { $$ = new_ast_node(N_ARRAY, $2, NULL); }
-      | L_SQ_BRACK R_SQ_BRACK               { $$ = NULL;                            }
+array : L_SQ_BRACK array_content R_SQ_BRACK { $$ = $2;   }
+      | L_SQ_BRACK R_SQ_BRACK               { $$ = NULL; }
       ;
 
 array_content : array_content COMMA primary { $$ = new_ast_node(N_ARRAY_CONTENT, $3, $1);   }

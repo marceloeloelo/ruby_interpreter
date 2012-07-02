@@ -161,7 +161,7 @@ struct opt_block_node {
 struct array_access_node {
   int node_type;
   char* array_name;
-  int entry;
+  int index;
 };
 
 #endif

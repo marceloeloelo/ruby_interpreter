@@ -4,63 +4,58 @@ char* native_methods[2] = { PUTS, GETS };
 char* instance_native_methods[3] = { LENGTH, EACH_ITERATOR, RESPOND_TO };
 char* class_native_methods[1] = {NEW};
 
-struct ast* rputs(struct method_call_node* m){
-	struct list_node* arg_node = m->args;
-	while(arg_node != NULL){
-		struct ast* evaluated = eval_ast(arg_node->arg);
-    int a = evaluated->node_type;
-		switch(evaluated->node_type){
-			case N_STRING_1 : {
-        printf("%s\n", string_value(evaluated));        
-				break;
-			};
-			case N_STRING_2 : {
-        char * str = malloc(sizeof( strlen(string_value(evaluated)) ));
-        strcpy(str, string_value(evaluated));
-        
-        /* convert end of lines int '\n' chars */
-        int i = 0;
-        int j = i;
-        for(i = 0; i < (strlen(str) - 1); i = i + 1){
-          if (str[i] == '\\' && str[i+1] == 'n'){
-            str[i] = '\n';
-            for(j = i + 1; j < (strlen(str)); j = j + 1){
-              str[j] = str[j + 1];
-            }
-          }
-        }
-        printf("%s\n", str);
-				break;
-			};
-			case N_INTEGER : {
-				printf("%i\n", int_value(evaluated));
-				break;
-			};
-			case N_DOUBLE : {
-				double d = double_value(evaluated);
-			    if ( d - floor(d) == 0.0 ) {
-			        printf( "%g.0\n", d );
-			    }
-			    else {
-			        printf( "%g\n", d );
-			    }
-				break;
-			};
-			case N_BOOL : {
-				printf("%s\n", bool_value(evaluated) ? "true" : "false");
-				break;
-			};
-			case N_NIL : {
-				printf("%s\n", "");
-				break;
-			};
-			default:{
-				printf("Puts doesn't support %s type, sorry :D\n", type_name(evaluated->node_type));
-				break;
-			};
-		};
-		arg_node = arg_node->next;
-	};
+struct ast* rputs(struct ast* a){
+  if (a->node_type == N_METHOD_CALL_0 || a->node_type == N_METHOD_CALL_1 || a->node_type == N_METHOD_CALL_2) {
+    struct method_call_node* m = (struct method_call_node*)a;
+    struct list_node* arg_node = m->args;
+    while(arg_node != NULL){
+      struct ast* evaluated = eval_ast(arg_node->arg);
+      rputs(evaluated);
+      arg_node = arg_node->next;
+    };
+
+  } else if (a->node_type == N_ARRAY_CONTENT) {
+    rputs(eval_ast(a->left));
+
+  } else if (a->node_type == N_STRING_1) {
+    printf("%s\n", string_value(a));
+
+  } else if (a->node_type == N_STRING_2) {
+    char * str = malloc(sizeof( strlen(string_value(a)) ));
+    strcpy(str, string_value(a));
+    /* convert end of lines in '\n' chars */
+  int i = 0;
+  int j = i;
+  for(i = 0; i < (strlen(str) - 1); i = i + 1){
+    if (str[i] == '\\' && str[i+1] == 'n'){
+      str[i] = '\n';
+      for(j = i + 1; j < (strlen(str)); j = j + 1){
+        str[j] = str[j + 1];
+      }
+    }
+  }
+    printf("%s\n", str);
+
+  } else if (a->node_type == N_INTEGER) {
+    printf("%d\n", int_value(a));
+
+  } else if (a->node_type == N_DOUBLE) {
+    double d = double_value(a);
+    if ( d - floor(d) == 0.0 ) {
+      printf( "%g.0\n", d );
+    } else {
+      printf( "%g\n", d );
+    };
+
+  } else if (a->node_type == N_BOOL) {
+    printf("%s\n", bool_value(a) ? "true" : "false");
+
+  } else if (a->node_type == N_NIL) {
+    printf("nil\n");
+
+  } else {
+    printf("Puts doesn't support %s type, sorry :D\n", type_name(a->node_type));
+  };
   return new_nil_node();
 };
 
@@ -134,7 +129,7 @@ struct ast* eval_native_method(struct ast* m){
     };
 
 		if (!strcmp(method_name, PUTS)) {
-			return rputs((struct method_call_node*)m);
+			return rputs(m);
     } else if (!strcmp(method_name, GETS)) {
       return rgets();
     };
