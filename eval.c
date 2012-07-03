@@ -1012,7 +1012,7 @@ struct ast* eval_ast(struct ast* node) {
                                 // creo setter
                                 struct ast* assign = new_ast_node(N_OP_EQUAL, new_identifier_node(at_name), new_identifier_node("arg"));
                                 struct list_node* param = new_list_node(N_ARG_LIST, new_identifier_node("arg"), NULL);
-                                put_sym(SYM_FUNC, concat_strings(sym_name, "="), assign, param);
+                                put_sym(SYM_FUNC, concat_strings("set_", sym_name), assign, param);
                               };
                               break;
       };
@@ -1046,7 +1046,7 @@ struct ast* eval_ast(struct ast* node) {
                                 // creo setter
                                 struct ast* assign = new_ast_node(N_OP_EQUAL, new_identifier_node(at_name), new_identifier_node("arg"));
                                 struct list_node* param = new_list_node(N_ARG_LIST, new_identifier_node("arg"), NULL);
-                                put_sym(SYM_FUNC, concat_strings(sym_name, "="), assign, param);
+                                put_sym(SYM_FUNC, concat_strings("set_", sym_name), assign, param);
                               };
                               break;
       };

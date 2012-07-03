@@ -1,10 +1,14 @@
 class Perro
 
-  attr_reader :raza
+  attr_accessor :raza
 
   def initialize(raza)
 	@raza = raza
   end
+
+  #def raza=raza
+  #	@raza= raza
+  #end
 
   def ladrar
 	puts ("guau!")
@@ -45,8 +49,8 @@ a.ruido()
 a.saltar(3)
 a.pluralize_raza()
 puts(a.raza())
-#a.raza= ("Salchicha") Syntax Error!
-#puts(a.raza())
+a.set_raza("Salchicha") #raza= -> ayntax Error!
+puts("La nueva raza es: " + a.raza())
 
 puts(nil)
 
