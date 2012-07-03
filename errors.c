@@ -56,6 +56,11 @@ int no_method_error(char* method, struct ast* ast) {
       printf("NoMethodError: undefined method `%s' for %s:%s\n", method, (b->value == 1) ? "true" : "false", type_name(b->node_type));  
       break;
     };
+    case N_OBJECT : {
+      struct object_node* o = (struct object_node*) ast;
+      printf("NoMethodError: undefined method `%s' for <#%s:%p>\n", method, (char*)o->class_ptr->name, (void *)o);
+      break;
+    };
     default : {
   	  // TODO imprimir distintos tipos de datos
       printf( "NoMethodError: FALTA DISTINGUIR ESTE TIPO");	
