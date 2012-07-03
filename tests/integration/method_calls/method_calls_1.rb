@@ -75,7 +75,7 @@ class Gato
 
   def pelear_con_perro(perro)
 	puts("Que miras " + perro.raza() + "!");
-	puts("#5!23!@#!")
+	puts("5!23!@!")
 	perro.ladrar()
 	puts("!$$$%%@!!")
 	maullar("miau!")

@@ -120,3 +120,8 @@ int uninitialized_constant_error(char* constant) {
   printf( "NameError: uninitialized constant %s\n", constant);
   exit(1);
 };
+
+int interpolation_error() {
+  printf( "InterpolarionError: more than one variable is not supported\n");
+  exit(1);
+};
