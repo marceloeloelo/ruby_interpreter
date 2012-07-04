@@ -14,6 +14,21 @@ struct ast* rputs(struct ast* a){
       arg_node = arg_node->next;
     };
 
+  } else if (a->node_type == N_ARRAY) {
+    int arr_size = array_tree_size(a->left);
+    struct ast* result[arr_size];
+    struct ast* ptr = a->left;
+    int i;
+    for (i = 0; i < arr_size; i++) {
+      result[i] = ptr;
+      ptr = ptr->right;
+    };
+
+    ptr = result[arr_size-1];
+    for (i = arr_size-1; i >= 0; i--) {
+      rputs(eval_ast(result[i]));
+    };
+
   } else if (a->node_type == N_ARRAY_CONTENT) {
     rputs(eval_ast(a->left));
 

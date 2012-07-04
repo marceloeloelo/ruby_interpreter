@@ -168,11 +168,52 @@ struct ast* eval_ast(struct ast* node) {
                               break;
       };
       case N_OP_EQUAL : {
-                              struct identifier_node* left = (struct identifier_node*) node->left;
+                            struct ast* left = node->left;
+                            if (left->node_type == N_IDENTIFIER) {
+                              struct identifier_node* id = (struct identifier_node*) node->left;
                               struct ast* expression = NULL;
-                              put_sym(var_type(left->name), left->name, expression = eval_ast(node->right), NULL);
+                              put_sym(var_type(id->name), id->name, expression = eval_ast(node->right), NULL);
                               return expression;
-                              break;
+                            } else if (left->node_type == N_ARRAY_ACCESS) {
+                               struct array_access_node* arr = (struct array_access_node*)left;
+                               struct sym* sym = get_sym(var_type(arr->array_name), arr->array_name);
+
+                               if (sym != NULL) {
+                                 int arr_size = array_tree_size(sym->ast->left);
+                                 int index = arr_size - arr->index - 1;
+                                 if (index >= 0 && index < arr_size) {
+                                   struct ast* ptr = sym->ast->left;
+                                   struct ast* result[arr_size];
+
+                                   int i;
+                                   for (i = 0; i < arr_size; i++) {
+                                     result[i] = ptr;
+                                     ptr = ptr->right;
+                                   };
+
+                                     struct ast* new_node = NULL;
+                                     if (arr_size == 1) {
+                                       new_node = new_ast_node(N_ARRAY_CONTENT, eval_ast(node->right), NULL);
+                                       sym->ast->left = new_node;
+                                     } else if (arr_size > 1) {
+                                       if (index == 0) {
+                                         new_node = new_ast_node(N_ARRAY_CONTENT, eval_ast(node->right), result[index+1]);
+                                         sym->ast->left = new_node;
+                                       } else if (index == arr_size-1) {
+                                         new_node = new_ast_node(N_ARRAY_CONTENT, eval_ast(node->right), NULL);
+                                         result[index-1]->right = new_node;
+                                       } else {
+                                         new_node = new_ast_node(N_ARRAY_CONTENT, eval_ast(node->right), result[index+1]);
+                                         result[index-1]->right = new_node;
+                                       };
+                                       return new_node;
+                                     }
+                                 } else {
+                                    undefined_variable_error(arr->array_name);
+                                 };
+                               };
+                            };
+                            break;
       };
       case N_OP_PLUS_EQ : {
                               struct identifier_node* id_node = (struct identifier_node*)node->left;
@@ -1012,8 +1053,12 @@ struct ast* eval_ast(struct ast* node) {
                               };
                               break;
       };
+      case N_ARRAY         : {
+                               return new_ast_node(N_ARRAY, node->left, NULL);
+                               break;
+      };
       case N_ARRAY_CONTENT : {
-                               return node;//new_ast_node(N_ARRAY_CONTENT, node, node->right);
+                               return node;
                                break;
       };
       case N_ARRAY_ACCESS :  {
@@ -1021,10 +1066,11 @@ struct ast* eval_ast(struct ast* node) {
                                struct sym* sym = get_sym(var_type(arr->array_name), arr->array_name);
 
                                if (sym != NULL) {
-                                 int arr_size = array_tree_size(sym->ast);
+
+                                 int arr_size = array_tree_size(sym->ast->left);
                                  struct ast* result[arr_size];
 
-                                 struct ast* ptr = sym->ast;
+                                 struct ast* ptr = sym->ast->left;
                                  int i;
                                  for (i = 0; i < arr_size; i++) {
                                    result[i] = ptr;
