@@ -95,7 +95,7 @@ int is_file_already_opened(char*);
                                    return STRING2;
                                  }
 
-[0-9]+\.[0-9]*                   {
+[0-9]+\.[0-9]+                   {
                                    yylval.double_number = atof(yytext);
                                    return DOUBLE;
                                  }
