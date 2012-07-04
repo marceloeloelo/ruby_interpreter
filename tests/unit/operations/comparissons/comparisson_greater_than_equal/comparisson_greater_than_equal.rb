@@ -38,6 +38,7 @@ puts("" >= "foo")
 "" >= ""
 puts("" >= "")
 
+# El resto da error en tiempo de ejecucion
 # string vs int
 
 "foo" >= 1

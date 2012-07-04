@@ -56,6 +56,7 @@ puts("foo" < 1.1)
 "1.1" < 1.1
 puts("1.1" < 1.1)
 
+# El resto da error en tiempo de ejecucion
 # bool vs bool
 
 true < false
