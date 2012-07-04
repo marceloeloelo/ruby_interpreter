@@ -4,7 +4,13 @@ char* native_methods[2] = { PUTS, GETS };
 char* instance_native_methods[4] = { LENGTH, EACH_ITERATOR, RESPOND_TO, NIL_METHOD };
 char* class_native_methods[1] = {NEW};
 // String method support
-char* string_methods_array[3] = { LENGTH, RESPOND_TO, NIL_METHOD };
+char* string_methods_array[3]  = { LENGTH, RESPOND_TO, NIL_METHOD };
+// Array method support
+char* array_methods_array[3]   = { LENGTH, RESPOND_TO, NIL_METHOD };
+// Integer method support
+char* integer_methods_array[2] = { RESPOND_TO, NIL_METHOD };
+// Bool method support
+char* bool_methods_array[2]    = { RESPOND_TO, NIL_METHOD };
 
 struct ast* rputs(struct ast* a){
 
@@ -115,29 +121,38 @@ struct ast* rnil(struct method_call_node* m) {
   return new_bool_node(evaluated->node_type == N_NIL);
 };
 
-struct ast* rrespond_to(struct method_call_node* m){
-  struct ast* evaluated = eval_ast(m->left_ast);
-  switch (evaluated->node_type) {
+struct ast* rrespond_to(struct ast* a, char* method_name){
+  switch (a->node_type) {
     case N_STRING_1: {
-                            return new_bool_node(string_is_in_array((void*)string_methods_array, (char*)evaluated));
-                            break;
+                            return new_bool_node(string_is_in_array((void*)string_methods_array, method_name));
     };
     case N_STRING_2: {
-                            return new_bool_node(string_is_in_array((void*)string_methods_array, (char*)evaluated));
-                            break;
+                            return new_bool_node(string_is_in_array((void*)string_methods_array, method_name));
     };
-    /* case N_ARRAY: {*/
-    /*                        break;*/
-    /* };*/
-    /* case N_ARRAY_ACCESS: {*/
-    /*                        break;*/
-    /* };*/
-     default: {
-                          no_method_error("length", evaluated);
-                          break;
-     };
-  };
-  return new_nil_node();
+    case N_ARRAY: {
+                            return new_bool_node(string_is_in_array((void*)array_methods_array, method_name));
+    };
+    case N_INTEGER : {
+                            return new_bool_node(string_is_in_array((void*)integer_methods_array, method_name));
+    };
+    case N_BOOL : {
+                            return new_bool_node(string_is_in_array((void*)bool_methods_array, method_name));
+    };
+    case N_OBJECT : {
+                            struct object_node* o = (struct object_node*) a;
+                            return new_bool_node(NULL != find_method_for_class(o->class_ptr->name, strdup(method_name)));
+    }
+    case N_IDENTIFIER: {
+                            return rrespond_to(eval_ast(a), strdup(method_name));
+    };
+    case N_ARRAY_CONTENT: {
+                            return rrespond_to(eval_ast(a->left), strdup(method_name));
+    };
+    default: {
+                            no_method_error("length", a);
+                            break;
+              };
+  }
 }
 
 int is_native_method(struct ast* m){
@@ -199,7 +214,12 @@ struct ast* eval_instance_native_method(struct ast* m) {
       return rlength((struct method_call_node*)m);
     } else if (!strcmp(method_name, EACH_ITERATOR)) {
     } else if (!strcmp(method_name, RESPOND_TO)) {
-      return rrespond_to((struct method_call_node*)m);
+      struct method_call_node* mc = (struct method_call_node*)m;
+      struct list_node* arg_node = mc->args;
+      if (list_length(arg_node) != 1){
+        wrong_arguments_error(list_length(arg_node), 1);
+      }
+      return rrespond_to(eval_ast(mc->left_ast), strdup(string_value(eval_ast(arg_node->arg))));
     } else if (!strcmp(method_name, NIL_METHOD)) {
       return rnil((struct method_call_node*)m);
     };
