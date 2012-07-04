@@ -145,11 +145,16 @@ struct ast* eval_ast(struct ast* node) {
                               char* str_l = malloc((strlen(string_value(node))+1)*sizeof(char)); // left
                               char* str_r = malloc((strlen(string_value(node))+1)*sizeof(char)); // right
                               char* str_m = malloc((strlen(string_value(node))+1)*sizeof(char)); // middle
+                              str_l[0] = '\0';
+                              str_r[0] = '\0';
+                              str_m[0] = '\0';
                               sscanf(string_value(node), "%[^#]#{%[^}]}%[^\"]", str_l, str_m, str_r);
 
                               // trim    
                               char* trim_1 = malloc((strlen(str_m)+1)*sizeof(char)); // middle sin espacios
                               char* trim_2 = malloc((strlen(str_m)+1)*sizeof(char)); // middle sin espacios
+                              trim_1[0] = '\0';
+                              trim_2[0] = '\0';
                               sscanf(str_m, "%s%s", trim_1, trim_2);
 
                               char* res;
