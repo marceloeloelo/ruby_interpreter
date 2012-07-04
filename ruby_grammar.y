@@ -79,7 +79,7 @@ statement  : end_of_line                     { $$ = $1; }
 
 method_call : CONSTANT DOT IDENTIFIER L_PAREN arg_decl2 R_PAREN optional_block  { $$ = new_method_call_node(N_METHOD_CALL_0, new_constant_node($1), $3, $5, $7); }
             | primary DOT IDENTIFIER  L_PAREN arg_decl2 R_PAREN optional_block  { $$ = new_method_call_node(N_METHOD_CALL_1, $1, $3, $5, $7);                    }
-            | IDENTIFIER              L_PAREN arg_list2 R_PAREN optional_block  { $$ = new_method_call_node(N_METHOD_CALL_2, NULL, $1, $3, $5);                  }
+            | IDENTIFIER              L_PAREN arg_decl2 R_PAREN optional_block  { $$ = new_method_call_node(N_METHOD_CALL_2, NULL, $1, $3, $5);                  }
             ;
 
 optional_block : DO PIPE optional_ids PIPE NL comp_statement END   { $$ = new_opt_block_node($3, $6); }

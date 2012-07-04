@@ -141,7 +141,50 @@ struct ast* eval_ast(struct ast* node) {
                               break;
       };
       case N_STRING_2: {
-                              return new_string_two_node(string_value(node));
+                              // splitteo
+                              char* str_l = malloc((strlen(string_value(node))+1)*sizeof(char)); // left
+                              char* str_r = malloc((strlen(string_value(node))+1)*sizeof(char)); // right
+                              char* str_m = malloc((strlen(string_value(node))+1)*sizeof(char)); // middle
+                              str_l[0] = '\0';
+                              str_r[0] = '\0';
+                              str_m[0] = '\0';
+                              sscanf(string_value(node), "%[^#]#{%[^}]}%[^\"]", str_l, str_m, str_r);
+
+                              // trim    
+                              char* trim_1 = malloc((strlen(str_m)+1)*sizeof(char)); // middle sin espacios
+                              char* trim_2 = malloc((strlen(str_m)+1)*sizeof(char)); // middle sin espacios
+                              trim_1[0] = '\0';
+                              trim_2[0] = '\0';
+                              sscanf(str_m, "%s%s", trim_1, trim_2);
+
+                              char* res;
+
+                              // no había nada dentro de #{ }
+                              if (strcmp(trim_1, "") == 0) {
+
+                                res = malloc((strlen(str_l) + strlen(str_r) + 1)*sizeof(char));
+                                strcpy(res, str_l);
+                                strcat(res, str_r);  
+
+                              // más de una variable
+                              } else if (0 != (int) strlen(trim_2)) {
+                                interpolation_error();   
+
+                              // si había algo válido, evalúo  
+                              } else {
+                                struct sym* sym = get_sym(SYM_VAR, trim_1); // busco variable primero
+                                if (sym != NULL) {
+                                  char* eval_str = string_value(eval_ast(sym->ast)); 
+                                  res = malloc((strlen(str_l) + strlen(eval_str) + strlen(str_r) + 1)*sizeof(char));
+                                  strcpy(res, str_l);
+                                  strcat(res, eval_str);
+                                  strcat(res, str_r);  
+                                } else {
+                                  undefined_variable_error(trim_1);
+                                };
+                              };
+
+                              return new_string_two_node(res);
                               break;
       };
       case N_IDENTIFIER : {
@@ -1015,7 +1058,7 @@ struct ast* eval_ast(struct ast* node) {
                                 // creo setter
                                 struct ast* assign = new_ast_node(N_OP_EQUAL, new_identifier_node(at_name), new_identifier_node("arg"));
                                 struct list_node* param = new_list_node(N_ARG_LIST, new_identifier_node("arg"), NULL);
-                                put_sym(SYM_FUNC, concat_strings(sym_name, "="), assign, param);
+                                put_sym(SYM_FUNC, concat_strings("set_", sym_name), assign, param);
                               };
                               break;
       };
@@ -1049,7 +1092,7 @@ struct ast* eval_ast(struct ast* node) {
                                 // creo setter
                                 struct ast* assign = new_ast_node(N_OP_EQUAL, new_identifier_node(at_name), new_identifier_node("arg"));
                                 struct list_node* param = new_list_node(N_ARG_LIST, new_identifier_node("arg"), NULL);
-                                put_sym(SYM_FUNC, concat_strings(sym_name, "="), assign, param);
+                                put_sym(SYM_FUNC, concat_strings("set_", sym_name), assign, param);
                               };
                               break;
       };

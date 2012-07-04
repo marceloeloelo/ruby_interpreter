@@ -1,0 +1,6 @@
+foo#{x}bar
+hola
+foo aux bar
+foo aux bar
+foo aux bar
+InterpolarionError: more than one variable is not supported

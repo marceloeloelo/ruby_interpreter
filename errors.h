@@ -6,6 +6,7 @@
 /*****************************************/
 
 #include "structures.h"
+#include "ast.h"
 
 int type_error(int, int);
 int no_method_error(char*, struct ast*);
@@ -20,5 +21,6 @@ int file_bad_inclusion_line_error(int);
 int memory_out_of_space_error();
 int invalid_token_error(int, char*);
 int uninitialized_constant_error(char*);
+int interpolation_error();
 
 #endif

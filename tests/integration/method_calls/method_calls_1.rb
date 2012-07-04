@@ -1,10 +1,14 @@
 class Perro
 
-  attr_reader :raza
+  attr_accessor :raza
 
   def initialize(raza)
-	@raza= raza
+	@raza = raza
   end
+
+  #def raza=raza
+  #	@raza= raza
+  #end
 
   def ladrar
 	puts ("guau!")
@@ -45,6 +49,49 @@ a.ruido()
 a.saltar(3)
 a.pluralize_raza()
 puts(a.raza())
-#a.raza= ("Salchicha") Syntax Error!
-#puts(a.raza())
+a.set_raza("Salchicha") #raza= -> ayntax Error!
+puts("La nueva raza es: " + a.raza())
 
+puts(nil)
+
+class Gato
+  def initialize(raza)
+	@raza = raza
+	@razaraza = raza*2
+  end
+
+  def maullar(maullido)
+	puts(maullido)
+  end
+
+  def info
+	puts(@raza)
+	puts(@razaraza)
+  end
+
+  def llamar_metodo_de_perro
+	ladrar
+  end
+
+  def pelear_con_perro(perro)
+	puts("Que miras " + perro.raza() + "!");
+	puts("5!23!@!")
+	perro.ladrar()
+	puts("!$$$%%@!!")
+	maullar("miau!")
+	perro.auyar()
+  end
+
+  def crear_perro(raza_perro)
+	Perro.new(raza_perro)
+  end
+end
+
+g = Gato.new("Siames")
+g.maullar('miau')
+g.info()
+#g.llamar_metodo_de_perro() # Deberia explotar
+g.pelear_con_perro(a)
+g.pelear_con_perro(Perro.new("Bulldog"))
+b = g.crear_perro("Pekines")
+puts(b.raza())
