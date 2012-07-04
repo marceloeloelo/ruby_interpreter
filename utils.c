@@ -17,6 +17,16 @@ int array_size(void* array[]){
 	return i;
 };
 
+int string_is_in_array(void * array[], char * string){
+  int i = 0;
+  int encontre = 0;
+  while(!encontre && i < array_size(array)) {
+    encontre = !strcmp(string, (char *)array[i]);
+    i = i + 1;
+  }
+  return encontre;
+}
+
 char * build_end_of_lines(char* str){
   /* convert end of lines in '\n' chars */
   int i = 0;

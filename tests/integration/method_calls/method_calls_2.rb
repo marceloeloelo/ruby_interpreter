@@ -18,4 +18,7 @@ puts(a.nil?())
 puts(nil.nil?())
 
 #respond_to?
-
+#a = "hola".respond_to?("length")
+#puts(a)
+#a = "hola".respond_to?("fruta")
+#puts(a)

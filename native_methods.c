@@ -1,8 +1,10 @@
 #include "native_methods.h"
 
 char* native_methods[2] = { PUTS, GETS };
-char* instance_native_methods[4] = { LENGTH, EACH_ITERATOR, RESPOND_TO, NIL };
+char* instance_native_methods[4] = { LENGTH, EACH_ITERATOR, RESPOND_TO, NIL_METHOD };
 char* class_native_methods[1] = {NEW};
+// String method support
+char* string_methods_array[3] = { LENGTH, RESPOND_TO, NIL_METHOD };
 
 struct ast* rputs(struct ast* a){
 
@@ -113,6 +115,31 @@ struct ast* rnil(struct method_call_node* m) {
   return new_bool_node(evaluated->node_type == N_NIL);
 };
 
+struct ast* rrespond_to(struct method_call_node* m){
+  struct ast* evaluated = eval_ast(m->left_ast);
+  switch (evaluated->node_type) {
+    case N_STRING_1: {
+                            return new_bool_node(string_is_in_array((void*)string_methods_array, (char*)evaluated));
+                            break;
+    };
+    case N_STRING_2: {
+                            return new_bool_node(string_is_in_array((void*)string_methods_array, (char*)evaluated));
+                            break;
+    };
+    /* case N_ARRAY: {*/
+    /*                        break;*/
+    /* };*/
+    /* case N_ARRAY_ACCESS: {*/
+    /*                        break;*/
+    /* };*/
+     default: {
+                          no_method_error("length", evaluated);
+                          break;
+     };
+  };
+  return new_nil_node();
+}
+
 int is_native_method(struct ast* m){
 	if (m == NULL){
 		return 0;
@@ -172,7 +199,8 @@ struct ast* eval_instance_native_method(struct ast* m) {
       return rlength((struct method_call_node*)m);
     } else if (!strcmp(method_name, EACH_ITERATOR)) {
     } else if (!strcmp(method_name, RESPOND_TO)) {
-    } else if (!strcmp(method_name, NIL)) {
+      return rrespond_to((struct method_call_node*)m);
+    } else if (!strcmp(method_name, NIL_METHOD)) {
       return rnil((struct method_call_node*)m);
     };
 	};

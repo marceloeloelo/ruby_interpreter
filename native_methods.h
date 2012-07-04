@@ -17,7 +17,7 @@
 #define LENGTH        "length"
 #define EACH_ITERATOR "each"
 #define RESPOND_TO    "respond_to?"
-#define NIL			  "nil?"
+#define NIL_METHOD	  "nil?"
 
 int is_native_method(struct ast*);
 int is_class_native_method(struct method_call_node*);
