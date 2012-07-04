@@ -91,25 +91,30 @@ struct ast* rgets() {
   return new_string_one_node(strdup(input_string));
 };
 
-struct ast* rlength(struct method_call_node* m) {
-  struct ast* evaluated = eval_ast(m->left_ast);
-  switch (evaluated->node_type) {
+struct ast* rlength(struct ast* a) {
+  switch (a->node_type) {
     case N_STRING_1: {
-                           return new_integer_node(strlen(string_value(evaluated)));
+                           return new_integer_node(strlen(string_value(a)));
                            break;
     };
     case N_STRING_2: {
-                           return new_integer_node(strlen(string_value(evaluated)));
+                           return new_integer_node(strlen(string_value(a)));
                            break;
     };
-    /* case N_ARRAY: {*/
-    /*                        break;*/
-    /* };*/
-    /* case N_ARRAY_ACCESS: {*/
-    /*                        break;*/
-    /* };*/
+    case N_IDENTIFIER: {
+                           return rlength(eval_ast(a));
+                           break;
+    };
+    case N_ARRAY: {
+                           return new_integer_node(array_tree_size(a->left));
+                           break;
+    };
+    case N_ARRAY_CONTENT: {
+                           return rlength(eval_ast(a->left));
+                           break;
+    };
      default: {
-                          no_method_error("length", evaluated);
+                          no_method_error("length", a);
 		                      break;
 		 };
   };
@@ -211,7 +216,8 @@ struct ast* eval_instance_native_method(struct ast* m) {
     };
 
 		if (!strcmp(method_name, LENGTH)) {
-      return rlength((struct method_call_node*)m);
+      struct method_call_node* mc = (struct method_call_node*)m;
+      return rlength(eval_ast(mc->left_ast));
     } else if (!strcmp(method_name, EACH_ITERATOR)) {
     } else if (!strcmp(method_name, RESPOND_TO)) {
       struct method_call_node* mc = (struct method_call_node*)m;
