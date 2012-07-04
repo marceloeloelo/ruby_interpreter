@@ -106,7 +106,7 @@ comp_class_statement : comp_class_statement statement       { $$ = new_list_node
 
 attr_statement : ATTR_ACCESSOR sym_list end_of_line  { $$ = new_ast_node(N_ATTR_ACCESSOR, $2, NULL); }
                | ATTR_READER sym_list end_of_line    { $$ = new_ast_node(N_ATTR_READER, $2, NULL);   }
-               | ATTR_WRITTER sym_list end_of_line   { $$ = new_ast_node(N_ATTR_WRITTER, $2, NULL);   }
+               | ATTR_WRITTER sym_list end_of_line   { $$ = new_ast_node(N_ATTR_WRITTER, $2, NULL);  }
                ;
 
 sym_list : sym_list COMMA SYMBOL { $$ = new_ast_node(N_SYM_LIST, new_symbol_node($3), $1);   }
@@ -126,40 +126,41 @@ case_remain : case_when case_remain
             | /* empty */
             ;
 
-expression : IDENTIFIER OP_EQUAL expression         { $$ = new_ast_node(N_OP_EQUAL, new_identifier_node($1), $3);     }
-           | IDENTIFIER OP_PLUS_EQ expression       { $$ = new_ast_node(N_OP_PLUS_EQ, new_identifier_node($1), $3);   }
-           | IDENTIFIER OP_MINUS_EQ expression      { $$ = new_ast_node(N_OP_MINUS_EQ, new_identifier_node($1), $3);  }
-           | IDENTIFIER OP_MUL_EQ expression        { $$ = new_ast_node(N_OP_MUL_EQ, new_identifier_node($1), $3);    }
-           | IDENTIFIER OP_DIV_EQ expression        { $$ = new_ast_node(N_OP_DIV_EQ, new_identifier_node($1), $3);    }
-           | IDENTIFIER OP_MODULO_EQ expression     { $$ = new_ast_node(N_OP_MODULO_EQ, new_identifier_node($1), $3); }
-           | expression OP_EXP expression           { $$ = new_ast_node(N_OP_EXP, $1, $3);                            }
-           | expression OP_MUL expression           { $$ = new_ast_node(N_OP_MUL, $1, $3);                            }
-           | expression OP_DIV expression           { $$ = new_ast_node(N_OP_DIV, $1, $3);                            }
-           | expression OP_MODULO expression        { $$ = new_ast_node(N_OP_MODULO, $1, $3);                         }
-           | expression OP_PLUS expression          { $$ = new_ast_node(N_OP_PLUS, $1, $3);                           }
-           | expression OP_MINUS expression         { $$ = new_ast_node(N_OP_MINUS, $1, $3);                          }
-           | expression OP_CMP_GT expression        { $$ = new_ast_node(N_OP_CMP_GT, $1, $3);                         }
-           | expression OP_CMP_GT_EQ expression     { $$ = new_ast_node(N_OP_CMP_GT_EQ, $1, $3);                      }
-           | expression OP_CMP_LE expression        { $$ = new_ast_node(N_OP_CMP_LE, $1, $3);                         }
-           | expression OP_CMP_LE_EQ expression     { $$ = new_ast_node(N_OP_CMP_LE_EQ, $1, $3);                      }
-           | expression OP_CMP_EQ expression        { $$ = new_ast_node(N_OP_CMP_EQ, $1, $3);                         }
-           | expression OP_CMP_EQ_EQ expression     { $$ = new_ast_node(N_OP_CMP_EQ_EQ, $1, $3);                      }
-           | expression OP_CMP_INEQ expression      { $$ = new_ast_node(N_OP_CMP_INEQ, $1, $3);                       }
-           | expression OP_CMP_NEG expression       { $$ = new_ast_node(N_OP_CMP_NEG, $1, $3);                        }
-           | expression OP_CMP_AND expression       { $$ = new_ast_node(N_OP_CMP_AND, $1, $3);                        }
-           | expression OP_CMP_OR expression        { $$ = new_ast_node(N_OP_CMP_OR, $1, $3);                         }
-           | OP_PLUS expression    %prec OP_NOT     { $$ = new_ast_node(N_OP_PLUS_UN, $2, NULL);                      }
-           | OP_MINUS expression   %prec OP_NOT     { $$ = new_ast_node(N_OP_MINUS_UN, $2, NULL);                     }
-           | OP_NOT expression                      { $$ = new_ast_node(N_OP_NOT, $2, NULL);                          }
-           | L_PAREN expression R_PAREN             { $$ = $2;                                                        }
-           | primary                                { $$ = $1;                                                        }
-           | method_call                            { $$ = $1;                                                        }
+expression : IDENTIFIER OP_EQUAL expression              { $$ = new_ast_node(N_OP_EQUAL, new_identifier_node($1), $3);                               }
+           | IDENTIFIER ARRAY_ACCESS OP_EQUAL expression { $$ = new_ast_node(N_OP_EQUAL, new_array_access_node(new_identifier_node($1), $2), $4);    }
+           | IDENTIFIER OP_PLUS_EQ expression            { $$ = new_ast_node(N_OP_PLUS_EQ, new_identifier_node($1), $3);                             }
+           | IDENTIFIER OP_MINUS_EQ expression           { $$ = new_ast_node(N_OP_MINUS_EQ, new_identifier_node($1), $3);                            }
+           | IDENTIFIER OP_MUL_EQ expression             { $$ = new_ast_node(N_OP_MUL_EQ, new_identifier_node($1), $3);                              }
+           | IDENTIFIER OP_DIV_EQ expression             { $$ = new_ast_node(N_OP_DIV_EQ, new_identifier_node($1), $3);                              }
+           | IDENTIFIER OP_MODULO_EQ expression          { $$ = new_ast_node(N_OP_MODULO_EQ, new_identifier_node($1), $3);                           }
+           | expression OP_EXP expression                { $$ = new_ast_node(N_OP_EXP, $1, $3);                                                      }
+           | expression OP_MUL expression                { $$ = new_ast_node(N_OP_MUL, $1, $3);                                                      }
+           | expression OP_DIV expression                { $$ = new_ast_node(N_OP_DIV, $1, $3);                                                      }
+           | expression OP_MODULO expression             { $$ = new_ast_node(N_OP_MODULO, $1, $3);                                                   }
+           | expression OP_PLUS expression               { $$ = new_ast_node(N_OP_PLUS, $1, $3);                                                     }
+           | expression OP_MINUS expression              { $$ = new_ast_node(N_OP_MINUS, $1, $3);                                                    }
+           | expression OP_CMP_GT expression             { $$ = new_ast_node(N_OP_CMP_GT, $1, $3);                                                   }
+           | expression OP_CMP_GT_EQ expression          { $$ = new_ast_node(N_OP_CMP_GT_EQ, $1, $3);                                                }
+           | expression OP_CMP_LE expression             { $$ = new_ast_node(N_OP_CMP_LE, $1, $3);                                                   }
+           | expression OP_CMP_LE_EQ expression          { $$ = new_ast_node(N_OP_CMP_LE_EQ, $1, $3);                                                }
+           | expression OP_CMP_EQ expression             { $$ = new_ast_node(N_OP_CMP_EQ, $1, $3);                                                   }
+           | expression OP_CMP_EQ_EQ expression          { $$ = new_ast_node(N_OP_CMP_EQ_EQ, $1, $3);                                                }
+           | expression OP_CMP_INEQ expression           { $$ = new_ast_node(N_OP_CMP_INEQ, $1, $3);                                                 }
+           | expression OP_CMP_NEG expression            { $$ = new_ast_node(N_OP_CMP_NEG, $1, $3);                                                  }
+           | expression OP_CMP_AND expression            { $$ = new_ast_node(N_OP_CMP_AND, $1, $3);                                                  }
+           | expression OP_CMP_OR expression             { $$ = new_ast_node(N_OP_CMP_OR, $1, $3);                                                   }
+           | OP_PLUS expression    %prec OP_NOT          { $$ = new_ast_node(N_OP_PLUS_UN, $2, NULL);                                                }
+           | OP_MINUS expression   %prec OP_NOT          { $$ = new_ast_node(N_OP_MINUS_UN, $2, NULL);                                               }
+           | OP_NOT expression                           { $$ = new_ast_node(N_OP_NOT, $2, NULL);                                                    }
+           | L_PAREN expression R_PAREN                  { $$ = $2;                                                                                  }
+           | primary                                     { $$ = $1;                                                                                  }
+           | method_call                                 { $$ = $1;                                                                                  }
            ;
 
-primary    : literal                     { $$ = $1;                            }
-           | IDENTIFIER                  { $$ = new_identifier_node($1);       }
-           | NIL                         { $$ = new_nil_node();                }
-           | array                       { $$ = $1;                            }
+primary    : literal                     { $$ = $1;                                                 }
+           | IDENTIFIER                  { $$ = new_identifier_node($1);                            }
+           | NIL                         { $$ = new_nil_node();                                     }
+           | array                       { $$ = new_ast_node(N_ARRAY, $1, NULL);                    }
            | IDENTIFIER ARRAY_ACCESS     { $$ = new_array_access_node(new_identifier_node($1), $2); }
            ;
 
