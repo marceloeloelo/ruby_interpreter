@@ -154,7 +154,7 @@ struct ast* rrespond_to(struct ast* a, char* method_name){
                             return rrespond_to(eval_ast(a->left), strdup(method_name));
     };
     default: {
-                            no_method_error("length", a);
+                            no_method_error("respond_ro?", a);
                             break;
               };
   }
