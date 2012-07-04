@@ -38,3 +38,5 @@ end
 c = Custom.new()
 puts(c.respond_to?("method_1"))
 puts(c.respond_to?("fruta"))
+puts(c.respond_to?("fruta", "asda"))
+

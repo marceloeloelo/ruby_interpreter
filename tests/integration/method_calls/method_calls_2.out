@@ -16,3 +16,4 @@ true
 false
 true
 false
+ArgumentError: wrong number of arguments (2 for 1)
