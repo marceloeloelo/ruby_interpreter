@@ -1,16 +1,16 @@
 #include "native_methods.h"
 
 char* native_methods[2] = { PUTS, GETS };
-char* instance_native_methods[4] = { LENGTH, EACH_ITERATOR, RESPOND_TO, NIL_METHOD };
+char* instance_native_methods[5] = { LENGTH, EACH_ITERATOR, RESPOND_TO, NIL_METHOD, OBJECT_ID };
 char* class_native_methods[1] = {NEW};
 // String method support
-char* string_methods_array[3]  = { LENGTH, RESPOND_TO, NIL_METHOD };
+char* string_methods_array[4]  = { LENGTH, RESPOND_TO, NIL_METHOD, OBJECT_ID };
 // Array method support
-char* array_methods_array[3]   = { LENGTH, RESPOND_TO, NIL_METHOD };
+char* array_methods_array[4]   = { LENGTH, RESPOND_TO, NIL_METHOD, OBJECT_ID };
 // Integer method support
-char* integer_methods_array[2] = { RESPOND_TO, NIL_METHOD };
+char* integer_methods_array[3] = { RESPOND_TO, NIL_METHOD, OBJECT_ID };
 // Bool method support
-char* bool_methods_array[2]    = { RESPOND_TO, NIL_METHOD };
+char* bool_methods_array[3]    = { RESPOND_TO, NIL_METHOD, OBJECT_ID };
 
 struct ast* rputs(struct ast* a){
 
@@ -53,6 +53,7 @@ struct ast* rputs(struct ast* a){
     printf("%s\n", string_value(a));
 
   } else if (a->node_type == N_STRING_2) {
+
     char * str = malloc(sizeof( strlen(string_value(a)) ));
     strcpy(str, string_value(a));
     str = build_end_of_lines(str);
@@ -126,6 +127,11 @@ struct ast* rnil(struct method_call_node* m) {
   return new_bool_node(evaluated->node_type == N_NIL);
 };
 
+struct ast* robject_id(struct method_call_node* m) {
+  struct ast* evaluated = eval_ast(m->left_ast);
+  return new_integer_node((long)evaluated);
+};
+
 struct ast* rrespond_to(struct ast* a, char* method_name){
   switch (a->node_type) {
     case N_STRING_1: {
@@ -146,7 +152,7 @@ struct ast* rrespond_to(struct ast* a, char* method_name){
     case N_OBJECT : {
                             struct object_node* o = (struct object_node*) a;
                             return new_bool_node(NULL != find_method_for_class(o->class_ptr->name, strdup(method_name)));
-    }
+    };
     case N_IDENTIFIER: {
                             return rrespond_to(eval_ast(a), strdup(method_name));
     };
@@ -228,6 +234,8 @@ struct ast* eval_instance_native_method(struct ast* m) {
       return rrespond_to(eval_ast(mc->left_ast), strdup(string_value(eval_ast(arg_node->arg))));
     } else if (!strcmp(method_name, NIL_METHOD)) {
       return rnil((struct method_call_node*)m);
+    } else if (!strcmp(method_name, OBJECT_ID)) {
+      return robject_id((struct method_call_node*)m);
     };
 	};
   return new_nil_node();

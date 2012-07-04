@@ -18,6 +18,7 @@
 #define EACH_ITERATOR "each"
 #define RESPOND_TO    "respond_to?"
 #define NIL_METHOD	  "nil?"
+#define OBJECT_ID	  "object_id"
 
 int is_native_method(struct ast*);
 int is_class_native_method(struct method_call_node*);

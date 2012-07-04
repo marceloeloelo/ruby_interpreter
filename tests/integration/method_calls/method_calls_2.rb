@@ -16,6 +16,12 @@ end
 a = Algo.new()
 puts(a.nil?())
 puts(nil.nil?())
+a = [1, 2, 3]
+a.nil?()
+puts(a.nil?())
+b = a[0]
+b.nil?()
+puts(b.nil?())
 
 #respond_to?
 a = "hola".respond_to?("length")
