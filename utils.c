@@ -28,6 +28,9 @@ int string_is_in_array(void * array[], char * string){
 }
 
 char * build_end_of_lines(char* str){
+  if (!strcmp(str, "")){
+    return "";
+  }
   /* convert end of lines in '\n' chars */
   int i = 0;
   int j = i;
