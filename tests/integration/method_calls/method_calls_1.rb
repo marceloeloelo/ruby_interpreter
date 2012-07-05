@@ -6,10 +6,6 @@ class Perro
 	@raza = raza
   end
 
-  #def raza=raza
-  #	@raza= raza
-  #end
-
   def ladrar
 	puts ("guau!")
   end

@@ -3,21 +3,23 @@ class Perro
 
   def initialize(raza, nombre)
     # atributos
-    # @raza = raza
-    # @nombre = nombre
+    @raza = raza
+    @nombre = nombre
   end
 
   # metodo ladrar
   def ladrar
-  #  puts 'Guau! Guau!'
+    puts('Guau! Guau!')
   end
 
   # metodo saludar
   def saludar
-  #  puts "Mi raza es #{@raza} y mi nombre es #{@nombre}"
+    raza = @raza
+    puts("Mi raza es #{raza}")
   end
 end
 
 a = Perro.new("Labrador", "Chicho")
 #puts(a)
 #puts(Perro.new())
+puts(a.saludar())

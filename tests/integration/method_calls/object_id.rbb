@@ -9,19 +9,6 @@ puts(b)
 puts("")
 
 a = [1, 2, 3, 4]
-b = a.object_id()
-puts(b)
-b = a.object_id()
-puts(b)
-
-puts("")
-
 c = a[0]
 puts(c.object_id())
 puts(c.object_id())
-
-puts("")
-
-puts(1.object_id())
-puts(2.object_id())
-puts(1.object_id())
