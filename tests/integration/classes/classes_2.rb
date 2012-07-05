@@ -41,7 +41,9 @@ class Auto
 
 end
 
-##### Crear Auto #####
+###############################
+######### Crear Auto ##########
+###############################
 puts("")
 puts("")
 auto = Auto.new("Chevrolet", 1998)
@@ -49,14 +51,18 @@ auto = Auto.new("Chevrolet", 1998)
 puts(auto.marca())
 auto.info()
 
+###############################
 #### Setear marca y duenio ####
+###############################
 puts("")
 puts("")
 auto.set_marca("Ford")
 auto.set_duenio("Juan Gonzalez")
 auto.info()
 
+###############################
 #### Checkeando respond_to ####
+###############################
 puts("")
 puts("")
 if (auto.respond_to?('set_anio'))
@@ -64,14 +70,17 @@ if (auto.respond_to?('set_anio'))
 else
 	puts("BIEN")
 end
-
-#### Seteando colores ####
+###############################
+###### Seteando colores #######
+###############################
 puts("")
 puts("")
 auto.set_colores_disponibles(["Verde", "Amarillo"])
 puts(auto.colores_disponibles())
 
-#### Creo una nueva clase ####
+###############################
+#### Creo una nueva clase #####
+###############################
 puts("")
 puts("")
 class Rueda
@@ -93,5 +102,5 @@ end
 rueda1 = Rueda.new(1)
 rueda2 = Rueda.new(2)
 
-auto.poner_rueda(rueda2) # No
-auto.poner_rueda(rueda1) # Si
+auto.poner_rueda(rueda2) # No se pone
+auto.poner_rueda(rueda1) # Si se pone
