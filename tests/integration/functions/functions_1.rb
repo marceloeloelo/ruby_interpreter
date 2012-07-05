@@ -21,8 +21,7 @@ end
 
 x = y = z = 5
 
-method_1
-#method_1()
+method_1()
 
 method_2(x)
 puts(method_2(x))
