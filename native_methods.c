@@ -160,11 +160,59 @@ struct ast* rrespond_to(struct ast* a, char* method_name){
                             return rrespond_to(eval_ast(a->left), strdup(method_name));
     };
     default: {
-                            no_method_error("respond_ro?", a);
+                            no_method_error("respond_to?", a);
                             break;
               };
   }
 }
+
+struct ast* reach(struct ast* a, struct ast* block) {
+
+  if (a->node_type == N_ARRAY) {
+
+    if (block != NULL) {
+
+      struct ast* arr = (struct ast*) a->left;
+      struct opt_block_node* b = (struct opt_block_node*) block;
+
+      // obtengo arreglo a partir de Array
+      int arr_size = array_tree_size(arr);
+
+      struct ast* result[arr_size];
+
+      struct ast* ptr = arr;
+      int i;
+      for (i = (arr_size - 1); i > -1; i--) {
+        result[i] = ptr->left;
+        ptr = ptr->right;
+      };
+
+      // itero sobre array
+      for (i = 0; i < arr_size; i++) {
+        push_scope();
+
+        // put first arg to scope
+        if (b->opt_ids != NULL) {
+          put_sym(SYM_VAR, string_value(b->opt_ids->arg), result[i], NULL);
+        };
+
+        // eval block stmts
+        eval_ast(b->stmts);
+
+        pop_scope();
+      }; 
+
+      return a;
+
+    } else {
+      block_is_required_error(EACH_ITERATOR);
+    };
+
+  } else {
+    no_method_error(EACH_ITERATOR, a);
+  };  
+
+};
 
 int is_native_method(struct ast* m){
 	if (m == NULL){
@@ -217,6 +265,7 @@ struct ast* eval_native_method(struct ast* m){
 struct ast* eval_instance_native_method(struct ast* m) {
 	if (m != NULL){
     char* method_name;
+
     if (m->node_type == N_METHOD_CALL_1) {
       method_name = strdup(((struct method_call_node*)m)->method_name);
     };
@@ -224,7 +273,11 @@ struct ast* eval_instance_native_method(struct ast* m) {
 		if (!strcmp(method_name, LENGTH)) {
       struct method_call_node* mc = (struct method_call_node*)m;
       return rlength(eval_ast(mc->left_ast));
+
     } else if (!strcmp(method_name, EACH_ITERATOR)) {
+      struct method_call_node* mc = (struct method_call_node*)m;
+      return reach(eval_ast(mc->left_ast), mc->opt_block);
+
     } else if (!strcmp(method_name, RESPOND_TO)) {
       struct method_call_node* mc = (struct method_call_node*)m;
       struct list_node* arg_node = mc->args;
@@ -232,8 +285,10 @@ struct ast* eval_instance_native_method(struct ast* m) {
         wrong_arguments_error(list_length(arg_node), 1);
       }
       return rrespond_to(eval_ast(mc->left_ast), strdup(string_value(eval_ast(arg_node->arg))));
+
     } else if (!strcmp(method_name, NIL_METHOD)) {
       return rnil((struct method_call_node*)m);
+
     } else if (!strcmp(method_name, OBJECT_ID)) {
       return robject_id((struct method_call_node*)m);
     };

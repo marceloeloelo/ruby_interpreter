@@ -56,6 +56,11 @@ int no_method_error(char* method, struct ast* ast) {
       printf("NoMethodError: undefined method `%s' for %s:%s\n", method, (b->value == 1) ? "true" : "false", type_name(b->node_type));  
       break;
     };
+    case N_ARRAY : {
+      struct bool_node* b = (struct bool_node*) ast;
+      printf("NoMethodError: undefined method `%s' for Array Object\n", method);  
+      break;
+    };
     case N_OBJECT : {
       struct object_node* o = (struct object_node*) ast;
       printf("NoMethodError: undefined method `%s' for <#%s:%p>\n", method, (char*)o->class_ptr->name, (void *)o);
@@ -123,5 +128,10 @@ int uninitialized_constant_error(char* constant) {
 
 int interpolation_error() {
   printf( "InterpolarionError: more than one variable is not supported\n");
+  exit(1);
+};
+
+int block_is_required_error(char* method_name) {
+  printf( "BlockError: a block is required for method `%s'\n", method_name);
   exit(1);
 };
