@@ -41,39 +41,39 @@ class Auto
 
 end
 
-puts("")
-puts("")
 ##### Crear Auto #####
+puts("")
+puts("")
 auto = Auto.new("Chevrolet", 1998)
 #puts(auto)
 puts(auto.marca())
 auto.info()
 
-puts("")
-puts("")
 #### Setear marca y duenio ####
+puts("")
+puts("")
 auto.set_marca("Ford")
 auto.set_duenio("Juan Gonzalez")
 auto.info()
 
-puts("")
-puts("")
 #### Checkeando respond_to ####
+puts("")
+puts("")
 if (auto.respond_to?('set_anio'))
 	puts("MAL")
 else
 	puts("BIEN")
 end
 
-puts("")
-puts("")
 #### Seteando colores ####
+puts("")
+puts("")
 auto.set_colores_disponibles(["Verde", "Amarillo"])
 puts(auto.colores_disponibles())
 
-puts("")
-puts("")
 #### Creo una nueva clase ####
+puts("")
+puts("")
 class Rueda
 	attr_accessor :rodado
 
