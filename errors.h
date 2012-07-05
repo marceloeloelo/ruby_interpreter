@@ -22,5 +22,6 @@ int memory_out_of_space_error();
 int invalid_token_error(int, char*);
 int uninitialized_constant_error(char*);
 int interpolation_error();
+int block_is_required_error(char*);
 
 #endif
